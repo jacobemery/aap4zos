@@ -3,9 +3,6 @@
   gather_facts: false
   tasks:
 
-    - name: Gather all z/OS facts.
-      ibm.ibm_zos_core.zos_gather_facts:
-
     - name: Gather only a subset of z/OS facts about the master catalog.
       ibm.ibm_zos_core.zos_gather_facts:
         gather_subset:
