@@ -2,6 +2,7 @@
   hosts: zos_host
   gather_facts: false
   tasks:
+  
     - name: Ping z/OS server using zos_ping module via SSH.
       tags: ping, zos_ping
       ibm.ibm_zos_core.zos_ping:
