@@ -2,9 +2,9 @@
   hosts: zos_host
   gather_facts: true
   tasks:
-  
+
     - name: Gather only a subset of z/OS facts about the master catalog.
-      zos_gather_facts:
+      ibm.ibm_zos_core.zos_gather_facts:
         gather_subset:
           - 'ipl'
         filter:
@@ -17,7 +17,7 @@
           - "master catalog volser: {{ ansible_facts.master_catalog_volser }}"
 
     - name: Gather all z/OS facts.
-      zos_gather_facts:
+      ibm.ibm_zos_core.zos_gather_facts:
 
     - name: Print only CPC and IODF info from gathered z/OS facts.
       ansible.builtin.debug:
