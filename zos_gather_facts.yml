@@ -1,6 +1,6 @@
 - name: Gather z/OS-specific facts.
   hosts: zos_host
-  gather_facts: true
+  gather_facts: false
   tasks:
 
     - name: Gather only a subset of z/OS facts about the master catalog.
