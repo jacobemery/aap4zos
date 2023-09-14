@@ -11,7 +11,7 @@
       register: dependency_paths
 
     - set_fact:
-        potential_paths: "{{ dependency_paths|potential_paths }}"
+        potential_paths: "{{ dependency_paths.stdout_lines|potential_paths }}"
 
     - name: Assert potential python installs were found
       fail:
