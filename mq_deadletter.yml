@@ -1,0 +1,20 @@
+---
+- name: Check MQ deadletter queue.
+  hosts: zos_host
+  gather_facts: false
+  tasks:
+
+    - name: Issue display command to MQ deadletter queue.
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "ZMQ1 DIS QLOCAL( ZMQ1.DEAD.QUEUE )"
+        verbose: false
+      register: display_output
+      
+    - name: Output response from display command
+      debug:
+        msg: "{{ display_output.content[18].strip() }}"
+
+    - name: Fail if deadletter queue is not empty.
+      fail: 
+        msg: "Deadletter queue is not empty."
+      when: display_output.content[18].strip() != "CURDEPTH(0)"
