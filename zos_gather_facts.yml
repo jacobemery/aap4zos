@@ -3,6 +3,9 @@
   gather_facts: false
   tasks:
 
+    - name: Gather all z/OS facts.
+      ibm.ibm_zos_core.zos_gather_facts:
+
     - name: Gather only a subset of z/OS facts about the master catalog.
       ibm.ibm_zos_core.zos_gather_facts:
         gather_subset:
@@ -15,9 +18,6 @@
         msg:
           - "master catalog dsn: {{ ansible_facts.master_catalog_dsn }}"
           - "master catalog volser: {{ ansible_facts.master_catalog_volser }}"
-
-    - name: Gather all z/OS facts.
-      ibm.ibm_zos_core.zos_gather_facts:
 
     - name: Print only CPC and IODF info from gathered z/OS facts.
       ansible.builtin.debug:
