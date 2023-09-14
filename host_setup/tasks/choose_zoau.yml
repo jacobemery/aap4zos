@@ -62,6 +62,7 @@
         ansible_python_interpreter: "{{ chosen_python.get('interpreter') }}"
       environment: "{{ environment_vars }}"
       register: zos_data_set_response
+      failed_when: false
 
     - name: Set ZOAU installation if completed successfully
       ansible.builtin.set_fact:
