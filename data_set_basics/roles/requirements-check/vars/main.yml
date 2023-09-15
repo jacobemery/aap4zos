@@ -1,6 +1,0 @@
----
-# vars file for requirements-check
-ansible_version_checks: []
-temp_version: None
-collection_paths: [/home/runner/.ansible/collections]
-dict2: []

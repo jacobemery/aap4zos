@@ -1,0 +1,21 @@
+################################################################################
+# © Copyright IBM Corporation 2020
+# Apache License, Version 2.0 (see https://opensource.org/licenses/Apache-2.0)
+################################################################################
+
+galaxy_info:
+  author: "Asif Mahmud (@asifmahmud)"
+  description: Copy, Find, Sort and Fetch Data Sets on z/OS using Ansible
+  company: IBM
+  license: "Apache License, Version 2.0"
+  min_ansible_version: "2.9"
+  galaxy_tags:
+    - z
+    - zos
+    - z_os
+    - ibm_zos_core
+    - data_set
+    - zos_copy
+    - zos_fetch
+    - zos_find
+    - zos_mvs_raw

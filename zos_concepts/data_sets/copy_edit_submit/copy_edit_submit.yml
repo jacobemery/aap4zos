@@ -1,0 +1,118 @@
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+###############################################################################
+# This sample playbook demonstrates how to copy a directory to a PDS, edit a
+# member within the PDS and submit PDS member containing JCL.
+#
+# Usage:
+#  ansible-playbook -i <inventory> <playbook>
+#
+# Example:
+#  ansible-playbook -i inventories copy_edit_submit.yml
+#
+#  When running this playbook, review the comments on how ths sample will
+#  interact with your target, ensure you have the required authority and
+#  permissions such as writing the the target directories or creating data sets.
+#
+# Requirements:
+#     - IBM z/OS core collection 1.2.0 or later
+#
+###############################################################################
+
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    # ##########################################################################
+    # Generate a temporary data set name
+    # ##########################################################################
+    - name: Create temp data set name
+      command: "mvstmp {{ ansible_user | upper }}"
+      register: tmp_ds
+
+    - set_fact:
+        tmp_data_set: "{{ tmp_ds.stdout }}"
+    # ##########################################################################
+    # Modules: zos_copy, zos_lineinfile, zos_mvs_raw, zos_job_submit
+    # ##########################################################################
+    # +-------------------------------------------------------------------------
+    # | - Using zos_copy, copy directory {{ playbook_dir }}/files to z/OS
+    # |   managed node into a data set, each file will be a data set member
+    # | - Using zos_copy, make a copy of member UPTIME JCL as PSA JCL
+    # | - Using zos_lineinfile, edit JCL PSA replacing the uptime command with a
+    # |   ps -A command to show all processes in USS
+    # | - Using zos_job_submit, submit both JCLs, UPTIME and PSA
+    # | - Using zos_data_set, delete the copied data set on z/OS host
+    # +-------------------------------------------------------------------------
+    - name: "Copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}"
+      zos_copy:
+        src: "{{ playbook_dir }}/files"
+        dest: "{{ tmp_data_set }}"
+        encoding:
+          from: ISO8859-1
+          to: IBM-1047
+      register: result_copy_dir
+
+    - name: "Response for copy local directory {{ playbook_dir }}/files to {{ tmp_data_set }}."
+      debug:
+        var: result_copy_dir
+
+    - name: "Copy PDS member {{ tmp_data_set }}(UPTIME) to a new PDS member {{ tmp_data_set }}(PSA)"
+      zos_copy:
+        src: "{{ tmp_data_set }}(UPTIME)"
+        dest: "{{ tmp_data_set }}(PSA)"
+        remote_src: true
+
+    - name: "Edit JCL PSA job card on z/OS managed node."
+      zos_lineinfile:
+        src: "{{ tmp_data_set }}(PSA)"
+        state: present
+        regexp: "//UPTIME    JOB (T043JM,JM00,1,0,0,0),'UPTIME - JRM',"
+        line: "//PSA    JOB (T043JM,JM00,1,0,0,0),'PSA - JRM',"
+
+    - name: "Edit JCL PSA step-name on z/OS managed node."
+      zos_lineinfile:
+        src: "{{ tmp_data_set }}(PSA)"
+        state: present
+        regexp: "//UPTIME  EXEC PGM=BPXBATCH"
+        line: "//PSA  EXEC PGM=BPXBATCH"
+
+    - name: "Edit JCL PSA USS command on z/OS managed node."
+      zos_lineinfile:
+        src: "{{ tmp_data_set }}(PSA)"
+        state: present
+        regexp: "SH uptime"
+        line: "SH ps -A"
+
+    - name: "Submit the JCL {{ tmp_data_set }}(PSA)"
+      zos_job_submit:
+        src: "{{ tmp_data_set }}(PSA)"
+        location: DATA_SET
+        wait: true
+      register: result_submit_psa
+
+    - name: "Response for submitting JCL {{ tmp_data_set }}(PSA)"
+      debug:
+        var: result_submit_psa
+
+    - name: "Submit the JCL {{ tmp_data_set }}(UPTIME)"
+      zos_job_submit:
+        src: "{{ tmp_data_set }}(UPTIME)"
+        location: DATA_SET
+        wait: true
+      register: result_submit_uptime
+
+    - name: "Response for submitting JCL {{ tmp_data_set }}(UPTIME)"
+      debug:
+        var: result_submit_uptime
+
+    - name: "Delete data set {{ tmp_data_set }}"
+      zos_data_set:
+        name: "{{ tmp_data_set }}"
+        state: absent
