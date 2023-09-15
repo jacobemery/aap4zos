@@ -1,6 +1,7 @@
 - name: Gather z/OS-specific facts.
   hosts: zos_host
   gather_facts: false
+  environment: "{{ environment_vars }}"
   tasks:
 
     - name: Gather only a subset of z/OS facts about the master catalog.
