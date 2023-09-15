@@ -41,7 +41,7 @@
 - name: Populate temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
   ansible.builtin.set_fact:
     temp_collection_paths_dict: "{{temp_collection_paths_dict | default([]) + [{'collection_path':item.stat.path,'installed_version':None}  ]}}"
-  when: item.stat.exists
+  # when: item.stat.exists
   with_items: "{{collection_paths_status.results}}"
 
 - name: DEBUG(-v) Display temporary dictionary `temp_collection_paths_dict` with COLLECTIONS_PATHS
