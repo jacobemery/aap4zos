@@ -23,7 +23,7 @@
 
 - name: Set fact `collection_paths` with Ansible COLLECTIONS_PATHS
   ansible.builtin.set_fact:
-    collection_paths: "{{ ansible_collections_paths.stdout if ansible_collections_paths.stdout != \"\" else ['~/.ansible/collections'] }}"
+    collection_paths: "{{ ansible_collections_paths if ansible_collections_paths.stdout != \"\" else ['~/.ansible/collections'] }}"
 
 - name: Evaluate Ansible COLLECTIONS_PATHS existance and status
   ansible.builtin.stat:
