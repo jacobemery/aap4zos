@@ -21,7 +21,7 @@
 #  ansible-playbook -i "mysystem.to.connect.com," zos_ping.yml
 
 ---
-- hosts: all
+- hosts: zos_host
   collections:
     - ibm.ibm_zos_core
   gather_facts: false
