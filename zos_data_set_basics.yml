@@ -85,6 +85,9 @@
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
+        dest_data_set:
+          record_format: FB
+          record_length: 80
       register: result
 
     - name: Response for copying USS file to data set
