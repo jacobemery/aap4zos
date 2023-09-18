@@ -95,7 +95,7 @@
     - name: Create an empty USS file at {{ tgt_tmp_dir }}/HELLO
       file:
         path: "{{ tgt_tmp_dir }}/HELLO"
-        state: touch
+        state: absent
       register: result
 
     - name: Response for USS file creation
@@ -106,7 +106,6 @@
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
-        force: true
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
@@ -119,7 +118,6 @@
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
-        force: true
       register: result
 
     - name: Response for copying USS file to data set
