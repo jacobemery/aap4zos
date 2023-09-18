@@ -106,6 +106,7 @@
       ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
+        force: true
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
