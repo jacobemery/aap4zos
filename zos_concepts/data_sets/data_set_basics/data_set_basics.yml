@@ -84,7 +84,7 @@
         state: present
         replace: true
         format: fb
-        record_length: 120
+        record_length: 100
         size: 5M
       register: result
 
@@ -119,7 +119,6 @@
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
-        force: true
       register: result
 
     - name: Response for copying USS file to data set
