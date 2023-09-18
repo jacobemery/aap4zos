@@ -6,10 +6,6 @@
 
     - name: Gather only a subset of z/OS facts about the master catalog.
       ibm.ibm_zos_core.zos_gather_facts:
-        gather_subset:
-          - 'ipl'
-        filter:
-          - 'master*'
 
     - name: Print gathered facts about the master catalog.
       ansible.builtin.debug:
