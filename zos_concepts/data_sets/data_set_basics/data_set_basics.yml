@@ -32,6 +32,17 @@
 ###############################################################################
 
 ---
+
+- hosts: localhost
+  tasks:
+    - name: Cat ansible.cfg
+      command: "cat /runner/project/ansible.cfg"
+      register: config
+
+    - name: print ansible.cfg
+      debug:
+        msg: "{{ config.stdout }}"
+
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
