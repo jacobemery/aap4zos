@@ -20,7 +20,7 @@
     - name: Print only CPC and IODF info from gathered z/OS facts.
       ansible.builtin.debug:
         msg:
-          - "manufacturer: {{ cpc_nd_manufacturer }}"
+          # - "manufacturer: {{ cpc_nd_manufacturer }}"
           - "model: {{ cpc_nd_model }}"
           - "plant: {{ cpc_nd_plant }}"
           - "iodf name: {{ iodf_name }}"
