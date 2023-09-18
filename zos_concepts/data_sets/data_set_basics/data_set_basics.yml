@@ -130,6 +130,7 @@
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
+        force: true
       register: result
 
     - name: Response for copying USS file to data set
@@ -164,6 +165,7 @@
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         remote_src: true
+        force: true
       register: result
 
     - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
