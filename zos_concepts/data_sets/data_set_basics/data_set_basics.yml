@@ -65,7 +65,7 @@
           - "pds name - {{ pds_name }}"
 
     ############################################################################
-    # Modules zos_data_set, zos_fetch
+    # Modules zos_copy, zos_data_set, zos_fetch
     ############################################################################
     # +-------------------------------------------------------------------------
     # | 1. Create a sequential data set
@@ -78,7 +78,7 @@
     # +-------------------------------------------------------------------------
 
     - name: Create a sequential data set
-      ibm.ibm_zos_core.zos_data_set:
+      zos_data_set:
         name: "{{ data_set_name }}"
         type: seq
         state: present
@@ -103,7 +103,7 @@
         msg: "{{ result }}"
 
     - name: Copy HELLO.jcl from project to USS file.
-      ibm.ibm_zos_core.zos_copy:
+      zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
       register: result
@@ -114,7 +114,7 @@
         msg: "{{ result }}"
 
     - name: Copy the USS file to the sequential data set.
-      ibm.ibm_zos_core.zos_copy:
+      zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
@@ -125,7 +125,7 @@
         msg: "{{ result }}"
 
     - name: Create a PDS
-      ibm.ibm_zos_core.zos_data_set:
+      zos_data_set:
         name: "{{ pds_name }}"
         type: pds
         size: 5M
@@ -138,7 +138,7 @@
         msg: "{{ result }}"
 
     - name: Remove the target PDS member if it exists, for idempotency.
-      ibm.ibm_zos_core.zos_data_set:
+      zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: MEMBER
         state: absent
@@ -149,7 +149,7 @@
         msg: "{{ result }}"
 
     - name: Copy the sequential data set to PDS member
-      ibm.ibm_zos_core.zos_copy:
+      zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         remote_src: true
@@ -160,7 +160,7 @@
         msg: "{{ result }}"
 
     - name: Delete the data sets
-      ibm.ibm_zos_core.zos_data_set:
+      zos_data_set:
         batch:
           - name: "{{ data_set_name }}"
             state: absent
@@ -176,3 +176,19 @@
       file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
+
+    - name: List tasks this playbook completed:
+      debug:
+        msg: |
+          ############################################################################
+          # Modules zos_copy, zos_data_set, zos_fetch
+          ############################################################################
+          # +-------------------------------------------------------------------------
+          # | 1. Create a sequential data set
+          # | 2. Create a USS file and populate it with some data
+          # | 3. Copy the USS file to the sequential data set
+          # | 4. Create a PDS and a member within the PDS
+          # | 5. Copy the sequential data set to the PDS member
+          # | 6. Create a new PDS, replacing the existing one
+          # | 7. Delete all data sets that were created during playbook execution
+          # +-------------------------------------------------------------------------
