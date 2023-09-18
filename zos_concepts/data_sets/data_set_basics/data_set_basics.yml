@@ -84,7 +84,7 @@
         state: present
         replace: true
         format: fb
-        record_length: 80
+        record_length: 120
         size: 5M
       register: result
 
