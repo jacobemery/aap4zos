@@ -78,7 +78,7 @@
     # +-------------------------------------------------------------------------
 
     - name: Create a sequential data set
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: seq
         state: present
@@ -102,12 +102,15 @@
       debug:
         msg: "{{ result }}"
 
-    - name: zos_copy
-      zos_copy:
+    - name: Copy HELLO.jcl from project to USS file.
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
+        dest_data_set:
+          type: SEQ
+          record_format: FB
+          record_length: 100
         force: true
-       # remote_src: yes
       register: result
 
     - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
@@ -115,8 +118,8 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Copy the USS file to the sequential data set
-      zos_copy:
+    - name: Copy the USS file to the sequential data set.
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         dest_data_set:
@@ -132,7 +135,7 @@
         msg: "{{ result }}"
 
     - name: Create a PDS
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}"
         type: pds
         size: 5M
@@ -145,7 +148,7 @@
         msg: "{{ result }}"
 
     - name: Create a PDS member
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: MEMBER
       register: result
@@ -155,7 +158,7 @@
         msg: "{{ result }}"
 
     - name: Copy the sequential data set to PDS member
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         dest_data_set:
@@ -171,7 +174,7 @@
         msg: "{{ result }}"
 
     - name: Delete the data sets
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         batch:
           - name: "{{ data_set_name }}"
             state: absent
