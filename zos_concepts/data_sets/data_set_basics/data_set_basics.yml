@@ -120,6 +120,7 @@
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         dest_data_set:
+          type: SEQ
           record_format: FB
           record_length: 100
         remote_src: true
@@ -158,6 +159,7 @@
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         dest_data_set:
+          type: MEMBER
           record_format: FB
           record_length: 100
         remote_src: true
