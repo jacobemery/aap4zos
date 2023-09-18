@@ -116,6 +116,7 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
+        force: true
        # remote_src: yes
       register: result
 
