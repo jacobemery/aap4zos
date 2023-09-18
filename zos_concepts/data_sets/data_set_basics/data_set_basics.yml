@@ -137,10 +137,11 @@
       debug:
         msg: "{{ result }}"
 
-    - name: Create a PDS member
+    - name: Remove the target PDS member if it exists, for idempotency.
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: MEMBER
+        state: absent
       register: result
 
     - name: Response for creating the PDS member
