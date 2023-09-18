@@ -97,7 +97,7 @@
         type: pds
         size: 5M
         format: fba
-        record_length: 100
+        record_length: 200
       register: result
 
     - name: Response for creating the PDS
