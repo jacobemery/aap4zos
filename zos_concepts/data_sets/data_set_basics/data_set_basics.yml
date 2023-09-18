@@ -107,7 +107,7 @@
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
         dest_data_set:
-          type: SEQ
+          type: BASIC
           record_format: FB
           record_length: 100
         force: true
