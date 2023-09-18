@@ -119,6 +119,9 @@
       zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
+        dest_data_set:
+          record_format: FB
+          record_length: 100
         remote_src: true
         force: true
       register: result
