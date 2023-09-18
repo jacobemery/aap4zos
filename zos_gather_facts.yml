@@ -4,7 +4,7 @@
   environment: "{{ environment_vars }}"
   tasks:
 
-    - name: Gather only a subset of z/OS facts about the master catalog.
+    - name: Gather all facts about z/OS host.
       ibm.ibm_zos_core.zos_gather_facts:
 
     - name: Print gathered facts about the master catalog.
