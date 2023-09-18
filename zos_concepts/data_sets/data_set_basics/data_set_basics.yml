@@ -92,13 +92,13 @@
       debug:
         msg: "{{ result }}"
 
-    # - name: Create an empty USS file at {{ tgt_tmp_dir }}/HELLO
-    #   file:
-    #     path: "{{ tgt_tmp_dir }}/HELLO"
-    #     state: absent
-    #   register: result
+    - name: Remove old {{ tgt_tmp_dir }}/HELLO if it exists, for idempotency.
+      file:
+        path: "{{ tgt_tmp_dir }}/HELLO"
+        state: absent
+      register: result
 
-    - name: Response for USS file creation
+    - name: Response for USS file deletion.
       debug:
         msg: "{{ result }}"
 
