@@ -84,7 +84,7 @@
         state: present
         replace: true
         format: fb
-        record_length: 100
+        record_length: 80
         size: 5M
       register: result
 
@@ -117,10 +117,6 @@
       ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
-        dest_data_set:
-          type: SEQ
-          record_format: FB
-          record_length: 100
         remote_src: true
         force: true
       register: result
