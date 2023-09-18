@@ -17,7 +17,3 @@ dependencies:
 
 options:
   package_manager_path: /usr/bin/microdnf
-
-additional_build_files:
-  - src: ansible.cfg
-    dest: configs
