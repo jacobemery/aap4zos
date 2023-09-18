@@ -177,18 +177,18 @@
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
 
-    - name: List tasks this playbook completed:
+    - name: List tasks this playbook completed.
       debug:
         msg:
-          ############################################################################
-          # Modules zos_copy, zos_data_set, zos_fetch
-          ############################################################################
-          # +-------------------------------------------------------------------------
-          # | 1. Create a sequential data set
-          # | 2. Create a USS file and populate it with some data
-          # | 3. Copy the USS file to the sequential data set
-          # | 4. Create a PDS and a member within the PDS
-          # | 5. Copy the sequential data set to the PDS member
-          # | 6. Create a new PDS, replacing the existing one
-          # | 7. Delete all data sets that were created during playbook execution
-          # +-------------------------------------------------------------------------
+          - ############################################################################
+          - # Modules zos_copy, zos_data_set, zos_fetch
+          - ############################################################################
+          - # +-------------------------------------------------------------------------
+          - # | 1. Create a sequential data set
+          - # | 2. Create a USS file and populate it with some data
+          - # | 3. Copy the USS file to the sequential data set
+          - # | 4. Create a PDS and a member within the PDS
+          - # | 5. Copy the sequential data set to the PDS member
+          - # | 6. Create a new PDS, replacing the existing one
+          - # | 7. Delete all data sets that were created during playbook execution
+          - # +-------------------------------------------------------------------------
