@@ -4,11 +4,14 @@
     - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
+  vars:
+    ds_name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+    dest_path: "{{ dest_path | default('/tmp/data_set') }}"
   tasks:
     
     - name: Create a sequential data set for demonstration purposes.
       zos_data_set:
-        name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+        name: "{{ ds_name }}"
         type: seq
         state: present
         replace: true
@@ -32,18 +35,18 @@
     - name: Copy the USS file to the sequential data set.
       zos_copy:
         src: "/tmp/HELLO"
-        dest: "{{ data_set_name }}"
+        dest: "{{ ds_name }}"
         remote_src: true
       register: result
 
-    - name: Fetch the created sequential data set and store in {{ dest_path | default('/tmp/data_set') }}.
+    - name: Fetch the created sequential data set and store in {{ dest_path }}.
       zos_fetch:
-        src: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
-        dest: "{{ dest_path | default('/tmp/data_set') }}"
+        src: "{{ ds_name }}"
+        dest: "{{ dest_path }}"
         flat: true
 
     - name: Get copied data set.
-      command: "cat {{ dest_path | default('/tmp/data_set') }}"
+      command: "cat {{ dest_path }}"
       register: ds_contents
       delegate_to: localhost
 
