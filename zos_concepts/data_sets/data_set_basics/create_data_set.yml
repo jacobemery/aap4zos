@@ -12,7 +12,7 @@
         type: "{{ ds_type }}"
         space_primary: "{{ ds_space_primary }}"
         space_type: "{{ ds_space_type }}"
-        record_format: "{{ ds_format }}"
+        record_format: "{{ ds_record_format }}"
         record_length: "{{ ds_record_length }}"
       register: ds_create
 
