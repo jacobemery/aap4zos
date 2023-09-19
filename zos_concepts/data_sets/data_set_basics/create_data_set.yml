@@ -10,8 +10,9 @@
       zos_data_set:
         name: "{{ ds_name }}"
         type: "{{ ds_type }}"
-        size: "{{ ds_size }}"
-        format: "{{ ds_format }}"
+        space_primary: "{{ ds_space_primary }}"
+        space_type: "{{ ds_space_type }}"
+        record_format: "{{ ds_format }}"
         record_length: "{{ ds_record_length }}"
       register: ds_create
 
