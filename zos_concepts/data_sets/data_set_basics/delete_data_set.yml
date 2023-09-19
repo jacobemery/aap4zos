@@ -14,5 +14,5 @@
 
     - name: Response for creating the dataset.
       debug:
-        verbosity: 1
         msg: "{{ ds_delete }}"
+        verbosity: 1

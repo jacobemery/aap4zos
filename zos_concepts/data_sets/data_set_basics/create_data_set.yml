@@ -18,5 +18,5 @@
 
     - name: Response for creating the dataset.
       debug:
-        verbosity: 1
         msg: "{{ ds_create }}"
+        verbosity: 1
