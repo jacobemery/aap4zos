@@ -28,7 +28,7 @@
 
     - name: Copy HELLO.jcl from project to USS file.
       zos_copy:
-        src: "{{ playbook_dir }}/files/HELLO.jcl"
+        src: "HELLO.jcl"
         dest: "/tmp/HELLO"
       register: result
 
@@ -45,12 +45,14 @@
         dest: "{{ dest_path }}"
         flat: true
 
+- hosts: localhost
+  gather_facts: false
+  tasks:
+
     - name: Get copied data set.
-      command: "cat {{ dest_path }}"
+      slurp: "{{ dest_path }}"
       register: ds_contents
-      delegate_to: localhost
 
     - name: Print copied data set's contents from Linux's side.
       debug:
-        msg: "{{ ds_contents.stdout }}"
-      delegate_to: localhost
+        msg: "{{ ds_contents['content'] | b64decode | regex_replace('\\n', '\n') }}"
