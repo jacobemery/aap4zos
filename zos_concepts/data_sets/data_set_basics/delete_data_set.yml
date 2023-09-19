@@ -8,7 +8,7 @@
     
     - name: Delete a z/OS data set.
       zos_data_set:
-        name: "{{ ds_name }}"
+        name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
         state: absent 
       register: ds_delete
 
