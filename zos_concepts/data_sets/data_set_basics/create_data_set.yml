@@ -8,12 +8,12 @@
     
     - name: Create a z/OS data set.
       zos_data_set:
-        name: "{{ ds_name }}"
-        type: "{{ ds_type }}"
-        space_primary: "{{ ds_space_primary }}"
-        space_type: "{{ ds_space_type }}"
-        record_format: "{{ ds_record_format }}"
-        record_length: "{{ ds_record_length }}"
+        name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+        type: "{{ ds_type | default('PDS') }}"
+        space_primary: "{{ ds_space_primary | default('5') }}"
+        space_type: "{{ ds_space_type | default('M') }}"
+        record_format: "{{ ds_record_format | default('FB') }}"
+        record_length: "{{ ds_record_length | default('80') }}"
       register: ds_create
 
     - name: Response for creating the dataset.
