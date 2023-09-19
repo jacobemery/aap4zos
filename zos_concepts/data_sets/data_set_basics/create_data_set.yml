@@ -1,0 +1,20 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:    
+    
+    - name: Create a z/OS data set.
+      zos_data_set:
+        name: "{{ ds_name }}"
+        type: "{{ ds_type }}"
+        size: "{{ ds_size }}"
+        format: "{{ ds_format }}"
+        record_length: "{{ ds_record_length }}"
+      register: ds_create
+
+    - name: Response for creating the dataset.
+      debug:
+        msg: "{{ ds_create }}"

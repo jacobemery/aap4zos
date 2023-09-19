@@ -1,0 +1,17 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:    
+    
+    - name: Delete a z/OS data set.
+      zos_data_set:
+        name: "{{ ds_name }}"
+        state: absent 
+      register: ds_delete
+
+    - name: Response for creating the dataset.
+      debug:
+        msg: "{{ ds_delete }}"
