@@ -51,10 +51,10 @@
   tasks:
 
     - name: Get copied data set.
-      slurp: 
-        src: "{{ dest_path }}"
+      shell: "cat {{ dest_path }}"
       register: ds_contents
+      changed_when: False
 
     - name: Print copied data set's contents from Linux's side.
       debug:
-        msg: "{{ ds_contents['content'] | b64decode | regex_replace('\\n', '\n') }}"
+        msg: "{{ ds_contents.stdout_lines }}"
