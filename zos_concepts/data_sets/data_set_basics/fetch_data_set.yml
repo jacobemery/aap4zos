@@ -6,6 +6,7 @@
   environment: "{{ environment_vars }}"
   vars:
     ds_name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+    src_file: "{{ src_file | default('HELLO.jcl')}}"
     dest_path: "{{ dest_path | default('/tmp/data_set') }}"
   tasks:
     
@@ -20,21 +21,21 @@
         size: 5M
       register: result
 
-    - name: Remove old /tmp/HELLO if it exists already, for idempotency.
+    - name: Remove old /tmp/ds_temp if it exists already, for idempotency.
       file:
-        path: "/tmp/HELLO"
+        path: "/tmp/ds_temp"
         state: absent
       register: result
 
-    - name: Copy HELLO.jcl from project to USS file.
+    - name: Copy {{ playbook_dir }}/files/{{ src_file }} from project to USS file.
       zos_copy:
-        src: "HELLO.jcl"
-        dest: "/tmp/HELLO"
+        src: "{{ playbook_dir }}/files/{{ src_file }}"
+        dest: "/tmp/ds_temp"
       register: result
 
     - name: Copy the USS file to the sequential data set.
       zos_copy:
-        src: "/tmp/HELLO"
+        src: "/tmp/ds_temp"
         dest: "{{ ds_name }}"
         remote_src: true
       register: result
