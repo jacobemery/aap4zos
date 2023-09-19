@@ -20,7 +20,7 @@
         size: 5M
       register: result
 
-   - name: Remove old /tmp/HELLO if it exists already, for idempotency.
+    - name: Remove old /tmp/HELLO if it exists already, for idempotency.
       file:
         path: "/tmp/HELLO"
         state: absent
