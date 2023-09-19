@@ -51,7 +51,8 @@
   tasks:
 
     - name: Get copied data set.
-      slurp: "{{ dest_path }}"
+      slurp: 
+        src: "{{ dest_path }}"
       register: ds_contents
 
     - name: Print copied data set's contents from Linux's side.
