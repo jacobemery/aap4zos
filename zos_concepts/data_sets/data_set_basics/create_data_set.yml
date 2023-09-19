@@ -8,7 +8,7 @@
     
     - name: Create a z/OS data set.
       zos_data_set:
-        name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+        name: "{{ ds_name }}"
         type: "{{ ds_type | default('PDS') }}"
         space_primary: "{{ ds_space_primary | default('5') }}"
         space_type: "{{ ds_space_type | default('M') }}"
