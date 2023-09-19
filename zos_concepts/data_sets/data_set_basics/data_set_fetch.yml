@@ -1,0 +1,53 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+    
+    - name: Create a sequential data set for demonstration purposes.
+      zos_data_set:
+        name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+        type: seq
+        state: present
+        replace: true
+        format: fb
+        record_length: 100
+        size: 5M
+      register: result
+
+   - name: Remove old /tmp/HELLO if it exists already, for idempotency.
+      file:
+        path: "/tmp/HELLO"
+        state: absent
+      register: result
+
+    - name: Copy HELLO.jcl from project to USS file.
+      zos_copy:
+        src: "{{ playbook_dir }}/files/HELLO.jcl"
+        dest: "/tmp/HELLO"
+      register: result
+
+    - name: Copy the USS file to the sequential data set.
+      zos_copy:
+        src: "/tmp/HELLO"
+        dest: "{{ data_set_name }}"
+        remote_src: true
+      register: result
+
+    - name: Fetch the created sequential data set and store in {{ dest_path | default('/tmp/data_set') }}.
+      zos_fetch:
+        src: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+        dest: "{{ dest_path | default('/tmp/data_set') }}"
+        flat: true
+
+    - name: Get copied data set.
+      command: "cat {{ dest_path | default('/tmp/data_set') }}"
+      register: ds_contents
+      delegate_to: localhost
+
+    - name: Print copied data set's contents from Linux's side.
+      debug:
+        msg: "{{ ds_contents.stdout }}"
+      delegate_to: localhost
