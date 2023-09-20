@@ -5,7 +5,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    ds_name: "{{ ds_name | default('IBMUSER.ANSIB.DATASET') }}"
+    ds_name: "{{ ds_name | default('IBMUSER.FETCH.DATASET') }}"
     src_file: "{{ src_file | default('HELLO.jcl')}}"
     dest_path: "{{ dest_path | default('/tmp/data_set') }}"
   tasks:
