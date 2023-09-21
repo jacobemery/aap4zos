@@ -276,19 +276,19 @@
       file:
         path: "{{ tgt_tmp_dir }}/ansible"
         state: absent
-      register: result
+      register: delete_dir
 
     - name: Response for remove {{ job_name }} JCL and folder on
             USS target
       debug:
-        msg: "{{ result }}"
+        msg: "{{ delete_dir }}"
 
     - name: Delete data set {{ data_set_name }}
       zos_data_set:
         name: "{{ data_set_name }}"
         state: absent
-      register: result
+      register: delete_ds
 
     - name: Response for delete data set {{ data_set_name }}
       debug:
-        msg: "{{ result }}"
+        msg: "{{ delete_ds }}"
