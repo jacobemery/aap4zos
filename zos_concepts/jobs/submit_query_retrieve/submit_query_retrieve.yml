@@ -117,6 +117,7 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
+        force: true
       register: result
 
     - name: Response for write HELLO JCL to USS
