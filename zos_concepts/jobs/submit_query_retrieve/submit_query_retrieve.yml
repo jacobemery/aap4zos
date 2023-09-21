@@ -190,16 +190,16 @@
       set_fact:
         job_sub_result: "{{ job_submit.results }}"
 
-- name: Set facts used in this playbook
-  set_fact:
-    submit_job_name: "{{ job_sub_result[0]['jobs'][0]['job_name'] }}"
-    submit_job_id: "{{ job_sub_result[0]['jobs'][0]['job_id'] }}"
-    submit_jobs_ddnames_length: "{{ job_sub_result[0]['jobs'][0]['ddnames'] | length }}"
-    submit_job_ddnames_list: "{{ job_sub_result[0]['jobs'][0]['ddnames'] }}"
-    submit_job_list: "{{ job_sub_result[0]['jobs'][0] }}"
-    submit_job_ret_code: "{{ job_sub_result[0]['jobs'][0]['ret_code']['code'] }}"
-    submit_job_ret_code_msg: "{{ job_sub_result[0]['jobs'][0]['ret_code']['msg'] }}"
-    submit_job_subsystem: "{{ job_sub_result[0]['jobs'][0]['subsystem'] }}"
+    - name: Set facts used in this playbook
+      set_fact:
+        submit_job_name: "{{ job_sub_result[0]['jobs'][0]['job_name'] }}"
+        submit_job_id: "{{ job_sub_result[0]['jobs'][0]['job_id'] }}"
+        submit_jobs_ddnames_length: "{{ job_sub_result[0]['jobs'][0]['ddnames'] | length }}"
+        submit_job_ddnames_list: "{{ job_sub_result[0]['jobs'][0]['ddnames'] }}"
+        submit_job_list: "{{ job_sub_result[0]['jobs'][0] }}"
+        submit_job_ret_code: "{{ job_sub_result[0]['jobs'][0]['ret_code']['code'] }}"
+        submit_job_ret_code_msg: "{{ job_sub_result[0]['jobs'][0]['ret_code']['msg'] }}"
+        submit_job_subsystem: "{{ job_sub_result[0]['jobs'][0]['subsystem'] }}"
 
     - name: Fact `submit_job_id` set with value
       debug:
