@@ -172,7 +172,6 @@
       zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
         location: DATA_SET
-        wait: true
       register: result
       with_sequence: count=1
 
