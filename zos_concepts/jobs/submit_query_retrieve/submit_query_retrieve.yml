@@ -91,11 +91,11 @@
     # | is that single member 'MEM1' is created.
     # +-------------------------------------------------------------------------
 
-    - name: Create a PDS member and replace if member exist
+    - name: Remove PDS member and replace if member exist already, for idempotency.
       zos_data_set:
         name: "{{ data_set_name }}(MEM{{ item }})"
         type: MEMBER
-        replace: true
+        state: absent
       with_sequence: count=1
       register: result
 
