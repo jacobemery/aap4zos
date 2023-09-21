@@ -91,11 +91,12 @@
     # | is that single member 'MEM1' is created.
     # +-------------------------------------------------------------------------
 
-    - name: Remove PDS member and replace if member exist already, for idempotency.
+    - name: Create a PDS member and replace if member exist
       zos_data_set:
         name: "{{ data_set_name }}(MEM{{ item }})"
         type: MEMBER
-        state: absent
+        replace: true
+        force: true
       with_sequence: count=1
       register: result
 
@@ -117,6 +118,7 @@
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
+        force: true
       register: result
 
     - name: Response for write HELLO JCL to USS
@@ -131,6 +133,7 @@
         src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         remote_src: true
         dest: "{{ data_set_name }}(MEM1)"
+        force: true
       register: result
 
     - name: Response for populate {{ data_set_name }} member with data from
