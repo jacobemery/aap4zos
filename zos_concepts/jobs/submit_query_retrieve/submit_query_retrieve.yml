@@ -103,19 +103,6 @@
       debug:
         msg: "{{ delete_member }}"
 
-    # - name: Create PDS member.
-    #   zos_data_set:
-    #     name: "{{ data_set_name }}(MEM{{ item }})"
-    #     type: MEMBER
-    #     state: present
-    #     replace: true
-    #   with_sequence: count=1
-    #   register: create_member
-
-    # - name: Response for creating a PDS member.
-    #   debug:
-    #     msg: "{{ create_member }}"
-
     - name: Ensure JCL folder exists in USS to manage JCL
       file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl"
@@ -291,3 +278,21 @@
     - name: Response for delete data set {{ data_set_name }}
       debug:
         msg: "{{ delete_ds }}"
+
+    - name: List tasks this playbook completed.
+      debug:
+        msg:
+          - "############################################################################"
+          - "# z/OS modules used: zos_data_set, zos_job_submit, zos_job_query, "
+          - "#   zos_job_output, zos_data_set, zos_copy."
+          - "# --------------------------------------------------------------------------"
+          - "# 1. Create a data set and member"
+          - "# 2. Create JCL on USS target"
+          - "# 3. Copy USS JCL to data set"
+          - "# 4. Submit JCL in data set"
+          - "# 5. Query job"
+          - "# 6. Print job output"
+          - "# 7. Repeat the process with JCL submitted from USS file"
+          - "# 8. Clean up by removing JCL files from USS, delete PDS"
+          - "# --------------------------------------------------------------------------"
+          - "############################################################################"
