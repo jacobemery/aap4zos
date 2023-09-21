@@ -223,7 +223,6 @@
       zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
         location: USS
-        wait: true
       register: job_submit_uss
 
     - name: Response for submit {{ job_name }} JCL located on target
@@ -234,7 +233,7 @@
 
     - name: Set job id fact used in this playbook
       set_fact:
-        job_id_uss: "{{ job_submit_uss.results[0]['jobs'][0]['job_id'] }}"
+        job_id_uss: "{{ job_submit_uss['jobs'][0]['job_id'] }}"
 
     - name: Print fact `job_id_uss` set with value
       debug:
