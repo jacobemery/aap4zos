@@ -78,11 +78,11 @@
         format: fb
         record_length: 80
         replace: true
-      register: result
+      register: create_pds
 
     - name: Response for create a PDS data set {{ data_set_name }}
       debug:
-        msg: "{{ result }}"
+        msg: "{{ create_pds }}"
 
     # +-------------------------------------------------------------------------
     # | "with_sequence" is a type of conditional Ansible loop. The loop here
@@ -91,33 +91,55 @@
     # | is that single member 'MEM1' is created.
     # +-------------------------------------------------------------------------
 
-    - name: Delete PDS member if member exists, for idempotency.
+    - name: Delete PDS member, if it exists, for idempotency
+      zos_data_set:
+        name: "{{ data_set_name }}(MEM{{ item }})"
+        state: absent 
+      with_sequence: count=1
+      register: delete_member
+
+    - name: Response for creating a PDS member.
+      debug:
+        msg: "{{ delete_member }}"
+
+    - name: Create PDS member.
       zos_data_set:
         name: "{{ data_set_name }}(MEM{{ item }})"
         type: MEMBER
-        state: absent
+        state: present
+        replace: true
       with_sequence: count=1
-      register: result
+      register: create_member
 
-    - name: Response for deleting a PDS member.
+    - name: Response for creating a PDS member.
       debug:
-        msg: "{{ result }}"
+        msg: "{{ create_member }}"
 
     - name: Ensure JCL folder exists in USS to manage JCL
       file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl"
         state: directory
+      register: create_dir
 
     - name: Response for ensure JCL folder exists in USS to manage JCL
       debug:
-        msg: "{{ result }}"
+        msg: "{{ create_dir }}"
+
+    - name: Ensure {{ tgt_tmp_dir }}/ansible/jcl/HELLO does not already exists in USS, for idempotency
+      file:
+        path: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
+        state: absent
+      register: delete_file
+
+    - name: Response for deleting USS file.
+      debug:
+        msg: "{{ delete_file }}"
 
     - name: Write HELLO JCL to USS in {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         on target {{ inventory_hostname }}
       zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
-        force: true
       register: result
 
     - name: Response for write HELLO JCL to USS
