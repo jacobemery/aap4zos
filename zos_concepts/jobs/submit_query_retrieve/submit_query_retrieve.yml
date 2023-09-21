@@ -172,12 +172,12 @@
       zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
         location: DATA_SET
-      register: result
+      register: job_submit
       with_sequence: count=1
 
     - name: Response for submit the JCL {{ data_set_name }}.(MEM1)
       debug:
-        msg: "{{ result }}"
+        msg: "{{ job_submit }}"
 
     # +-------------------------------------------------------------------------
     # | There is a list of results returned by the zos_job_submit module. Each
@@ -188,7 +188,7 @@
 
     - name: Setting fact `job_id_pds` for id of job submitted above
       set_fact:
-        job_id_pds: "{{ result.results.jobs[0].job_id }}"
+        job_id_pds: "{{ job_submit.jobs[0].job_id }}"
 
     - name: Fact `job_id_pds` set with value
       debug:
