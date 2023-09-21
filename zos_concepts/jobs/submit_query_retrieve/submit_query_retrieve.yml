@@ -188,7 +188,7 @@
 
     - name: Set fact `job_sub_result` with live production content
       set_fact:
-        job_sub_result: "{{ job_submit }}"
+        job_sub_result: "{{ job_submit.results }}"
 
     - name: Set facts used in this playbook
       set_fact:
