@@ -177,7 +177,7 @@
 
     - name: Response for submit the JCL {{ data_set_name }}.(MEM1)
       debug:
-        msg: "{{ job_submit.results }}"
+        msg: "{{ job_submit }}"
 
     # +-------------------------------------------------------------------------
     # | There is a list of results returned by the zos_job_submit module. Each
@@ -186,29 +186,41 @@
     # | submitted, it will be the first (and only) job in the results list.
     # +-------------------------------------------------------------------------
 
-    - name: Setting fact `job_id_pds` for id of job submitted above
+    - name: Set fact `job_sub_result` with live production content
       set_fact:
-        job_id_pds: "{{ job_submit.results.jobs[0].job_id }}"
+        job_sub_result: "{{ job_sub_results }}"
 
-    - name: Fact `job_id_pds` set with value
+    - name: Set facts used in this playbook
+      set_fact:
+        submit_job_name: "{{ job_sub_result.jobs[0].job_name }}"
+        submit_job_id: "{{ job_sub_result.jobs[0].job_id }}"
+        submit_jobs_ddnames_length: "{{ job_sub_result.jobs[0].ddnames |length }}"
+        submit_job_ddnames_list: "{{ job_sub_result.jobs[0].ddnames }}"
+        submit_job_list: "{{ job_sub_result.jobs[0] }}"
+        submit_job_ret_code: "{{ job_sub_result.jobs[0].ret_code.code }}"
+        submit_job_ret_code_msg: "{{ job_sub_result.jobs[0].ret_code.msg }}"
+        submit_job_subsystem: "{{ job_sub_result.jobs[0].subsystem }}"
+      tags: always
+
+    - name: Fact `submit_job_id` set with value
       debug:
-        msg: "{{ job_id_pds }}"
+        msg: "{{ submit_job_id }}"
 
     - name: Query submitted job by job_id
       zos_job_query:
-        job_id: "{{ job_id_pds }}"
+        job_id: "{{ submit_job_id }}"
       register: result
 
     - name: Response for query submitted job by job_id
       debug:
         msg: "{{ result }}"
 
-    - name: Get job output for job {{ job_id_pds }} from PDS member
+    - name: Get job output for job {{ submit_job_id }} from PDS member
       zos_job_output:
-        job_id: "{{ job_id_pds }}"
+        job_id: "{{ submit_job_id }}"
       register: result
 
-    - name: Response for get job output for job "{{ job_id_pds }}" from PDS
+    - name: Response for get job output for job "{{ submit_job_id }}" from PDS
         member
       debug:
         msg: "{{ result }}"
