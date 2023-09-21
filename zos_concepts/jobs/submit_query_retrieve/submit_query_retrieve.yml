@@ -177,7 +177,7 @@
 
     - name: Response for submit the JCL {{ data_set_name }}.(MEM1)
       debug:
-        msg: "{{ job_submit }}"
+        msg: "{{ job_submit.results }}"
 
     # +-------------------------------------------------------------------------
     # | There is a list of results returned by the zos_job_submit module. Each
