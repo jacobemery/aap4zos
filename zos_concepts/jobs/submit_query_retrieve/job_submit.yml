@@ -34,7 +34,7 @@
         submit_job_ret_code_msg: "{{ job_results.jobs[0].ret_code.msg }}"
         submit_job_subsystem: "{{ job_results.jobs[0].subsystem }}"
 
-    - name: Print job submit results.
+    - name: Print results for job {{ submit_job_name }}
       debug:
         msg:
           - Job name={{ submit_job_name }}
@@ -45,12 +45,3 @@
           - "{{ submit_job_list }}"
           - Return Code={{ submit_job_ret_code }}
           - Return Code Message={{ submit_job_ret_code_msg }}
-
-    - name: Get job output for job {{ submit_job_name }}
-      zos_job_output:
-        job_id: "{{ submit_job_id }}"
-      register: job_output_result
-
-    - name: Print results for get job output for job {{ submit_job_name }}
-      debug:
-        msg: "{{ job_output_result.stdout_lines }}"
