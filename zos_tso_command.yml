@@ -13,4 +13,4 @@
 
     - name: Print results from command.
       debug:
-        var: command
+        var: command.output
