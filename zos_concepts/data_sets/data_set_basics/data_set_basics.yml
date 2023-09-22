@@ -39,30 +39,11 @@
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
+    data_set_name: "IBMUSER.BASICS.SEQ"
+    pds_name: "IBMUSER.BASICS.PDS"
   environment: "{{ environment_vars }}"
 
   tasks:
-    # ##########################################################################
-    # Generate and set temporary names for data sets
-    # ##########################################################################
-    - name: Create temp sequential data set name
-      command: "mvstmp {{ ansible_user | upper }}"
-      register: tmp_ds_seq
-
-    - name: Create temp PDS name
-      command: "mvstmp {{ ansible_user | upper }}"
-      register: tmp_ds_pds
-
-    - name: Set names for sequential data set and pds for use by this sample
-      set_fact:
-        data_set_name: "{{ tmp_ds_seq.stdout }}"
-        pds_name: "{{ tmp_ds_pds.stdout }}"
-
-    - name: Fact `data_set_name` and `pds_name` set with values
-      debug:
-        msg:
-          - "sequential data set name - {{ data_set_name }}"
-          - "pds name - {{ pds_name }}"
 
     ############################################################################
     # Modules zos_copy, zos_data_set, zos_fetch

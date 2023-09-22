@@ -38,7 +38,7 @@
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "HELLO"
-    data_set_name: "IBMUSER.DATASET.BASICS"
+    data_set_name: "IBMUSER.JOBS.DEMO"
   environment: "{{ environment_vars }}"
 
   tasks:
