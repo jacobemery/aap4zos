@@ -38,26 +38,10 @@
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "HELLO"
+    data_set_name: "IBMUSER.DATASET.BASICS"
   environment: "{{ environment_vars }}"
 
   tasks:
-    # ##########################################################################
-    # Generate a temporary data set name
-    # ##########################################################################
-    - name: Create temp data set name
-      command: "mvstmp {{ ansible_user | upper }}"
-      register: tmp_ds
-
-    # ##########################################################################
-    # Fact setting for use by this playbook
-    # ##########################################################################
-    - name: Setting fact `data_set_name` for use by this sample
-      set_fact:
-        data_set_name: "{{ tmp_ds.stdout }}"
-
-    - name: Fact `data_set_name` set with value
-      debug:
-        msg: "{{ data_set_name }}"
 
     ############################################################################
     # Modules zos_data_set, zos_job_submit, zos_job_query, zos_job_output,
@@ -91,17 +75,17 @@
     # | is that single member 'MEM1' is created.
     # +-------------------------------------------------------------------------
 
-    - name: Delete PDS member, if it exists, for idempotency
-      zos_data_set:
-        name: "{{ data_set_name }}(MEM{{ item }})"
-        state: absent 
-        type: MEMBER
-      with_sequence: count=1
-      register: delete_member
+    # - name: Delete PDS member, if it exists, for idempotency
+    #   zos_data_set:
+    #     name: "{{ data_set_name }}(MEM{{ item }})"
+    #     state: absent 
+    #     type: MEMBER
+    #   with_sequence: count=1
+    #   register: delete_member
 
-    - name: Response for creating a PDS member.
-      debug:
-        msg: "{{ delete_member }}"
+    # - name: Response for creating a PDS member.
+    #   debug:
+    #     msg: "{{ delete_member }}"
 
     - name: Ensure JCL folder exists in USS to manage JCL
       file:
