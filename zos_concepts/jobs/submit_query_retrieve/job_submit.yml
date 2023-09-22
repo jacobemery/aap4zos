@@ -1,0 +1,56 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  vars:
+    tgt_tmp_dir: "/tmp"
+    job_name: "{{ job_name | default('HELLO') }}"
+  environment: "{{ environment_vars }}"
+  tasks:
+
+    - name: Submit {{ job_name }} job.
+      zos_job_submit:
+        src: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
+        location: LOCAL
+        wait: false
+        encoding:
+          from: ISO8859-1
+          to: IBM-037
+      register: job_submit
+
+    - name: Set fact with results from job submission.
+      set_fact:
+        job_results: "{{ job_submit }}"
+
+    - name: Set facts used in this playbook based on results.
+      set_fact:
+        submit_job_name: "{{ job_results.jobs[0].job_name }}"
+        submit_job_id: "{{ job_results.jobs[0].job_id }}"
+        submit_jobs_ddnames_length: "{{ job_results.jobs[0].ddnames |length }}"
+        submit_job_ddnames_list: "{{ job_results.jobs[0].ddnames }}"
+        submit_job_list: "{{ job_results.jobs[0] }}"
+        submit_job_ret_code: "{{ job_results.jobs[0].ret_code.code }}"
+        submit_job_ret_code_msg: "{{ job_results.jobs[0].ret_code.msg }}"
+        submit_job_subsystem: "{{ job_results.jobs[0].subsystem }}"
+
+    - name: Print job submit results.
+      debug:
+        msg:
+          - Job name={{ submit_job_name }}
+          - Subsystem={{ submit_job_subsystem }}
+          - Job ID={{ submit_job_id }}
+          - DD Count={{ submit_jobs_ddnames_length }}
+          - "{{ submit_job_ddnames_list }}"
+          - "{{ submit_job_list }}"
+          - Return Code={{ submit_job_ret_code }}
+          - Return Code Message={{ submit_job_ret_code_msg }}
+
+    - name: Get job output for job {{ submit_job_name }}
+      zos_job_output:
+        job_id: "{{ submit_job_id }}"
+      register: job_output_result
+
+    - name: Print results for get job output for job {{ submit_job_name }}
+      debug:
+        msg: "{{ job_output_result }}"
