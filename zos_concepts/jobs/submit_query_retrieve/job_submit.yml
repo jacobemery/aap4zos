@@ -5,7 +5,7 @@
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
-    job_name: "{{ job_name | default('HELLO') }}"
+    job_name: "{{ jcl | default('HELLO') }}"
   environment: "{{ environment_vars }}"
   tasks:
 
