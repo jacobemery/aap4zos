@@ -18,6 +18,7 @@
           from: ISO8859-1
           to: IBM-037
       register: job_submit
+      ignore_errors: true
 
     - name: Set fact with results from job submission.
       set_fact:
