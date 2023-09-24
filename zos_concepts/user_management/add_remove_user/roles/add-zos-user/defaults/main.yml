@@ -76,7 +76,7 @@ generate_password: true
 #     you must use two single quotation marks together for each single quotation mark.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
-passphrase: "'changeM3please!'"
+passphrase: "changeM3please!"
 
 ##################################################################################################################
 # Specifies if a random passphrase should be generated when no passphrase is provided.
