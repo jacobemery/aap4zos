@@ -1,6 +1,4 @@
 ---
 collections:
   - name: ibm.ibm_zos_core
-  - name: ibm.ibm_zos_ims
-  - name: ibm.ibm_zos_cics
   - name: community.general
