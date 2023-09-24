@@ -151,7 +151,7 @@ security_categories: ""
 # The HOME path name can consist of any characters.
 # If left blank, home directory is /u/userid.
 ##################################################################################################################
-omvs_home_directory: ""
+omvs_home_directory: "/u/{{ userid }}"
 
 ##################################################################################################################
 # Specifies the user identifier. The UID is a numeric value from 0 - 2 147 483 647.
