@@ -14,5 +14,4 @@
 
     - name: Print results from command.
       debug:
-        verbosity: 1
         var: command.output
