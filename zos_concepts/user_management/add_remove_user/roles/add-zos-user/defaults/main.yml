@@ -17,7 +17,7 @@ userid: "NEWUSER"
 # Specifies the name of a RACF-defined group to be used as the default group for the user.
 # If you do not specify a group, RACF uses your current connect group as the default.
 ##################################################################################################################
-default_group: "USER"
+default_group: "SYS1"
 
 ##################################################################################################################
 # Specifies the level of group authority for the new user in the default group.
