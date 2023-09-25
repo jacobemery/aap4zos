@@ -42,12 +42,13 @@
     commands: "{{ lookup('template', '../templates/add-user.j2') }}"
 
 - block:
-  tags: profile
     - name: Create generic profile
+      tags: profile
       ibm.ibm_zos_core.zos_tso_command:
         commands: "ADDSD '{{ userid | upper }}.**' UACC(NONE)"
   rescue:
     - name: Create generic profile, without support for enhanced generic naming
+      tags: profile
       ibm.ibm_zos_core.zos_tso_command:
         commands: "ADDSD '{{ userid | upper }}.*' UACC(NONE)"
 
@@ -137,34 +138,40 @@
   when: templates_to_copy is defined and templates_to_copy | length > 0
 
 - name: Make mount persistent
-  tags: mount
   when: bpxprm_member is defined and bpxprm_member
   block:
     - name: Generate tempfile to hold BPXPRMxx
+      tags: mount
       ansible.builtin.tempfile:
         state: file
       register: temp
 
     - name: Generate tempfile to hold backup
+      tags: mount
       ansible.builtin.tempfile:
         state: file
       register: backup
 
     - name: Copy BPXPRMxx member to file
+      tags: mount
       ansible.builtin.shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ temp.path }}
 
     - name: Copy BPXPRMxx member to backup
+      tags: mount
       ansible.builtin.shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ backup.path }}
 
     - name: Get file contents
+      tags: mount
       ansible.builtin.command: cat {{ temp.path }}
       register: cat_response
 
     - name: Insert mount into contents
+      tags: mount
       ansible.builtin.set_fact:
         updated_contents: "{{ cat_response.stdout | insert_mount(omvs_zfs_data_set_name, omvs_home_directory) }}"
 
     - name: Insert updated contents back into temp file
+      tags: mount
       ibm.ibm_zos_core.zos_copy:
         content: "{{ updated_contents }}"
         dest: "{{ temp.path }}"
@@ -173,29 +180,35 @@
           to: "{{ target_charset }}"
 
     - name: Copy updated BPXPRMxx member back to data set
+      tags: mount
       ansible.builtin.shell: cp {{ temp.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
 
     - name: Verify updated contents are valid
+      tags: mount
       ibm.ibm_zos_core.zos_operator:
         cmd: "SETOMVS SYNTAXCHECK=({{ bpxprm_member | upper }})"
       register: syntaxcheck_response
       ignore_errors: true
 
     - name: Undo mount changes if bad syntaxcheck
+      tags: mount
       ansible.builtin.shell: cp {{ backup.path }} "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'"
       when: syntaxcheck_response.get("rc", 4) > 0
 
     - name: Assert persistent mount did not fail
+      tags: mount
       ansible.builtin.fail:
         msg: "Persistent mount updated did not pass syntax check."
       when: syntaxcheck_response.get("rc", 4) > 0
   always:
     - name: Remove temporary file
+      tags: mount
       ansible.builtin.file:
         path: "{{ temp.path }}"
         state: absent
       when: temp.path is defined and temp.path
     - name: Remove backup file
+      tags: mount
       ansible.builtin.file:
         path: "{{ backup.path }}"
         state: absent
