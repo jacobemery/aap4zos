@@ -6,12 +6,12 @@
   environment: "{{ environment_vars }}"
   tasks:
 
-    - name: Run z/OS TSO command.
+    - name: Run z/OS TSO command(s).
       ibm.ibm_zos_core.zos_tso_command:
         commands: 
           "{{ zos_tso_command.split('\n') | default(\"LISTCAT ENT('SYS1.PARMLIB') ALL\") }}"
       register: command
 
-    - name: Print results from command.
+    - name: Print results from command(s) Click and go to the JSON tab for more details.
       debug:
         var: command.output
