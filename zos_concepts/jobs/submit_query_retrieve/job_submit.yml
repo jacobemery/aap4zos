@@ -6,8 +6,6 @@
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "{{ jcl | default('HELLO') }}"
-    data_set_name: IBMUSER.JOB.SUBMIT
-    tgt_tmp_dir: /tmp
   environment: "{{ environment_vars }}"
   tasks:
 
