@@ -9,7 +9,7 @@
     - name: Run z/OS TSO command.
       ibm.ibm_zos_core.zos_tso_command:
         commands: 
-          "{{ zos_tso_command | default(\"LISTCAT ENT('SYS1.PARMLIB') ALL\") }}"
+          "{{ zos_tso_command.split('\n') | default(\"LISTCAT ENT('SYS1.PARMLIB') ALL\") }}"
       register: command
 
     - name: Print results from command.
