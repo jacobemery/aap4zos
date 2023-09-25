@@ -37,13 +37,13 @@ owner: "IBMUSER"
 ##################################################################################################################
 # Specifies the user catalog entryname for which an alias will be defined.
 ##################################################################################################################
-user_catalog: "SYS1.USER"
+user_catalog: 
 
 ##################################################################################################################
 # Identifies the catalog in which the alias is defined. If the catalog's volume is physically mounted,
 # it is dynamically allocated. The volume must be mounted as permanently resident or reserved.
 ##################################################################################################################
-master_catalog: "SYS1.MASTER.CATALOG"
+master_catalog: 
 
 ##################################################################################################################
 # Specifies the user's initial logon password. This password is always set expired,
