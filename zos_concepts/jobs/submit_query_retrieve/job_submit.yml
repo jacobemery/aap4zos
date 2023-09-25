@@ -16,7 +16,7 @@
         wait_time_s: 60
         encoding:
           from: UTF-8
-          to: IBM-037
+          to: IBM-047
       register: job_submit
       ignore_errors: true
 
