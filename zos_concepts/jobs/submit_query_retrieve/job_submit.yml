@@ -15,8 +15,8 @@
         location: LOCAL
         wait_time_s: 60
         encoding:
-          from: UTF-8
-          to: IBM-1047
+          from: ISO8859-1
+          to: IBM-037
       register: job_submit
       ignore_errors: true
 
