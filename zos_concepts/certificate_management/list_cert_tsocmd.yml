@@ -42,15 +42,15 @@
       always:
         - name: Print results from list USER cert command.
           debug:
-            msg: "{{ list_user_cert.output[0].content }}"
+            var: list_user_cert.output[0].content
           when: cert_type == 'USER'
 
         - name: Print results from list CERTAUTH command.
           debug:
-            msg: "{{ list_certauth.output[0].content }}"
+            var: list_certauth.output[0].content
           when: cert_type == 'CERTAUTH'
 
         - name: Print results from list SITE cert command.
           debug:
-            msg: "{{ list_site_cert.output[0].content }}"
+            var: list_site_cert.output[0].content
           when: cert_type == 'SITE'
