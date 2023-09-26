@@ -10,7 +10,7 @@
   vars:
     # owner_id: 'IBMUSER'
     # cert_label: 'Test Cert'
-    cn: ' {{ cert_label }}'
+    cn: '{{ cert_label }}'
     # ou: 'ANSIBLE CORE'
     # country: 'US'
     # keyring: 'SharedRing1'
