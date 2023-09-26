@@ -39,10 +39,18 @@
         when: cert_type == 'SITE'
         register: list_site_cert
 
-      # always:
-      #   - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
-      #     debug:
-      #       msg: "{{ list_user_cert.output[0].content if list_user_cert is defined else list_certauth.output[0].content if list_certauth is defined else list_site_cert.output[0].content if list_site_cert is defined }}"
+      always:
+        - name: "Debug for USER"
+          debug:
+            msg: "{{ list_user_cert.output[0].content }}"
+          when: cert_type == 'USER'
 
-    - debug:
-        var: list_certauth
+        - name: "Debug for CERTAUTH"
+          debug:
+            msg: "{{ list_certauth.output[0].content }}"
+          when: cert_type == 'CERTAUTH'
+
+        - name: "Debug for SITE"
+          debug:
+            msg: "{{ list_site_cert.output[0].content }}"
+          when: cert_type == 'SITE'
