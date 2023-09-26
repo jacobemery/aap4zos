@@ -8,8 +8,8 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'OMVSKERN'
-    cert_label: 'ANDY CA'
+    owner_id: 'IBMUSER'
+    cert_label: 'Test Cert'
     cn: '{{cert_label}}'
     ou: 'ANSIBLE CORE'
     country: 'US'
