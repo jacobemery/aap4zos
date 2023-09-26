@@ -8,14 +8,14 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'IBMUSER'
-    cert_label: 'ANDY CA'
-    cn: '{{cert_label}}'
-    ou: 'ANSIBLE CORE'
-    country: 'US'
-    keyring: 'SharedRing1'
-    expiry_date: ''
-    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    cert_label: "{{ cert_label_survey | default('Test Cert') }}"
+    cn: '{{ cert_label }}'
+    ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
+    country: "{{ country_survey | default('US') }}"
+    keyring: "{{ keyring_survey | default('SharedRing1') }}"
+    expiry_date: "{{ expiry_date_survey | default('') }}"
+    check_name: "{{ check_name_survey | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
   tasks:
     - block:
