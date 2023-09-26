@@ -13,7 +13,7 @@
     cn: '{{ cert_label }}'
     ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
     country: "{{ country_survey | default('US') }}"
-    keyring: "{{ keyring_survey | default('SharedRing1') }}"
+    keyring: "{{ keyring_survey | default('SharedRing2') }}"
     expiry_date: "{{ expiry_date_survey | default('') }}"
     check_name: "{{ check_name_survey | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
