@@ -9,7 +9,7 @@
   environment: "{{ environment_vars }}"
   vars:
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
-    cert_label: "{{ cert_label_survey | default('Test Cert') }}"
+    cert_label: "{{ cert_label_survey | default('Test CA') }}"
     cn: '{{ cert_label }}'
     ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
     country: "{{ country_survey | default('US') }}"
