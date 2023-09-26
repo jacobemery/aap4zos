@@ -16,29 +16,38 @@
     # cert_label: 'ANDY CA'
 
     cert_type: "{{ cert_type_survey | default('SITE') }}"
-    cert_label: "{{ cert_label_survey | default('Test Cert') }}"
+    cert_label: "{{ cert_label_survey | default('TEST SITE') }}"
 
   tasks:
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Displaying cert {{cert_label}}'
-        command:
-          - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
-      when: cert_type == 'USER'
+    - block:
+      - include_role:
+          name: issue_tso_cmd
+        vars:
+          task_description: 'Displaying cert {{cert_label}}'
+          command:
+            - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
+        when: cert_type == 'USER'
+        register: command
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Displaying cert {{cert_label}}'
-        command:
-          - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
-      when: cert_type == 'CERTAUTH'
+      - include_role:
+          name: issue_tso_cmd
+        vars:
+          task_description: 'Displaying cert {{cert_label}}'
+          command:
+            - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
+        when: cert_type == 'CERTAUTH'
+        register: command
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Displaying cert {{cert_label}}'
-        command:
-          - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
-      when: cert_type == 'SITE'
+      - include_role:
+          name: issue_tso_cmd
+        vars:
+          task_description: 'Displaying cert {{cert_label}}'
+          command:
+            - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
+        when: cert_type == 'SITE'
+        register: command
+
+      always:
+        - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
+          debug:
+            var: command.output
