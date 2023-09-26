@@ -27,7 +27,7 @@
           command:
             - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
         when: cert_type == 'USER'
-        register: command
+        register: list_user_cert
 
       - include_role:
           name: issue_tso_cmd
@@ -36,7 +36,7 @@
           command:
             - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
         when: cert_type == 'CERTAUTH'
-        register: command
+        register: list_certauth
 
       - include_role:
           name: issue_tso_cmd
@@ -45,9 +45,9 @@
           command:
             - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
         when: cert_type == 'SITE'
-        register: command
+        register: list_site_cert
 
       always:
         - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
           debug:
-            var: command
+            msg: "{{ list_user_cert.output.content if defined else list_certauth.output.content if defined else list_site_cert.output.content if defined }}"
