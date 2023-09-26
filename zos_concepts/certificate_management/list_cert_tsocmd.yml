@@ -20,6 +20,7 @@
 
   tasks:
     - block:
+
       - name: 'Displaying cert {{cert_label}}'
         ibm.ibm_zos_core.zos_tso_command:
           commands: "RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))"
@@ -38,7 +39,10 @@
         when: cert_type == 'SITE'
         register: list_site_cert
 
-      always:
-        - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
-          debug:
-            msg: "{{ list_user_cert.output[0].content if list_user_cert is defined else list_certauth.output[0].content if list_certauth is defined else list_site_cert.output[0].content if list_site_cert is defined }}"
+      # always:
+      #   - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
+      #     debug:
+      #       msg: "{{ list_user_cert.output[0].content if list_user_cert is defined else list_certauth.output[0].content if list_certauth is defined else list_site_cert.output[0].content if list_site_cert is defined }}"
+
+    - debug:
+        var: list_certauth
