@@ -20,37 +20,25 @@
 
   tasks:
     - block:
-      - include_role:
-          name: issue_tso_cmd
-        vars:
-          task_description: 'Displaying cert {{cert_label}}'
-          command:
-            - RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))
+      - name: 'Displaying cert {{cert_label}}'
+        ibm.ibm_zos_core.zos_tso_command:
+          commands: "RACDCERT ID({{ owner_id}}) LIST(LABEL('{{cert_label}}'))"
         when: cert_type == 'USER'
         register: list_user_cert
 
-      - include_role:
-          name: issue_tso_cmd
-        vars:
-          task_description: 'Displaying cert {{cert_label}}'
-          command:
-            - RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))
+      - name: 'Displaying cert {{cert_label}}'
+        ibm.ibm_zos_core.zos_tso_command:
+          commands: "RACDCERT CERTAUTH LIST(LABEL('{{cert_label}}'))"
         when: cert_type == 'CERTAUTH'
         register: list_certauth
 
-      - include_role:
-          name: issue_tso_cmd
-        vars:
-          task_description: 'Displaying cert {{cert_label}}'
-          command:
-            - RACDCERT SITE LIST(LABEL('{{cert_label}}'))
+      - name: 'Displaying cert {{cert_label}}'
+        ibm.ibm_zos_core.zos_tso_command:
+          commands: "RACDCERT SITE LIST(LABEL('{{cert_label}}'))"
         when: cert_type == 'SITE'
         register: list_site_cert
 
-      # always:
-      #   - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
-      #     debug:
-      #       msg: "{{ list_user_cert.output[0].content if list_user_cert is defined else list_certauth.output[0].content if list_certauth is defined else list_site_cert.output[0].content if list_site_cert is defined }}"
-
-    - debug:
-        var: list_certauth
+      always:
+        - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
+          debug:
+            msg: "{{ list_user_cert.output[0].content if list_user_cert is defined else list_certauth.output[0].content if list_certauth is defined else list_site_cert.output[0].content if list_site_cert is defined }}"
