@@ -1,0 +1,12 @@
+- name: Test command.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+    - name: Print FQDN
+      command: hostname
+      register: command
+
+    - name: Print command results.
+      debug:
+        var: command
