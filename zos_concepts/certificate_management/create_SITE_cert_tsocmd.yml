@@ -8,9 +8,9 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'OMVSKERN'
-    cert_label: 'ANDY SITE'
-    sign_label: 'ANDY CA'
+    owner_id: 'IBMSUER'
+    cert_label: 'TEST SITE'
+    sign_label: 'TEST CA'
     cn: '{{cert_label}}.svl.ibm.com'
     ou: '{{cert_label}}'
     country: 'US'
