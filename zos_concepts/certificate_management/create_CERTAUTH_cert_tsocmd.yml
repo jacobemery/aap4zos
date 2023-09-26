@@ -9,11 +9,11 @@
   environment: "{{ environment_vars }}"
   vars:
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
-    cert_label: "{{ cert_label_survey | default('Test Cert2') }}"
+    cert_label: "{{ cert_label_survey | default('Test Cert') }}"
     cn: '{{ cert_label }}'
     ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
     country: "{{ country_survey | default('US') }}"
-    keyring: "{{ keyring_survey | default('SharedRing2') }}"
+    keyring: "{{ keyring_survey | default('SharedRing1') }}"
     expiry_date: "{{ expiry_date_survey | default('') }}"
     check_name: "{{ check_name_survey | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
