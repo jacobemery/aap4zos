@@ -6,16 +6,16 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: false
-  environment: " {{ environment_vars  }}"
+  environment: " {{ environment_vars }}"
   vars:
-    owner_id: 'IBMUSER'
-    cert_label: 'Test Cert'
-    cn: ' {{ cert_label  }}'
-    ou: 'ANSIBLE CORE'
-    country: 'US'
-    keyring: 'SharedRing1'
-    expiry_date: ''
-    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+    # owner_id: 'IBMUSER'
+    # cert_label: 'Test Cert'
+    cn: ' {{ cert_label }}'
+    # ou: 'ANSIBLE CORE'
+    # country: 'US'
+    # keyring: 'SharedRing1'
+    # expiry_date: ''
+    # check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
   tasks:
     - block:
