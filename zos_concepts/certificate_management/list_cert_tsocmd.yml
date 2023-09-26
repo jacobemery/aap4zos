@@ -15,8 +15,8 @@
     # cert_type: 'CERTAUTH'
     # cert_label: 'ANDY CA'
 
-    cert_type: 'SITE'
-    cert_label: 'ANDY SITE'
+    cert_type: "{{ cert_type_survey | default('SITE') }}"
+    cert_label: "{{ cert_label_survey | default('Test Cert') }}"
 
   tasks:
     - include_role:
