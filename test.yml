@@ -9,4 +9,4 @@
 
     - name: Print command results.
       debug:
-        var: command
+        var: command.stdout
