@@ -50,4 +50,4 @@
       always:
         - name: "Print results from list cert command. Click on the output and go to the 'JSON' tab to show more output."
           debug:
-            var: command.output
+            var: command
