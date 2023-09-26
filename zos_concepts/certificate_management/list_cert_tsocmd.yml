@@ -40,17 +40,17 @@
         register: list_site_cert
 
       always:
-        - name: "Debug for USER"
+        - name: Print results from list USER cert command.
           debug:
             msg: "{{ list_user_cert.output[0].content }}"
           when: cert_type == 'USER'
 
-        - name: "Debug for CERTAUTH"
+        - name: Print results from list CERTAUTH command.
           debug:
             msg: "{{ list_certauth.output[0].content }}"
           when: cert_type == 'CERTAUTH'
 
-        - name: "Debug for SITE"
+        - name: Print results from list SITE cert command.
           debug:
             msg: "{{ list_site_cert.output[0].content }}"
           when: cert_type == 'SITE'
