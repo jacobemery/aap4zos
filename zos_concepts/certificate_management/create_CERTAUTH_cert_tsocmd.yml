@@ -6,7 +6,7 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: false
-  environment: " {{ environment_vars }}"
+  # environment: " {{ environment_vars }}"
   vars:
     # owner_id: 'IBMUSER'
     # cert_label: 'Test Cert'
