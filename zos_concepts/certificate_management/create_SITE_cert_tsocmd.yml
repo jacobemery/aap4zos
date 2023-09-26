@@ -8,15 +8,15 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'IBMSUER'
-    cert_label: 'TEST SITE'
-    sign_label: 'TEST CA'
-    cn: '{{cert_label}}.svl.ibm.com'
-    ou: '{{cert_label}}'
-    country: 'US'
-    expiry_date: '2021-12-28'
-    keyring: 'SharedRing1'
-    check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    cert_label: "{{ cert_label_survey | default('TEST SITE') }}"
+    sign_label: "{{ cert_label_survey | default('TEST CA') }}"
+    ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
+    cn: "{{ cn_survey }}"
+    country: "{{ country_survey | default('US') }}"
+    expiry_date: "{{ expiry_date_survey | default('2030-01-01') }}"
+    keyring: "{{ keyring_survey | default('SharedRing1') }}"
+    check_name: "{{ check_name_survey | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
   tasks:
     - block:
@@ -28,6 +28,16 @@
               - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
               - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
       ignore_errors: true
+
+    - name: Get FQDN of this z/OS server from USS, if cn is undefined.
+      command: hostname
+      when: cn is undefined
+      register: get_hostname
+
+    - name: Set cn fact from previous task, if cn is undefined.
+      set_fact:
+        cn: "{{ get_hostname.stdout }}"
+      when: cn is undefined
 
     - include_role:
         name: issue_tso_cmd
