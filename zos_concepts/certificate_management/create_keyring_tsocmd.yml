@@ -1,0 +1,17 @@
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    keyring: "{{ keyring_survey | default('SharedRing1') }}"
+
+  tasks:
+    - include_role:
+        name: issue_tso_cmd
+      vars:
+        task_description: 'Creating keyring {{keyring}}'
+        command:
+          - RACDCERT ID({{ owner_id}}) ADDRING({{keyring}})
+          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
