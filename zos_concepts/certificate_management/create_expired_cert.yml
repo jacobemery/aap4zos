@@ -30,6 +30,7 @@
       copy:
         src: "{{ playbook_dir }}/expired_cert/"
         dest: "/u/{{ owner_id }}/expired_cert/" 
+        exclude: .gitkeep
 
     - name: Copy the USS file to a sequential data.
       zos_copy:
