@@ -8,13 +8,6 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    # owner_id: 'OMVSADM'
-    # cert_type: 'USER'
-    # cert_label: 'ANDY SSL'
-
-    # cert_type: 'CERTAUTH'
-    # cert_label: 'ANDY CA'
-
     cert_type: "{{ cert_type_survey | default('SITE') }}"
     cert_label: "{{ cert_label_survey | default('TEST SITE') }}"
 
