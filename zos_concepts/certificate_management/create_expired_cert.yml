@@ -15,6 +15,7 @@
         privatekey_path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
         provider: selfsigned
         selfsigned_not_after: "20000101000000Z"
+        ignore_timestamps: true
 
     - name: Copy expired cert contents to folder on z/OS host.
       copy:
