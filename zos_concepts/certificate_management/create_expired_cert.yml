@@ -5,7 +5,7 @@
   become: false
   tasks:
 
-    - name: Generate private key
+    - name: Generate private key.
       community.crypto.openssl_privatekey:
         path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
 
@@ -22,10 +22,23 @@
     - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
+  vars:
+    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
   tasks:
 
     - name: Copy expired cert contents to folder on z/OS host.
       copy:
         src: "{{ playbook_dir }}/expired_cert/"
-        dest: /u/ibmuser/expired_cert/
-        
+        dest: "/u/{{ owner_id }}/expired_cert/" 
+
+    - name: Copy the USS file to a sequential data.
+      zos_copy:
+        src: "/u/{{ owner_id }}/expired_cert/expired_cert.pem"
+        dest: "{{ owner_id }}.CERTS.EXPIRED"
+        remote_src: true
+        force: true
+      register: copy_to_ds
+
+    - name: Response for copying expired_cert.pem to data set.
+      debug:
+        var: copy_to_ds
