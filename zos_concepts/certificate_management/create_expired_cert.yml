@@ -17,6 +17,13 @@
         selfsigned_not_before: +0s
         selfsigned_not_after: +1s
 
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
     - name: Copy expired cert contents to folder on z/OS host.
       copy:
         src: "{{ playbook_dir }}/expired_cert/"
