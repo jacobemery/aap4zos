@@ -8,16 +8,13 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    # owner_id: 'OMVSKERN'
-    # ring_name: 'SharedRing1'
-
-    owner_id: 'OMVSADM'
-    ring_name: 'WEBSSL'
+    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    keyring: "{{ keyring_survey | default('SharedRing1') }}"
 
   tasks:
     - include_role:
         name: issue_tso_cmd
       vars:
-        task_description: 'Deleting keyring {{ring_name}}'
+        task_description: 'Deleting keyring {{keyring}}'
         command:
-          - RACDCERT ID({{ owner_id}}) DELRING({{ring_name}})
+          - RACDCERT ID({{ owner_id}}) DELRING({{keyring}})
