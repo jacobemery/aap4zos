@@ -8,7 +8,6 @@
     - name: Generate expired certificate on controller.
       community.crypto.x509_certificate:
         path: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
-        privatekey_path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
         provider: selfsigned
         selfsigned_not_after: "20000101000000Z"
 
