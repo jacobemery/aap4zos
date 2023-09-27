@@ -8,16 +8,9 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'OMVSADM'
-    cert_type: 'USER'
-    cert_label: 'ANDY SSL'
-
-    # cert_type: 'CERTAUTH'
-    # cert_label: 'ANDY CA'
-
-    # cert_type: 'SITE'
-    # cert_label: 'ANDY SITE'
-
+    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    cert_type: "{{ cert_type_survey | default('USER') }}"
+    cert_label: "{{ cert_label_survey | default('TEST USER') }}"
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
   tasks:
