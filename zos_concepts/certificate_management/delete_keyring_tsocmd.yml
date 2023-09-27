@@ -18,3 +18,4 @@
         task_description: 'Deleting keyring {{keyring}}'
         command:
           - RACDCERT ID({{ owner_id}}) DELRING({{keyring}})
+          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
