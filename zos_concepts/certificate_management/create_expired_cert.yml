@@ -5,6 +5,10 @@
   become: false
   tasks:
 
+    - name: Generate private key
+      community.crypto.openssl_privatekey:
+        path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
+
     - name: Generate expired certificate on controller.
       community.crypto.x509_certificate:
         path: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
