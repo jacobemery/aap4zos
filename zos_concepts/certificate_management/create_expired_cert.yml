@@ -24,6 +24,8 @@
   environment: "{{ environment_vars }}"
   vars:
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    cert_label: "{{ cert_label_survey | default('EXPIRED') }}"
+
   tasks:
 
     - name: Create temp destination folder.
@@ -44,6 +46,8 @@
         force: true
       register: copy_to_ds
 
-    - name: Response for copying expired_cert.pem to data set.
-      debug:
-        var: copy_to_ds
+    - name: Add expired certificate to RACF.
+      zos_tso_command:
+        commands:
+          - "RACDCERT ADD('{{ owner_id }}.CERTS.EXPIRED') ID({{ owner_id }}) NOTRUST WITHLABEL('{{ cert_label }}')"
+          - "SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH"
