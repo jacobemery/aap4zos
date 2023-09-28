@@ -66,5 +66,5 @@
     - name: Add expired certificate to RACF.
       zos_tso_command:
         commands:
-          - "RACDCERT ADD({{ owner_id }}.CERTS.EXPIRED) ID({{ owner_id }}) NOTRUST WITHLABEL({{ cert_label }})"
+          - "RACDCERT ADD({{ owner_id }}.CERTS.EXPIRED) ID({{ owner_id }}) NOTRUST WITHLABEL('{{ cert_label }}')"
           - "SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH"
