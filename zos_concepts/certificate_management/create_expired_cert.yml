@@ -44,6 +44,9 @@
         dest: "{{ owner_id }}.CERTS.EXPIRED"
         remote_src: true
         force: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
       register: copy_to_ds
 
     - name: Add expired certificate to RACF.
