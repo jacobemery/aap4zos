@@ -1,22 +1,28 @@
-# ---
-# - name: Generate an expired X.509 certificate.
-#   hosts: localhost
-#   gather_facts: false
-#   become: false
-#   tasks:
-
-#     - name: Generate private key.
-#       community.crypto.openssl_privatekey:
-#         path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
-
-#     - name: Generate expired certificate on controller.
-#       community.crypto.x509_certificate:
-#         path: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
-#         privatekey_path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
-#         provider: selfsigned
-#         selfsigned_not_before: +0s
-#         selfsigned_not_after: +1s
 ---
+- name: Generate an expired X.509 certificate.
+  hosts: localhost
+  gather_facts: false
+  become: false
+  tasks:
+
+    - name: Generate private key.
+      community.crypto.openssl_privatekey:
+        path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
+
+    # - name: Generate expired certificate on controller.
+    #   community.crypto.x509_certificate:
+    #     path: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
+    #     privatekey_path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
+    #     provider: selfsigned
+    #     selfsigned_not_before: +0s
+    #     selfsigned_not_after: +1s
+
+    - name: Generate certificate in der format.
+      shell: "openssl req -x509 -newkey rsa:4096 -keyout {{ playbook_dir }}/expired_cert/private_key.der -out {{ playbook_dir }}/expired_cert/expired_cert.der -days 0 -outform DER"
+
+    - name: Copy to z/OS in binary.
+      shell: 'scp -i ~/.ssh/id_rsa -o "TransferMode=binary" {{ playbook_dir }}/expired_cert/expired_cert.der {{ hostvars[zos_host].ansible_user }}@{{ hostvars[zos_host].zos_ip }}:/tmp'
+
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
@@ -28,43 +34,26 @@
 
   tasks:
 
-    - name: Generate private key.
-      community.crypto.openssl_privatekey:
-        path: "/tmp/expired_cert/expired_key.pem"
-
-    - name: Generate expired certificate on controller.
-      community.crypto.x509_certificate:
-        path: "/tmp/expired_cert/expired_cert.pem"
-        privatekey_path: "/tmp/expired_cert/expired_key.pem"
-        provider: selfsigned
-        selfsigned_not_before: +0s
-        selfsigned_not_after: +1s
-
-    # - name: Create temp destination folder.
-    #   file:
-    #     state: directory
-    #     path: /tmp/expired_cert/
-
-    # - name: Copy expired cert contents to folder on z/OS host.
-    #   copy:
-    #     src: "/tmp/expired_cert/expired_cert.pem"
-    #     dest: /tmp/expired_cert/expired_cert.pem
+    - name: Copy expired cert contents to folder on z/OS host.
+      copy:
+        src: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
+        dest: /tmp/expired_cert.der
 
     - name: Copy the USS file to a sequential data.
       zos_copy:
-        src: /tmp/expired_cert/expired_cert.pem
+        src: /tmp/expired_cert.der
         dest: "{{ owner_id }}.CERTS.EXPIRED"
         remote_src: true
         force: true
         dest_data_set:
           type: SEQ
           record_format: VB
-          record_length: 1700
-          block_size: 6800
+          record_length: 1024
+          block_size: 4096
       register: copy_to_ds
 
     - name: Add expired certificate to RACF.
       zos_tso_command:
         commands:
-          - "RACDCERT ADD({{ owner_id }}.CERTS.EXPIRED) ID({{ owner_id }}) NOTRUST WITHLABEL('{{ cert_label }}')"
+          - "RACDCERT ADD('{{ owner_id }}.CERTS.EXPIRED') ID({{ owner_id }}) NOTRUST WITHLABEL('{{ cert_label }}')"
           - "SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH"
