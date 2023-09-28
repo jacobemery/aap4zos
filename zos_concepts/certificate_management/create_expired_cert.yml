@@ -17,11 +17,21 @@
     #     selfsigned_not_before: +0s
     #     selfsigned_not_after: +1s
 
+    - name: Install faketime package.
+      package:
+        name: faketime
+
     - name: Generate certificate in der format.
-      shell: "openssl req -x509 -newkey rsa:4096 -keyout {{ playbook_dir }}/expired_cert/private_key.der -out {{ playbook_dir }}/expired_cert/expired_cert.der -days 0 -outform DER"
+      shell: |
+        faketime '2022-01-01 5 pm' /bin/bash -c 'openssl req -x509 -newkey rsa:4096 -keyout {{ playbook_dir }}/expired_cert/expired_key.pem -outform der -out {{ playbook_dir }}/expired_cert/expired_cert.der -days 1 -nodes'
+      register: openssl_output
+      failed_when: openssl_output.rc != 0
 
     - name: Copy to z/OS in binary.
-      shell: 'scp -i ~/.ssh/id_rsa -o "TransferMode=binary" {{ playbook_dir }}/expired_cert/expired_cert.der {{ hostvars[zos_host].ansible_user }}@{{ hostvars[zos_host].zos_ip }}:/tmp'
+      shell: |
+        scp -i ~/.ssh/id_rsa {{ playbook_dir }}/expired_cert/expired_cert.der {{ hostvars[zos_host].ansible_user }}@{{ hostvars[zos_host].zos_ip }}:/tmp
+      register: scp_output
+      failed_when: scp_output.rc != 0
 
 - hosts: zos_host
   collections:
