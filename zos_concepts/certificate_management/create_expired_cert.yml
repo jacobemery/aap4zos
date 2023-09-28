@@ -26,6 +26,11 @@
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
   tasks:
 
+    - name: Create temp destination folder.
+      file:
+        state: directory
+        path: /tmp/expired_cert/
+
     - name: Copy expired cert contents to folder on z/OS host.
       copy:
         src: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
