@@ -30,7 +30,6 @@
       copy:
         src: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
         dest: "/u/{{ owner_id | lower }}/expired_cert/expired_cert.pem" 
-        unsafe_writes: true
 
     - name: Copy the USS file to a sequential data.
       zos_copy:
