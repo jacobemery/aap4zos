@@ -29,11 +29,11 @@
     - name: Copy expired cert contents to folder on z/OS host.
       copy:
         src: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
-        dest: "/u/{{ owner_id | lower }}/expired_cert/expired_cert.pem" 
+        dest: /tmp/expired_cert/expired_cert.pem
 
     - name: Copy the USS file to a sequential data.
       zos_copy:
-        src: "/u/{{ owner_id | lower }}/expired_cert/expired_cert.pem"
+        src: /tmp/expired_cert/expired_cert.pem
         dest: "{{ owner_id }}.CERTS.EXPIRED"
         remote_src: true
         force: true
