@@ -47,6 +47,8 @@
         dest_data_set:
           type: SEQ
           record_format: VB
+          record_length: 1024
+          block_size: 4096
       register: copy_to_ds
 
     - name: Add expired certificate to RACF.
