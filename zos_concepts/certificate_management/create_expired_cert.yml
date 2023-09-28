@@ -1,22 +1,22 @@
+# ---
+# - name: Generate an expired X.509 certificate.
+#   hosts: localhost
+#   gather_facts: false
+#   become: false
+#   tasks:
+
+#     - name: Generate private key.
+#       community.crypto.openssl_privatekey:
+#         path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
+
+#     - name: Generate expired certificate on controller.
+#       community.crypto.x509_certificate:
+#         path: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
+#         privatekey_path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
+#         provider: selfsigned
+#         selfsigned_not_before: +0s
+#         selfsigned_not_after: +1s
 ---
-- name: Generate an expired X.509 certificate.
-  hosts: localhost
-  gather_facts: false
-  become: false
-  tasks:
-
-    - name: Generate private key.
-      community.crypto.openssl_privatekey:
-        path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
-
-    - name: Generate expired certificate on controller.
-      community.crypto.x509_certificate:
-        path: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
-        privatekey_path: "{{ playbook_dir }}/expired_cert/expired_key.pem"
-        provider: selfsigned
-        selfsigned_not_before: +0s
-        selfsigned_not_after: +1s
-
 - hosts: zos_host
   collections:
     - ibm.ibm_zos_core
@@ -28,15 +28,27 @@
 
   tasks:
 
-    - name: Create temp destination folder.
-      file:
-        state: directory
-        path: /tmp/expired_cert/
+    - name: Generate private key.
+      community.crypto.openssl_privatekey:
+        path: "/tmp/expired_cert/expired_key.pem"
 
-    - name: Copy expired cert contents to folder on z/OS host.
-      copy:
-        src: "{{ playbook_dir }}/expired_cert/expired_cert.pem"
-        dest: /tmp/expired_cert/expired_cert.pem
+    - name: Generate expired certificate on controller.
+      community.crypto.x509_certificate:
+        path: "/tmp/expired_cert/expired_cert.pem"
+        privatekey_path: "/tmp/expired_cert/expired_key.pem"
+        provider: selfsigned
+        selfsigned_not_before: +0s
+        selfsigned_not_after: +1s
+
+    # - name: Create temp destination folder.
+    #   file:
+    #     state: directory
+    #     path: /tmp/expired_cert/
+
+    # - name: Copy expired cert contents to folder on z/OS host.
+    #   copy:
+    #     src: "/tmp/expired_cert/expired_cert.pem"
+    #     dest: /tmp/expired_cert/expired_cert.pem
 
     - name: Copy the USS file to a sequential data.
       zos_copy:
