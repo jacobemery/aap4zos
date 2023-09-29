@@ -1,24 +1,10 @@
 ---
-- hosts: zos_host
-  gather_facts: false
-  environment: "{{ environment_vars }}"
-  vars:
-    cn: "{{ cn_survey }}"
-  tasks:
-    - name: Get FQDN of this z/OS server from USS, if cn is undefined.
-      command: hostname
-      when: cn is undefined
-      register: get_hostname
-
-    - name: Set cn fact from previous task, if cn is undefined.
-      set_fact:
-        cn: "{{ get_hostname.stdout }}"
-      when: cn is undefined
-  
 - name: Generate an expired X.509 certificate.
   hosts: localhost
   gather_facts: false
   become: false
+  vars:
+    cn: "{{ cn_survey }}"
   tasks:
 
     - name: Generate private key.
@@ -41,9 +27,23 @@
       ansible.builtin.command:
         cmd: "dnf install -y faketime --setopt=skip_if_unavailable=true"
 
+    - name: Get FQDN of this z/OS server from USS, if cn is undefined.
+      environment: "{{ environment_vars }}"
+      command: hostname
+      when: cn is undefined
+      register: get_hostname
+      delegate_to: zos_host
+
+    - name: Set cn fact from previous task, if cn is undefined.
+      environment: "{{ environment_vars }}"
+      set_fact:
+        cn: "{{ get_hostname.stdout }}"
+      when: cn is undefined
+      delegate_to: zos_host
+
     - name: Generate certificate in der format.
       shell: |
-        faketime '2022-01-01 5 pm' /bin/bash -c 'openssl req -x509 -newkey rsa:4096 -keyout {{ playbook_dir }}/expired_cert/expired_key.pem -outform der -out {{ playbook_dir }}/expired_cert/expired_cert.der -days 1 -nodes -subj "/CN={{ hostvars['zos_host'].cn }}"'
+        faketime '2022-01-01 5 pm' /bin/bash -c 'openssl req -x509 -newkey rsa:4096 -keyout {{ playbook_dir }}/expired_cert/expired_key.pem -outform der -out {{ playbook_dir }}/expired_cert/expired_cert.der -days 1 -nodes -subj "/CN={{ cn }}"'
       register: openssl_output
       failed_when: openssl_output.rc != 0
 
