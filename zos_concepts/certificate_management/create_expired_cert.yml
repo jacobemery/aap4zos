@@ -21,10 +21,9 @@
       ansible.builtin.command:
         cmd: "dnf install -y https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm --setopt=skip_if_unavailable=true"
 
-
-    - name: Install faketime package.
-      package:
-        name: faketime
+- name: Install faketime by bypassing repo checks
+  ansible.builtin.command:
+    cmd: "dnf install -y faketime --setopt=skip_if_unavailable=true"
 
     - name: Generate certificate in der format.
       shell: |
