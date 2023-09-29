@@ -17,12 +17,10 @@
     #     selfsigned_not_before: +0s
     #     selfsigned_not_after: +1s
 
-    - name: Enable repo.
-      shell: |
-        set -o pipefail
-        echo -e "[rhel-8-for-s390x-baseos-rpms]\nname=RHEL 8 for s390x - BaseOS\nbaseurl=http://path/to/repo\nenabled=1\ngpgcheck=0" > /etc/yum.repos.d/rhel-8-for-s390x-baseos-rpms.repo
-        dnf clean all
-        dnf makecache
+    - name: Install EPEL
+      ansible.builtin.yum:
+        name: https://dl.fedoraproject.org/pub/epel/epel-release-latest-8.noarch.rpm
+        state: present
 
     - name: Install faketime package.
       package:
