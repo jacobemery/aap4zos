@@ -1,5 +1,5 @@
 ---
-- host: zos_host
+- hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
