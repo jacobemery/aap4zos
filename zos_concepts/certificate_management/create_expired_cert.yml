@@ -25,7 +25,7 @@
 
 - name: Generate an expired X.509 certificate.
   hosts: localhost
-  gather_facts: false
+  gather_facts: true
   become: false
   vars:
     cn: "{{ cn_survey }}"
