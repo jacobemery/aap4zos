@@ -24,7 +24,7 @@
       when: cn is undefined
 
 - name: Generate an expired X.509 certificate.
-  hosts: localhost
+  hosts: automationcontroller
   gather_facts: true
   become: false
   vars:
