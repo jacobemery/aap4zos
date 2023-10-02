@@ -6,18 +6,18 @@
 # Specifies the user name to be associated with the new user ID.
 # You can use a maximum of 20 alphanumeric or non-alphanumeric characters.
 ##################################################################################################################
-name: "New User"
+name: 
 
 ##################################################################################################################
 # Specifies the user to be defined to RACF.
 ##################################################################################################################
-userid: "NEWUSER"
+userid: 
 
 ##################################################################################################################
 # Specifies the name of a RACF-defined group to be used as the default group for the user.
 # If you do not specify a group, RACF uses your current connect group as the default.
 ##################################################################################################################
-default_group: "SYS1"
+default_group: 
 
 ##################################################################################################################
 # Specifies the level of group authority for the new user in the default group.
@@ -26,13 +26,13 @@ default_group: "SYS1"
 # This operand is group-related. If a user is connected to other groups (with the CONNECT command),
 # the user can have a different group authority in each group.
 ##################################################################################################################
-default_group_authority: "USE"
+default_group_authority: 
 
 ##################################################################################################################
 # Specifies a RACF-defined user or group to be assigned as the owner of the RACF profile for the user being added.
 # If you omit this operand, you are defined as the owner.
 ##################################################################################################################
-owner: "IBMUSER"
+owner: 
 
 ##################################################################################################################
 # Specifies the user catalog entryname for which an alias will be defined.
@@ -52,7 +52,7 @@ master_catalog:
 # do not apply to this password.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
-password: "changeM3!"
+password: 
 
 ##################################################################################################################
 # Specifies if a random password should be generated when no password is provided.
@@ -76,7 +76,7 @@ generate_password: true
 #     you must use two single quotation marks together for each single quotation mark.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
-passphrase: "changeM3please!"
+passphrase: 
 
 ##################################################################################################################
 # Specifies if a random passphrase should be generated when no passphrase is provided.
