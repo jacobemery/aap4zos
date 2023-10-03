@@ -41,6 +41,10 @@
       set_fact:
         job_results: "{{ job_submit }}"
 
+    - name: Print results.
+      debug:
+        msg: "{{ job_results }}"
+        
     - name: Set facts used in this playbook based on results.
       set_fact:
         submit_job_name: "{{ job_results.jobs[0].job_name }}"
