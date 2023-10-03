@@ -9,20 +9,26 @@
   environment: "{{ environment_vars }}"
   tasks:
 
-    - name: Create temp file for JCL contents from survey.
-      blockinfile:
-        path: "/tmp/{{ job_name }}.jcl"
-        block: "{{ job_contents }}"
-        create: true
-        marker: ""
+    - name: Copy JCL from template
+      copy: 
+        content: "{{ job_contents }}"
+        dest: "/tmp/{{ job_name }}.jcl"
       delegate_to: localhost
 
-    - name: Remove blank lines blockinfile put in
-      lineinfile :
-        path: "/tmp/{{ job_name }}.jcl"
-        state: absent
-        regexp: '^$'
-      delegate_to: localhost
+    # - name: Create temp file for JCL contents from survey.
+    #   blockinfile:
+    #     path: "/tmp/{{ job_name }}.jcl"
+    #     block: "{{ job_contents }}"
+    #     create: true
+    #     marker: ""
+    #   delegate_to: localhost
+
+    # - name: Remove blank lines blockinfile put in
+    #   lineinfile :
+    #     path: "/tmp/{{ job_name }}.jcl"
+    #     state: absent
+    #     regexp: '^$'
+    #   delegate_to: localhost
 
     - name: Get job contents from file.
       command: "cat /tmp/{{ job_name }}.jcl"
