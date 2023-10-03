@@ -31,9 +31,6 @@
         src: "/tmp/{{ job_name }}.jcl"
         location: USS
         wait_time_s: 60
-        # encoding:
-        #   from: IBM-037
-        #   to: IBM-037
       register: job_submit
       ignore_errors: true
       no_log: true
