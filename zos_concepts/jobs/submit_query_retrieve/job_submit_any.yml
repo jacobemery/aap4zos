@@ -37,13 +37,13 @@
       register: job_submit
       ignore_errors: true
 
-    - name: Set fact with results from job submission.
+    - name: Set fact with job ID from job submission.
       set_fact:
-        job_results: "{{ job_submit }}"
+        job_id: "{{ job_submit | regex_search('JOB\\d{5}') }}"
 
     - name: Print results.
       debug:
-        msg: "{{ job_results }}"
+        msg: "{{ job_id }}"
         
     - name: Set facts used in this playbook based on results.
       set_fact:
