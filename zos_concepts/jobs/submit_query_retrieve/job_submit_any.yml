@@ -55,7 +55,6 @@
     - name: Result for get job output for job ID {{submit_job_id}}
       debug:
         msg: "{{ job_output_result.results.msg.split('\n') }}"
-      ignore_errors: true
 
     # - name: Set facts used in this playbook based on results.
     #   set_fact:
