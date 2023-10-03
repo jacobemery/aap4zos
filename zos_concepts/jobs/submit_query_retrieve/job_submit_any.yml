@@ -12,8 +12,7 @@
     - name: Create temp file for JCL contents from survey.
       blockinfile:
         path: "/tmp/{{ job_name }}.jcl"
-        block: |
-          "{{ job_contents }}"
+        block: "{{ job_contents }}"
         create: true
       delegate_to: localhost
 
