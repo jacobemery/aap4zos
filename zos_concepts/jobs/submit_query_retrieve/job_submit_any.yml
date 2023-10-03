@@ -16,6 +16,14 @@
         create: true
       delegate_to: localhost
 
+    - name: Get job contents from file.
+      command: "cat /tmp/{{ job_name }}.jcl"
+      register: job_contents_from_file
+
+    - name: Print job contents from file.
+      debug:
+        msg: "{{ job_contents_from_file.stdout_lines }}"
+
     - name: Submit {{ job_name }} job.
       zos_job_submit:
         src: "/tmp/{{ job_name }}.jcl"
