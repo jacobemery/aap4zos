@@ -11,7 +11,7 @@
 
     - name: Create temp file for JCL contents from survey.
       blockinfile:
-        path: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
+        path: "/tmp/{{ job_name }}.jcl"
         block: |
           "{{ job_contents }}"
         create: true
@@ -19,7 +19,7 @@
 
     - name: Submit {{ job_name }} job.
       zos_job_submit:
-        src: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
+        src: "/tmp/{{ job_name }}.jcl"
         location: LOCAL
         wait_time_s: 60
         encoding:
