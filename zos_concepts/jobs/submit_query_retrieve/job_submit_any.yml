@@ -10,9 +10,10 @@
   tasks:
 
     - name: Copy JCL from template
-      copy: 
+      zos_copy: 
         content: "{{ job_contents }}"
         dest: "/tmp/{{ job_name }}.jcl"
+        force: true
 
     # - name: Create temp file for JCL contents from survey.
     #   blockinfile:
