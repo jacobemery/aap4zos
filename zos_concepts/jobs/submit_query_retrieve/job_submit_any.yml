@@ -13,7 +13,6 @@
       copy: 
         content: "{{ job_contents }}"
         dest: "/tmp/{{ job_name }}.jcl"
-      delegate_to: localhost
 
     # - name: Create temp file for JCL contents from survey.
     #   blockinfile:
@@ -33,7 +32,6 @@
     - name: Get job contents from file.
       command: "cat /tmp/{{ job_name }}.jcl"
       register: job_contents_from_file
-      delegate_to: localhost
 
     - name: Print job contents from file.
       debug:
@@ -42,7 +40,7 @@
     - name: Submit {{ job_name }} job.
       zos_job_submit:
         src: "/tmp/{{ job_name }}.jcl"
-        location: LOCAL
+        location: USS
         wait_time_s: 60
         encoding:
           from: UTF-8
