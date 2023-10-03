@@ -14,6 +14,14 @@
         path: "/tmp/{{ job_name }}.jcl"
         block: "{{ job_contents }}"
         create: true
+        marker: ""
+      delegate_to: localhost
+
+    - name: Remove blank lines blockinfile put in
+      lineinfile :
+        path: "/tmp/{{ job_name }}.jcl"
+        state: absent
+        regexp: '^$'
       delegate_to: localhost
 
     - name: Get job contents from file.
