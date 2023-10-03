@@ -36,7 +36,7 @@
         ignore_errors: true
         no_log: true
 
-      - rescue:
+      rescue:
         - name: Set fact with job ID from job submission.
           set_fact:
             job_id: "{{ job_submit | regex_search('JOB\\d{5}') }}"
