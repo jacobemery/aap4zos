@@ -19,6 +19,7 @@
     - name: Get job contents from file.
       command: "cat /tmp/{{ job_name }}.jcl"
       register: job_contents_from_file
+      delegate_to: localhost
 
     - name: Print job contents from file.
       debug:
