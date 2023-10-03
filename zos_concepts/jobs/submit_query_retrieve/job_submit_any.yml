@@ -18,8 +18,7 @@
 
     - name: Submit {{ job_name }} job.
       zos_job_submit:
-        src: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
-        location: LOCAL
+        src: "/tmp/{{ job_name }}.jcl"
         wait_time_s: 60
         encoding:
           from: ISO8859-1
@@ -53,16 +52,3 @@
           - "{{ submit_job_list }}"
           - Return Code={{ submit_job_ret_code }}
           - Return Code Message={{ submit_job_ret_code_msg }}
-
-    - name: Get job output for job ID {{ submit_job_id }}
-      zos_job_output:
-        job_id: "{{ submit_job_id }}"
-      register: job_output_result
-
-    - name: Result for get job output for job ID {{submit_job_id}}
-      debug:
-        msg: "{{ job_output_result }}"
-
-    - name: Debug return code variable.
-      debug:
-        var: job_results.jobs[0].ret_code.code
