@@ -14,6 +14,9 @@
         path: "/tmp/{{ job_name }}.jcl"
         block: "{{ job_contents }}"
         create: true
+        marker: ""
+        marker_begin: ""
+        marker_end: ""
       delegate_to: localhost
 
     - name: Submit {{ job_name }} job.
