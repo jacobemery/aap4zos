@@ -15,9 +15,13 @@
         block: "{{ job_contents }}"
         create: true
         marker: ""
-        marker_begin: ""
-        marker_end: ""
       delegate_to: localhost
+
+    - name: Remove blank lines blockinfile put in.
+      lineinfile:
+      path: "/tmp/{{ job_name }}.jcl"
+      state: absent
+      regexp: '^$'
 
     - name: Submit {{ job_name }} job.
       zos_job_submit:
