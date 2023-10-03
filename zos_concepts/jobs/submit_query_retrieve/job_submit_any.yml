@@ -22,7 +22,7 @@
         path: "/tmp/{{ job_name }}.jcl"
         state: absent
         regexp: '^$'
-    delegate_to: localhost
+      delegate_to: localhost
 
     - name: Submit {{ job_name }} job.
       zos_job_submit:
