@@ -16,10 +16,6 @@
         create: true
       delegate_to: localhost
 
-    - name: Print contents of JCL to be submitted.
-      debug:
-        msg: "{{ job_contents }}"
-
     - name: Submit {{ job_name }} job.
       zos_job_submit:
         src: "/tmp/{{ job_name }}.jcl"
