@@ -14,7 +14,7 @@
         content: "{{ job_contents }}"
         dest: "/tmp/{{ job_name }}.jcl"
         encoding:
-          from: UTF-8
+          from: ISO8859-1
           to: IBM-037
         force: true
 
