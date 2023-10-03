@@ -19,9 +19,10 @@
 
     - name: Remove blank lines blockinfile put in.
       lineinfile:
-      path: "/tmp/{{ job_name }}.jcl"
-      state: absent
-      regexp: '^$'
+        path: "/tmp/{{ job_name }}.jcl"
+        state: absent
+        regexp: '^$'
+    delegate_to: localhost
 
     - name: Submit {{ job_name }} job.
       zos_job_submit:
