@@ -4,11 +4,17 @@
     - ibm.ibm_zos_core
   gather_facts: false
   environment: "{{ environment_vars }}"
+  vars:
+    zos_operator_command: "{{ zos_operator_command_survey | default('D M=CPU') }}"
+    wait_time_s: "{{ wait_time_s_survey | default('1') }}"
+    verbose: "{{ verbose_survey | default('false') }}"
   tasks:
     - block:
       - name: Submit z/OS operator command.
         zos_operator:
-          cmd: "{{ zos_operator_command_survey | default(\"D M=CPU\")  }}"
+          cmd: "{{ zos_operator_command  }}"
+          wait_time_s: "{{ wait_time_s }}"
+          verbose: "{{ verbose }}"
         register: result_zos_operator
 
       always:
