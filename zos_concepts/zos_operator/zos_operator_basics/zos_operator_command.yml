@@ -15,6 +15,7 @@
           cmd: "{{ zos_operator_command  }}"
           wait_time_s: "{{ wait_time_s }}"
           verbose: "{{ verbose }}"
+        no_log: true
         register: result_zos_operator
 
       always:
