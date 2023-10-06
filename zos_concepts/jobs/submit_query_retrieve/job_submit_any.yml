@@ -48,12 +48,13 @@
         zos_job_output:
           job_id: "{{ job_id }}"
         register: job_output_result
+        no_log: true
 
       - name: Print job output for job ID {{ job_id }}.
         debug:
           msg: "{{ job_output_result }}"
 
       rescue:
-        - name: Print job output for job ID {{ job_id }} if it failed because of invalid start byte in results.
+        - name: Print job output for job ID {{ job_id }} if it failed because of invalid start byte bug in output.
           debug:
             msg: "{{ job_output_result.msg.split('\\n') }}"
