@@ -3,14 +3,12 @@
   collections:
     - ibm.ibm_zos_core
   gather_facts: false
-  vars:
-    zos_operator_command: "{{ zos_operator_command_survey.split('\n') | default(\"D M=CPU\") }}"
   environment: "{{ environment_vars }}"
   tasks:
     - block:
       - name: Submit z/OS operator command.
         zos_operator:
-          cmd: "{{ zos_operator_command }}"
+          cmd: "{{ zos_operator_command_survey | default(\"D M=CPU\")  }}"
         register: result_zos_operator
 
       always:
