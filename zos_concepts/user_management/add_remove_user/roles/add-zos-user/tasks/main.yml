@@ -6,7 +6,7 @@
 - name: Set omvs_home_directory if not set
   tags: home_dir
   ansible.builtin.set_fact:
-    omvs_home_directory: "/u/{{ userid }}"
+    omvs_home_directory: "/u/{{ userid | lower }}"
   when: omvs_home_directory is not defined or not omvs_home_directory
 
 - name: Verify user does not exist
@@ -70,15 +70,15 @@
   debug:
     msg: "DEFINE ALIAS ( NAME('{{ userid | upper }}'){%- if user_catalog is defined and user_catalog %} RELATE('{{ user_catalog | upper }}'){%- endif %}{%- if master_catalog is defined and master_catalog %} CATALOG('{{ master_catalog | upper }}'){%- endif %}"
 
-# - name: Define alias for user ID
-#   tags: alias
-#   ibm.ibm_zos_core.zos_tso_command:
-#     commands: "{{ lookup('template', '../templates/define-alias.j2') }}"
+- name: Define alias for user ID
+  tags: alias
+  ibm.ibm_zos_core.zos_tso_command:
+    commands: "{{ lookup('template', '../templates/define-alias.j2') }}"
 
 - name: Create the users ISPPROF data set
   tags: ispprof_data_set, data_set
   ibm.ibm_zos_core.zos_data_set:
-    name: "{{ userid }}.SPF.ISPPROF"
+    name: "{{ userid | upper }}.SPF.ISPPROF"
     state: present
     type: pds
     space_primary: 2
@@ -90,7 +90,7 @@
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
   ibm.ibm_zos_core.zos_data_set:
-    name: "{{ omvs_zfs_data_set_name }}"
+    name: "{{ omvs_zfs_data_set_name | upper }}"
     state: present
     replace: true
     type: lds

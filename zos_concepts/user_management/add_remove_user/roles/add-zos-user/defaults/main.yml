@@ -6,18 +6,18 @@
 # Specifies the user name to be associated with the new user ID.
 # You can use a maximum of 20 alphanumeric or non-alphanumeric characters.
 ##################################################################################################################
-name: 
+name:
 
 ##################################################################################################################
 # Specifies the user to be defined to RACF.
 ##################################################################################################################
-userid: 
+userid:
 
 ##################################################################################################################
 # Specifies the name of a RACF-defined group to be used as the default group for the user.
 # If you do not specify a group, RACF uses your current connect group as the default.
 ##################################################################################################################
-default_group: 
+default_group:
 
 ##################################################################################################################
 # Specifies the level of group authority for the new user in the default group.
@@ -26,24 +26,24 @@ default_group:
 # This operand is group-related. If a user is connected to other groups (with the CONNECT command),
 # the user can have a different group authority in each group.
 ##################################################################################################################
-default_group_authority: 
+default_group_authority:
 
 ##################################################################################################################
 # Specifies a RACF-defined user or group to be assigned as the owner of the RACF profile for the user being added.
 # If you omit this operand, you are defined as the owner.
 ##################################################################################################################
-owner: 
+owner:
 
 ##################################################################################################################
 # Specifies the user catalog entryname for which an alias will be defined.
 ##################################################################################################################
-user_catalog: 
+user_catalog: CATALOG.VS01.TSO
 
 ##################################################################################################################
 # Identifies the catalog in which the alias is defined. If the catalog's volume is physically mounted,
 # it is dynamically allocated. The volume must be mounted as permanently resident or reserved.
 ##################################################################################################################
-master_catalog: 
+master_catalog: CATALOG.VS01.MASTER
 
 ##################################################################################################################
 # Specifies the user's initial logon password. This password is always set expired,
@@ -52,7 +52,7 @@ master_catalog:
 # do not apply to this password.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
-password: 
+password:
 
 ##################################################################################################################
 # Specifies if a random password should be generated when no password is provided.
@@ -76,12 +76,12 @@ generate_password: true
 #     you must use two single quotation marks together for each single quotation mark.
 # Whether password or passphrase arguments are used depends on system configuration. Passphrase takes priority.
 ##################################################################################################################
-passphrase: 
+passphrase:
 
 ##################################################################################################################
 # Specifies if a random passphrase should be generated when no passphrase is provided.
 ##################################################################################################################
-generate_passphrase: true
+generate_passphrase: false 
 
 ##################################################################################################################
 # Specifies if a password and/or passphrase should be printed to the console upon completion of the playbook.
@@ -91,27 +91,27 @@ print_pass: true
 ##################################################################################################################
 # Specifies the SMTP server to use for sending email, if sending email is desired.
 ##################################################################################################################
-smtp_server: 
+smtp_server:
 
 ##################################################################################################################
 # Specifies the SMTP port to use for sending email, if sending email is desired.
 ##################################################################################################################
-smtp_port: 
+smtp_port:
 
 ##################################################################################################################
 # Specifies the username to use for sending email, if sending email is desired.
 ##################################################################################################################
-smtp_username: 
+smtp_username:
 
 ##################################################################################################################
 # Specifies the password to use for sending email, if sending email is desired.
 ##################################################################################################################
-smtp_password: 
+smtp_password:
 
 ##################################################################################################################
 # Specifies the email address which should receive the logon credentials for the new user.
 ##################################################################################################################
-email_to: 
+email_to:
 
 ##################################################################################################################
 # Specifies if an email should be sent containing new user credentials.
@@ -127,7 +127,7 @@ send_email: false
 # A security label corresponds to a particular security level (such as CONFIDENTIAL) with a set of
 # zero or more security categories (such as PAYROLL or PERSONNEL).
 ##################################################################################################################
-security_label: 
+security_label:
 
 ##################################################################################################################
 # Specifies the user's security level, where security_level is an installation-defined security
@@ -135,14 +135,14 @@ security_label:
 # The security_level that you specify corresponds to the number of the minimum security level
 # that a user must have to access the resource.
 ##################################################################################################################
-security_level: 
+security_level:
 
 ##################################################################################################################
 # Specifies one or more names of installation-defined security categories.
 # The names you specify must be defined as members of the CATEGORY profile in a SECDATA class.
 # security_categories must be provided as a list.
 ##################################################################################################################
-security_categories: 
+security_categories:
 
 ##################################################################################################################
 # Specifies the user's z/OS UNIX initial directory path name.
@@ -151,7 +151,7 @@ security_categories:
 # The HOME path name can consist of any characters.
 # If left blank, home directory is /u/userid.
 ##################################################################################################################
-omvs_home_directory: 
+omvs_home_directory: "/u/{{ userid | lower }}"
 
 ##################################################################################################################
 # Specifies the user identifier. The UID is a numeric value from 0 - 2 147 483 647.
@@ -160,18 +160,18 @@ omvs_home_directory:
 # command and can access z/OS UNIX files based on the UID and GID values assigned.
 # If left blank, AUTOUID is used.
 ##################################################################################################################
-omvs_uid: 
+omvs_uid:
 
 ##################################################################################################################
 # Specifies the group identifier. The GID is a numeric value from 0 - 2 147 483 647.
 # If no GID specified, the default is used.
 ##################################################################################################################
-omvs_gid: 
+omvs_gid:
 
 ##################################################################################################################
 # Specifies the name of the data set to be used when creating ZFS data set.
 ##################################################################################################################
-omvs_zfs_data_set_name: "{{ user_catalog }}.{{ userid }}"
+omvs_zfs_data_set_name: "{{ user_catalog }}.{{ userid | upper }}"
 
 ##################################################################################################################
 # Specifies amount of space, in cylinders, to allocate for the ZFS data set.
@@ -183,33 +183,33 @@ omvs_zfs_data_set_size: 50
 ##################################################################################################################
 # Specifies the data set which contains BPXPRMxx members to modify.
 ##################################################################################################################
-bpxprm_data_set: "SYS1.PARMLIB"
+bpxprm_data_set: SYS1.PARMLIB
 
 ##################################################################################################################
 # Specifies the last 2 characters (xx) of the BPXPRMxx member
 # in bpxprm_data_set to which a mount command for new user's ZFS data set will be added.
 # If not specified, no persistent mount will be made for new ZFS data set.
 ##################################################################################################################
-bpxprm_member: 
+bpxprm_member:
 
 ##################################################################################################################
 # Specifies the user's default TSO account number when logging on through the TSO/E logon panel.
 # The account number you specify must be protected by a profile in the ACCTNUM general resource class.
 # Account numbers can consist of any characters, and can be entered with or without single quotation marks.
 ##################################################################################################################
-tso_account_number: 
+tso_account_number:
 
 ##################################################################################################################
 # Specifies the name of the user's default logon procedure when logging on through the TSO/E logon panel.
 # The name you specify must be 1 - 8 alphanumeric characters and begin with an alphabetic character.
 # The name must also be defined as a profile in the TSOPROC general resource class.
 ##################################################################################################################
-tso_logon_procedure: 
+tso_logon_procedure:
 
 ##################################################################################################################
 # Specifies an 8-character DFP data application identifier.
 ##################################################################################################################
-dfp_data_application: 
+dfp_data_application:
 
 ##################################################################################################################
 # Specifies the default data class. The maximum length of data-class-name is 8 characters.
@@ -217,7 +217,7 @@ dfp_data_application:
 # During new data set allocation, data management uses the value you specify as a default unless it is
 # preempted by a higher priority default, or overridden in some other way, for example by JCL.
 ##################################################################################################################
-data_class: 
+data_class:
 
 ##################################################################################################################
 # Specifies the default management class. The maximum length of management-class-name is 8 characters.
@@ -225,7 +225,7 @@ data_class:
 # Data management uses the value you specify as a default unless it is preempted by a higher priority default,
 # or overridden in some other way, for example by JCL.
 ##################################################################################################################
-management_class: 
+management_class:
 
 ##################################################################################################################
 # Specifies the default storage class. The maximum length of storage-class-name is 8 characters.
@@ -234,7 +234,7 @@ management_class:
 # as a default unless it is preempted by a higher priority default,
 # or overridden in some other way (for example, by JCL).
 ##################################################################################################################
-storage_class: 
+storage_class:
 
 ##################################################################################################################
 # A list of groups to which the user should be added.
@@ -259,7 +259,7 @@ storage_class:
 #       owner: ""
 #       authority: "CREATE"
 ##################################################################################################################
-groups_to_connect: 
+groups_to_connect:
 
 ##################################################################################################################
 # A list of resources the user should be permitted to access.
@@ -299,7 +299,7 @@ resources_to_permit:
 #     - src: "../templates/datatemplate.j2"
 #       dest: "{{ userid }}.private.somedata"
 ##################################################################################################################
-templates_to_copy: 
+templates_to_copy:
 
 ##################################################################################################################
 # A list of any files on control node that should be copied to the z/OS host.
@@ -316,7 +316,7 @@ templates_to_copy:
 #     - src: "../files/datafinal.txt"
 #       dest: "{{ userid }}.private.mydata"
 ##################################################################################################################
-files_to_copy: 
+files_to_copy:
 
 ##################################################################################################################
 # Specifies the character set any copied templates and files should be converted to.
