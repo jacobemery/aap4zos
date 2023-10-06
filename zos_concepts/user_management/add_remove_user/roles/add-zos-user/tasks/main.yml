@@ -87,10 +87,16 @@
     block_size: 3120
     record_length: 80
 
+- name: Set omvs_zfs_data_set_name if not set
+  tags: home_dir
+  ansible.builtin.set_fact:
+    omvs_zfs_data_set_name: "{{ omvs_zfs_data_set_name | default('OMVS.USER.' + userid | upper + '.ZFS') }}"
+  when: omvs_zfs_data_set_name is not defined or not omvs_zfs_data_set_name
+
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
   ibm.ibm_zos_core.zos_data_set:
-    name: "{{ omvs_zfs_data_set_name | upper }}"
+    name: "{{ omvs_zfs_data_set_name }}"
     state: present
     replace: true
     type: lds
