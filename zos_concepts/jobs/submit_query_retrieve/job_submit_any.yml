@@ -43,12 +43,12 @@
       debug:
         msg: "{{ job_id }}"
         
-    - name: Get job output for job ID {{ job_id }}
-      zos_job_output:
-        job_id: "{{ job_id }}"
-      register: job_output_result
-
     - block:
+      - name: Get job output for job ID {{ job_id }}
+        zos_job_output:
+          job_id: "{{ job_id }}"
+        register: job_output_result
+
       - name: Print job output for job ID {{ job_id }}.
         debug:
           msg: "{{ job_output_result }}"
