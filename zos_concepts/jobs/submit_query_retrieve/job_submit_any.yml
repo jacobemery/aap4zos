@@ -51,14 +51,10 @@
           msg: "{{ job_output_result }}"
 
       rescue:
-        # - name: Print output of {{ job_id }} in alternate way because of 'invalid start byte' bug in output of failed tasks.
-        #   debug:
-        #     msg: "{{ job_output_result.msg.split('\\n') }}"
-
         - name: Print output of {{ job_id }} in alternate way because of 'invalid start byte' bug in output of failed tasks.
           debug:
-            msg: "{{ job_output_result }}"
+            msg: "{{ job_output_result.msg.split('\\n') }}"
 
         - name: Fail playbook to accurately reflect that the {{ job_id }} failed.
           fail:
-            # msg: 
+            msg: "{{ job_id }} failed, see above output for more details."
