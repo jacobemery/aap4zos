@@ -26,63 +26,36 @@
       debug:
         msg: "{{ job_contents_from_file.stdout_lines }}"
     
+    - name: Submit {{ job_name }} job.
+      zos_job_submit:
+        src: "/tmp/{{ job_name }}.jcl"
+        location: USS
+        wait_time_s: 60
+      register: job_submit
+      no_log: true
+      ignore_errors: true
+
+    - name: Set fact with job ID from job submission.
+      set_fact:
+        job_id: "{{ job_submit | regex_search('JOB\\d{5}') }}"
+
+    - name: Print job ID.
+      debug:
+        msg: "{{ job_id }}"
+        
+    - name: Get job output for job ID {{ job_id }}
+      zos_job_output:
+        job_id: "{{ job_id }}"
+      register: job_output_result
+      ignore_errors: true
+      no_log: true
+
     - block:
-      - name: Submit {{ job_name }} job.
-        zos_job_submit:
-          src: "/tmp/{{ job_name }}.jcl"
-          location: USS
-          wait_time_s: 60
-        register: job_submit
-        no_log: true
+      - name: Print result for get job output for job ID {{ job_id }}
+        debug:
+          msg: "{{ job_output_result }}"
 
       rescue:
-        - name: Set fact with job ID from job submission.
-          set_fact:
-            job_id: "{{ job_submit | regex_search('JOB\\d{5}') }}"
-
-        - name: Print results.
-          debug:
-            msg: "{{ job_id }}"
-            
-        - name: Get job output for job ID {{ submit_job_id }}
-          zos_job_output:
-            job_id: "{{ job_id }}"
-          register: job_output_result
-          ignore_errors: true
-          no_log: true
-
-        - name: Result for get job output for job ID {{submit_job_id}}
+        - name: Print result for get job output for job ID {{ job_id }} for jobs that failed.
           debug:
             msg: "{{ job_output_result.msg.split('\\n') }}"
-
-    - name: Get job output for job ID {{ submit_job_id }}
-      zos_job_output:
-        job_id: "{{ submit_job_id }}"
-      register: job_output_result
-
-    - name: Result for get job output for job ID {{submit_job_id}}
-      debug:
-        msg: "{{ job_output_result }}"
-
-    # - name: Set facts used in this playbook based on results.
-    #   set_fact:
-    #     submit_job_name: "{{ job_results.jobs[0].job_name }}"
-    #     submit_job_id: "{{ job_results.jobs[0].job_id }}"
-    #     submit_jobs_ddnames_length: "{{ job_results.jobs[0].ddnames |length }}"
-    #     submit_job_ddnames_list: "{{ job_results.jobs[0].ddnames }}"
-    #     submit_job_list: "{{ job_results.jobs[0] }}"
-    #     submit_job_ret_code: "{{ job_results.jobs[0].ret_code.code }}"
-    #     submit_job_ret_code_msg: "{{ job_results.jobs[0].ret_code.msg }}"
-    #     submit_job_subsystem: "{{ job_results.jobs[0].subsystem }}"
-
-    # - name: Print results for job {{ submit_job_name }}
-    #   debug:
-    #     msg:
-    #       - Job name={{ submit_job_name }}
-    #       - Subsystem={{ submit_job_subsystem }}
-    #       - Job ID={{ submit_job_id }}
-    #       - DD Count={{ submit_jobs_ddnames_length }}
-    #       - "{{ submit_job_ddnames_list }}"
-    #       - "{{ submit_job_list }}"
-    #       - Return Code={{ submit_job_ret_code }}
-    #       - Return Code Message={{ submit_job_ret_code_msg }}
