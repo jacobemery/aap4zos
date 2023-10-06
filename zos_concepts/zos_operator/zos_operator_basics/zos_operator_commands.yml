@@ -4,16 +4,16 @@
     - ibm.ibm_zos_core
   gather_facts: false
   vars:
-    zos_operator_command: "{{ zos_op_command_survey.split('\n') | default(\"D M=CPU\") }}"
+    zos_operator_commands: "{{ zos_operator_commands_survey.split('\n') | default(\"D M=CPU\") }}"
   environment: "{{ environment_vars }}"
   tasks:
     - block:
-      - name: Submit z/OS operator command.
+      - name: Submit z/OS operator command(s).
         zos_operator:
-          cmd: "{{ zos_op_command }}"
+          cmd: "{{ zos_operator_commands }}"
         register: result_zos_operator
 
       always:
-      - name: Response from operator command.
+      - name: Response from operator command(s).
         debug:
           msg: "{{ result_zos_operator }}"
