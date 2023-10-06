@@ -38,10 +38,6 @@
     - name: Set fact with job ID from job submission.
       set_fact:
         job_id: "{{ job_submit | regex_search('JOB\\d{5}') }}"
-
-    - name: Print job ID.
-      debug:
-        msg: "{{ job_id }}"
         
     - block:
       - name: Get job output for job ID {{ job_id }}
