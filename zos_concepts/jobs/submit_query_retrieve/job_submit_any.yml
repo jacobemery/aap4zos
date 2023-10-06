@@ -33,7 +33,6 @@
           location: USS
           wait_time_s: 60
         register: job_submit
-        ignore_errors: true
         no_log: true
 
       rescue:
