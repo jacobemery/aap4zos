@@ -20,4 +20,4 @@
       always:
       - name: Response from operator command.
         debug:
-          msg: "{{ result_zos_operator }}"
+          msg: "{{ result_zos_operator.content }}"
