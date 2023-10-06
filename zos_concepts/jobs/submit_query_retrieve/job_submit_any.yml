@@ -51,11 +51,11 @@
       no_log: true
 
     - block:
-      - name: Print result for get job output for job ID {{ job_id }}
+      - name: Print job output for job ID {{ job_id }}.
         debug:
           msg: "{{ job_output_result }}"
 
       rescue:
-        - name: Print result for get job output for job ID {{ job_id }} for jobs that failed.
+        - name: Print job output for job ID {{ job_id }} if it failed because of invalid start byte in results.
           debug:
             msg: "{{ job_output_result.msg.split('\\n') }}"
