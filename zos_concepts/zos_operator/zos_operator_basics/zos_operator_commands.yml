@@ -1,0 +1,19 @@
+---
+- hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  vars:
+    zos_operator_command: "{{ zos_op_command_survey.split('\n') | default(\"D M=CPU\") }}"
+  environment: "{{ environment_vars }}"
+  tasks:
+    - block:
+      - name: Submit z/OS operator command.
+        zos_operator:
+          cmd: "{{ zos_op_command }}"
+        register: result_zos_operator
+
+      always:
+      - name: Response from operator command.
+        debug:
+          msg: "{{ result_zos_operator }}"
