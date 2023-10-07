@@ -246,5 +246,3 @@
     secure: always
   delegate_to: localhost
   when: send_email is defined and send_email is not none and send_email
-  no_log: true
-
