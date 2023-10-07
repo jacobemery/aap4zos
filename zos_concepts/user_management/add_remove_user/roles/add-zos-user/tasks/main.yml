@@ -87,11 +87,10 @@
     block_size: 3120
     record_length: 80
 
-- name: Set omvs_zfs_data_set_name if not set
+- name: Ensure omvs_zfs_data_set_name is uppercase
   tags: home_dir
   ansible.builtin.set_fact:
-    omvs_zfs_data_set_name: "OMVS.USER.{{ userid | upper }}.ZFS"
-  when: omvs_zfs_data_set_name is not defined or not omvs_zfs_data_set_name
+    omvs_zfs_data_set_name: "{{ omvs_zfs_data_set_name | default('OMVS.USER.' + userid | upper + '.ZFS') | upper }}"
 
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
@@ -116,10 +115,6 @@
     state: directory
     owner: "{{ userid | lower }}"
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
-
-# - name: Mount ZFS to user directory
-#   tags: mount
-#   ansible.builtin.command: "/usr/sbin/mount -t zfs -f {{ omvs_zfs_data_set_name | upper }} {{ omvs_home_directory }}"
 
 - name: Mount ZFS to user directory
   ansible.posix.mount:
@@ -146,14 +141,14 @@
       from: ISO8859-1
       to: "{{ target_charset }}"
   with_items: "{{ files_to_copy }}"
-  when: files_to_copy is defined and files_to_copy | length > 0
+  when: files_to_copy is defined
 
 - name: Copy templates
   tags: template
   ansible.builtin.include_tasks:
     file: copy-template.yml
   with_items: "{{ templates_to_copy }}"
-  when: templates_to_copy is defined and templates_to_copy | length > 0
+  when: templates_to_copy is defined
 
 - name: Make mount persistent
   when: bpxprm_member is defined and bpxprm_member
