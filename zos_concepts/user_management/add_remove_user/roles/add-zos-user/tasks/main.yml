@@ -233,21 +233,9 @@
     msg: "UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
   when: print_pass is defined and print_pass
 
-- name: Check required variables for sending email
-  tags: email_check
-  ansible.builtin.fail:
-    msg: "Required variable '{{ item }}' is not defined or set to None"
-  loop:
-    - smtp_server
-    - smtp_port
-    - smtp_username
-    - smtp_password
-    - email_to
-  when: >
-    send_email is defined and
-    send_email is not none and
-    send_email and
-    (vars[item] is none or vars[item] is not defined)
+- name: Skip email task if send_email is false
+  meta: end_host
+  when: send_email is not true
 
 - name: Send email containing login credentials to owner of new user
   tags: email
@@ -262,3 +250,5 @@
     secure: always
   delegate_to: localhost
   when: send_email is defined and send_email is not none and send_email
+  no_log: true
+
