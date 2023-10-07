@@ -93,14 +93,6 @@
     omvs_zfs_data_set_name: "OMVS.USER.{{ userid | upper }}.ZFS"
   when: omvs_zfs_data_set_name is not defined or not omvs_zfs_data_set_name
 
-- name: Debug variables
-  ansible.builtin.debug:
-    msg:
-      - "UserID: {{ userid }}"
-      - "ZFS Data Set Name: {{ omvs_zfs_data_set_name }}"
-      - "Home Directory: {{ omvs_home_directory }}"
-
-
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
   ibm.ibm_zos_core.zos_data_set:
@@ -134,6 +126,7 @@
   ansible.builtin.file:
     path: "{{ omvs_home_directory }}"
     state: directory
+    mode: 0711
     owner: "{{ userid }}"
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
 
