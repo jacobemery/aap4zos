@@ -140,8 +140,8 @@
     encoding:
       from: ISO8859-1
       to: "{{ target_charset }}"
-  with_items: "{{ files_to_copy }}"
-  when: files_to_copy is defined
+  with_items: "{{ files_to_copy | default([]) }}"
+  when: files_to_copy is defined and files_to_copy is not none
 
 - name: Copy templates
   tags: template
