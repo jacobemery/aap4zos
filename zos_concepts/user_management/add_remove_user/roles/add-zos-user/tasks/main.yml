@@ -90,8 +90,7 @@
 - name: Set omvs_zfs_data_set_name
   tags: home_dir
   ansible.builtin.set_fact:
-    omvs_zfs_data_set_name: "{{ omvs_zfs_data_set_name | default('OMVS.USER.' + (userid | upper) + '.ZFS') }}"
-
+    omvs_zfs_data_set_name: "{{ ( omvs_zfs_data_set_name | default('OMVS.USER.' + userid | upper + '.ZFS', true) ) | upper }}"
 
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
@@ -107,7 +106,7 @@
 
 - name: Format LDS as ZFS
   tags: zfs_data_set, data_set
-  ansible.builtin.command: zfsadm format -aggregate {{ omvs_zfs_data_set_name }}
+  ansible.builtin.command: zfsadm format -aggregate {{ omvs_zfs_data_set_name | upper }}
 
 - name: Create user's omvs directory if it does not exist
   tags: home_dir
