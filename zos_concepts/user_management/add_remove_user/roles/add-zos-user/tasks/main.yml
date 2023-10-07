@@ -147,8 +147,8 @@
   tags: template
   ansible.builtin.include_tasks:
     file: copy-template.yml
-  with_items: "{{ templates_to_copy }}"
-  when: templates_to_copy is defined
+  with_items: "{{ templates_to_copy | default([]) }}"
+  when: templates_to_copy is defined and templates_to_copy is not none
 
 - name: Make mount persistent
   when: bpxprm_member is defined and bpxprm_member
