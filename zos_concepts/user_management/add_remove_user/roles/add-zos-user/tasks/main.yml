@@ -245,5 +245,6 @@
     body: "A new UserID has been created on {{ inventory_hostname }}. UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
     secure: always
   delegate_to: localhost
-  when: send_email is defined and send_email
+  when: send_email is defined and send_email is not none and send_email
   no_log: true
+
