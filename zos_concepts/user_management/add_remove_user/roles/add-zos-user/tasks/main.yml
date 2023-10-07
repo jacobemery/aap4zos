@@ -89,8 +89,8 @@
 
 - name: Ensure omvs_zfs_data_set_name is defined 
   tags: home_dir
-  ansible.builtin.set_fact:
-    omvs_zfs_data_set_name: "{{ (omvs_zfs_data_set_name | default('OMVS.USER.' + (userid | upper) + '.ZFS')) | upper }}"
+  ansible.builtin.debug:
+    msg: "{{ (omvs_zfs_data_set_name | default('OMVS.USER.' + (userid | upper) + '.ZFS')) | upper }}"
 
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
