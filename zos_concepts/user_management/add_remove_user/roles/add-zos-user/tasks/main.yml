@@ -243,11 +243,11 @@
     - smtp_username
     - smtp_password
     - email_to
-  when: 
-    - send_email is defined 
-    - send_email is not none 
-    - send_email 
-    - (vars[item] is none or vars[item] is not defined)
+  when: >
+    send_email is defined and
+    send_email is not none and
+    send_email and
+    (vars[item] is none or vars[item] is not defined)
 
 - name: Send email containing login credentials to owner of new user
   tags: email
