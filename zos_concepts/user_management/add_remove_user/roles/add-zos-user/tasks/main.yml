@@ -96,7 +96,7 @@
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
   ibm.ibm_zos_core.zos_data_set:
-    name: "{{ omvs_zfs_data_set_name }}"
+    name: "{{ omvs_zfs_data_set_name | upper }}"
     state: present
     replace: true
     type: lds
