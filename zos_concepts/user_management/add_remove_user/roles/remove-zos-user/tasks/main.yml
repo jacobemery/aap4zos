@@ -4,7 +4,7 @@
 # tasks file for remove-zos-user
 - name: Set omvs_home_directory if not set
   ansible.builtin.set_fact:
-    omvs_home_directory: "/u/{{ userid }}"
+    omvs_home_directory: "/u/{{ userid | lower }}"
   when: omvs_home_directory is not defined or not omvs_home_directory
 
 - name: Get information about the user

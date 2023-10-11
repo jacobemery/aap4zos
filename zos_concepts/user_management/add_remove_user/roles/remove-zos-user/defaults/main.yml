@@ -6,7 +6,7 @@
 ##################################################################################################################
 # Specifies the user to be removed from RACF.
 ##################################################################################################################
-userid: ""
+userid:
 
 ##################################################################################################################
 # Specifies a RACF-defined user or group that owns the group data set profiles now owned by the
@@ -17,12 +17,7 @@ userid: ""
 # The new owner of the group data set profiles must have at least USE authority in the specified group.
 # Do not specify a user who is being removed from the group as the new data set profile owner.
 ##################################################################################################################
-new_owner: ""
-
-##################################################################################################################
-# Specifies the user catalog entryname for which an alias is defined.
-##################################################################################################################
-user_catalog: ""
+new_owner:
 
 ##################################################################################################################
 # Specifies the user's z/OS UNIX initial directory path name.
@@ -31,12 +26,12 @@ user_catalog: ""
 # The HOME path name can consist of any characters.
 # If left blank, home directory is /u/userid.
 ##################################################################################################################
-omvs_home_directory: ""
+omvs_home_directory:
 
 ##################################################################################################################
 # Specifies the name of the data set to be used when removing ZFS data set.
 ##################################################################################################################
-omvs_zfs_data_set_name: "{{ user_catalog }}.{{ userid }}"
+omvs_zfs_data_set_name: 'OMVS.USER.{{ userid | upper }}.ZFS'
 
 ##################################################################################################################
 # Specifies the data set which contains BPXPRMxx members to modify.
@@ -48,7 +43,7 @@ bpxprm_data_set: "SYS1.PARMLIB"
 # in SYS1.PARMLIB in which a persistent ZFS mount command exists for the user to be removed.
 # If not specified, no persistent mount will be removed.
 ##################################################################################################################
-bpxprm_member: ""
+bpxprm_member:
 
 ##################################################################################################################
 # Specifies if the user data sets should be deleted.
