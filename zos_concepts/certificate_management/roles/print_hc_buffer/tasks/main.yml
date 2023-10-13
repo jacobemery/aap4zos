@@ -32,6 +32,6 @@
         msg: "{{ submit_job_id }}"
 
     - name: Query submitted job by job_id.
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ submit_job_id }}"
       register: query_job
