@@ -36,6 +36,9 @@
       ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ submit_job_id }}"
       register: query_job
+      until: query_job['msg']['message'] | length > 0
+      retries: 10  # Number of retries before giving up
+      delay: 30    # Delay in seconds between retries
 
     - name: Response for query submitted job by job_id.
       debug:
