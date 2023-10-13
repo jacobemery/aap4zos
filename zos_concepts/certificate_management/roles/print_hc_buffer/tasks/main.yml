@@ -22,7 +22,7 @@
         # src: USER.PRIVATE.PROCLIB(HZSPRINT)
         # location: DATA_SET
         # wait: true
-        wait_time_s: 30
+        wait_time_s: 60
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
       register: hc_job_output
