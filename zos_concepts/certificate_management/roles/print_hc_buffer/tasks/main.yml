@@ -22,6 +22,7 @@
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
       register: hc_job_output
+      ignore_errors: true
 
     - name: Set job id fact used in this playbook
       set_fact:
