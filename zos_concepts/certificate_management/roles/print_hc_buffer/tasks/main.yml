@@ -25,7 +25,6 @@
         wait_time_s: 30
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
-        wait: true
       register: hc_job_output
 
 # - name: "{{task_description}}"
