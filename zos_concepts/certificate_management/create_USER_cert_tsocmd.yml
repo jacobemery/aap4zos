@@ -10,7 +10,7 @@
   vars:
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
     cert_label: "{{ cert_label_survey | default('TEST USER') }}"
-    sign_label: "{{ sign_label_survey | default('TEST CA') }}"
+    sign_label: "{{ sign_label_survey | default(' ') }}"
     cn: "{{ cn_survey }}"
     ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
     country: "{{ country_survey | default('US') }}"
