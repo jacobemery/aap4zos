@@ -16,7 +16,7 @@
     userid: "{{ userid_survey }}"
     new_owner: "{{ new_owner_survey | default(omit) }}"
     omvs_home_directory: "{{ omvs_home_directory_survey | default('/u/' + (userid | lower)) }}"
-    omvs_zfs_data_set_name: "{{ omvs_zfs_data_set_name_survey | default(''OMVS.USER.' + (userid | upper) + '.ZFS'') }}"
+    omvs_zfs_data_set_name: "{{ omvs_zfs_data_set_name_survey | default(\"OMVS.USER.\" + (userid | upper) + \".ZFS\") }}"
     bpxprm_data_set: "{{ bpxprm_data_set_survey | default('SYS1.PARMLIB') }}"
     bpxprm_member: "{{ bpxprm_member_survey | default(omit) }}"
     delete_user_data_sets: "{{ delete_user_data_sets_survey | default('true') }}"
