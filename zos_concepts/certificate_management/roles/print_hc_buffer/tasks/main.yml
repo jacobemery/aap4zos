@@ -19,21 +19,19 @@
 
     - name: Get expiring certs report for {{ hc_check }}
       ibm.ibm_zos_core.zos_job_submit:
-        # src: USER.PRIVATE.PROCLIB(HZSPRINT)
-        # location: DATA_SET
-        # wait: true
-        wait_time_s: 60
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
       register: hc_job_output
 
-# - name: "{{task_description}}"
-#   ibm.ibm_zos_core.zos_mvs_raw:
-#     pgm: HZSPRNT
-#     auth: yes
-#     parm: "REGION=0M,PARM={{parm_string}}"
-#     dds:
-#       - dd_output:
-#           dd_name: SYSOUT
-#           return_content:
-#             type: text
+    - name: Set job id fact used in this playbook
+      set_fact:
+        submit_job_id: "{{ hc_job_output.results[0]['jobs'][0]['job_id'] }}"
+
+    - name: Fact `submit_job_id` set with value
+      debug:
+        msg: "{{ submit_job_id }}"
+
+    - name: Query submitted job by job_id.
+      zos_job_query:
+        job_id: "{{ submit_job_id }}"
+      register: query_job
