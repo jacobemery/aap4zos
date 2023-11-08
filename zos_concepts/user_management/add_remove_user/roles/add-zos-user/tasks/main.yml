@@ -227,6 +227,10 @@
         state: absent
       when: backup.path is defined and backup.path
 
+- name: Print print_pass for debugging.
+  debug:
+    var: print_pass
+
 - name: Print password info
   tags: print_info
   ansible.builtin.debug:
