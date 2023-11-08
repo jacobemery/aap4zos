@@ -231,11 +231,11 @@
   tags: print_info
   ansible.builtin.debug:
     msg: "UserID: '{{ userid | upper }}' Password: '{{ password }}' Passphrase: '{{ passphrase }}'"
-  when: print_pass is defined and print_pass
+  when: print_pass
 
 - name: Skip email task if send_email is false
   meta: end_host
-  when: send_email
+  when: send_email is not true
 
 - name: Send email containing login credentials to owner of new user
   tags: email
