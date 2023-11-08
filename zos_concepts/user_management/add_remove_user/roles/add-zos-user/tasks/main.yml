@@ -128,7 +128,7 @@
   ansible.builtin.file:
     path: "{{ omvs_home_directory }}"
     state: directory
-    mode: 0711
+    mode: '0711'
     owner: "{{ userid | lower }}"
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
 
@@ -235,7 +235,7 @@
 
 - name: Skip email task if send_email is false
   meta: end_host
-  when: send_email is not true
+  when: send_email
 
 - name: Send email containing login credentials to owner of new user
   tags: email
