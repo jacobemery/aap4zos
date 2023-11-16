@@ -24,7 +24,7 @@
         # wait: true
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
-        wait_time_s: 300
+        wait_time_s: 1440
       register: hc_job_output
 
     # - name: Set job id fact used in this playbook
