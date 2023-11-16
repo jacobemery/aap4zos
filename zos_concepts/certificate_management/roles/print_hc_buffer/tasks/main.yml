@@ -19,11 +19,13 @@
 
     - name: Get expiring certs report for {{ hc_check }}
       ibm.ibm_zos_core.zos_job_submit:
+        # src: USER.PRIVATE.PROCLIB(HZSPRINT)
+        # location: DATA_SET
+        # wait: true
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
-        wait_time_s: 200
+        wait_timeS: 300
       register: hc_job_output
-      ignore_errors: true
 
     # - name: Set job id fact used in this playbook
     #   set_fact:
