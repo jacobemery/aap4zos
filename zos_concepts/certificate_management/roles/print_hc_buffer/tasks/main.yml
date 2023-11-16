@@ -21,7 +21,7 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
-        wait_time_s: 100
+        wait_time_s: 200
       register: hc_job_output
       ignore_errors: true
 
