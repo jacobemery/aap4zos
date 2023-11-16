@@ -21,25 +21,26 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
+        wait_time_s: 100
       register: hc_job_output
       ignore_errors: true
 
-    - name: Set job id fact used in this playbook
-      set_fact:
-        submit_job_id: "{{ hc_job_output['jobs'][0]['job_id'] }}"
+    # - name: Set job id fact used in this playbook
+    #   set_fact:
+    #     submit_job_id: "{{ hc_job_output['jobs'][0]['job_id'] }}"
 
-    - name: Fact `submit_job_id` set with value
-      debug:
-        msg: "{{ submit_job_id }}"
+    # - name: Fact `submit_job_id` set with value
+    #   debug:
+    #     msg: "{{ submit_job_id }}"
 
-    - name: Query submitted job by job_id.
-      ibm.ibm_zos_core.zos_job_query:
-        job_id: "{{ submit_job_id }}"
-      register: query_job
-      until: query_job['message'] | default('') | length > 0
-      retries: 10  # Number of retries before giving up
-      delay: 30    # Delay in seconds between retries
+    # - name: Query submitted job by job_id.
+    #   ibm.ibm_zos_core.zos_job_query:
+    #     job_id: "{{ submit_job_id }}"
+    #   register: query_job
+    #   until: query_job['message'] | default('') | length > 0
+    #   retries: 10  # Number of retries before giving up
+    #   delay: 30    # Delay in seconds between retries
 
-    - name: Response for query submitted job by job_id.
-      debug:
-        msg: "{{ query_job }}"
+    # - name: Response for query submitted job by job_id.
+    #   debug:
+    #     msg: "{{ query_job }}"
