@@ -12,6 +12,6 @@
         state: absent 
       register: ds_delete
 
-    - name: Response for creating the dataset.
+    - name: Response for deleting the dataset.
       debug:
         msg: "{{ ds_delete }}"
