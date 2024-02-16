@@ -1,0 +1,27 @@
+---
+- name: Query Operator console for actionable messages.
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  gather_facts: no
+  tasks:
+    - name: Detecting system name for later use.
+      ansible.builtin.command: uname -n
+      register: result
+
+    - name: Setting fact `system_name` for later use. 
+      ansible.builtin.set_fact:
+        system_name: "{{ result.stdout }}"
+
+    - name: Fact `system_name` set with value
+      ansible.builtin.debug:
+        msg: "{{ system_name }}"
+
+    - name: Query actionable messages on system {{ system_name }}.
+      ibm.ibm_zos_corezos_operator_action_query:
+        system: "{{ system_name }}"
+      register: result_zos_operator_action_pre_query
+
+    - name: Response for query actionable messages on system {{ system_name }}.
+      ansible.builtin.debug:
+        msg: "{{ result_zos_operator_action_pre_query }}"
+      when: result_zos_operator_action_pre_query is defined and not result_zos_operator_action_pre_query.failed
