@@ -17,7 +17,7 @@
         msg: "{{ system_name }}"
 
     - name: Query actionable messages on system {{ system_name }}.
-      ibm.ibm_zos_corezos_operator_action_query:
+      ibm.ibm_zos_core.zos_operator_action_query:
         system: "{{ system_name }}"
       register: result_zos_operator_action_pre_query
 
