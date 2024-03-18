@@ -44,8 +44,7 @@
       vars:
         issue_tso_cmd_task_description: 'Create new CA cert and connect to keyring'
         issue_tso_cmd_command:
-          - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}')\
-           C('{{ country }}')) WITHLABEL('{{ cert_label }}') NOTAFTER(DATE({{ expiry_date }}))
+          - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') NOTAFTER(DATE({{ expiry_date }}))
           - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
       when: not expiry_date == ''
 
