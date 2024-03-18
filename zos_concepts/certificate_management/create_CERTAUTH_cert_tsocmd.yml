@@ -27,6 +27,7 @@
             issue_tso_cmd_command:
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
           register: issue_tso_cmd_keyring_check
+          failed_when: false
 
         - name: Create a new keyring via TSO commands if keyring does not exist.
           ansible.builtin.include_role:
