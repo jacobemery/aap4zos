@@ -57,7 +57,7 @@
         - name: Create new SITE cert and connect to keyring.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT GENCERT SITE SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') SIGNWITH(CERTAUTH LABEL('{{ sign_label }}'){{ ' NOTAFTER(DATE(''' + expiry_date + '''))' if expiry_date != '' else '' }}
+              - RACDCERT GENCERT SITE SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') SIGNWITH(CERTAUTH LABEL('{{ sign_label }}')){{ ' NOTAFTER(DATE(''' + expiry_date + '''))' if expiry_date != '' else '' }}
               - RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
               - RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
