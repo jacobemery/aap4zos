@@ -65,7 +65,7 @@
               - RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
               - RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD107I No matching certificate was found for this user.' in list_cert"
+          when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content"
 
     - name: Stop TN3270 server.
       ibm.ibm_zos_core.zos_operator:
