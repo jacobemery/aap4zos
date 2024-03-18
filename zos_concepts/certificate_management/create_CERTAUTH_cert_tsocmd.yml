@@ -26,6 +26,10 @@
           register: keyring_check
           failed_when: false
 
+        - name: Debug.
+          ansible.builtin.debug:
+            var: keyring_check.output[0].content[0]
+
         - name: Create a new keyring via TSO commands, skip if it already exists.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
