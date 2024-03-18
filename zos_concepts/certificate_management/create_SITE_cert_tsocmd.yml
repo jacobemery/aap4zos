@@ -19,62 +19,57 @@
     check_name: "{{ check_name_survey | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
   tasks:
-    - block:
-        - include_role:
-            name: issue_tso_cmd
-          vars:
-            task_description: 'Create a new keyring'
-            command:
-              - RACDCERT ADDRING({{keyring}}) ID({{owner_id}})
-              - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
-      ignore_errors: true
+    - name: Check if keyring already exists and create it if it doesn't.
+      block:
+        - name: Check if keyring to be created already exists.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+          register: keyring_check
+          failed_when: false
+
+        - name: Create a new keyring via TSO commands, skip if it already exists.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
+              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check"
 
     - name: Get FQDN of this z/OS server from USS, if cn is undefined.
-      command: hostname
+      ansible.builtin.command: hostname
       when: cn is undefined
       register: get_hostname
 
     - name: Set cn fact from previous task, if cn is undefined.
-      set_fact:
+      ansible.builtin.set_fact:
         cn: "{{ get_hostname.stdout }}"
       when: cn is undefined
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Create new SITE cert and connect to keyring'
-        command:
-          - RACDCERT SITE GENCERT  SUBJECTSDN(CN('{{cn}}')  OU('{{ou}}') C('{{country}}'))  WITHLABEL('{{cert_label}}')   SIGNWITH(CERTAUTH LABEL('{{sign_label}}'))  NOTAFTER(DATE({{expiry_date}}))
-          - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) SITE
-          - RACDCERT ID({{owner_id}})  CONNECT(SITE LABEL('{{cert_label}}')  RING({{keyring}}) DEFAULT USAGE(PERSONAL))
-          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
-      when: not expiry_date == ''
+    - name: Check if certificate already exists and create it if it doesn't.
+      block:
+        - name: 'Check if cert to be created already exists.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
+          register: list_cert
+          failed_when: false
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Create new SITE cert and connect to keyring'
-        command:
-          - RACDCERT SITE GENCERT  SUBJECTSDN(CN('{{cn}}')  OU('{{ou}}') C('{{country}}'))  WITHLABEL('{{cert_label}}')   SIGNWITH(CERTAUTH LABEL('{{sign_label}}'))
-          - RACDCERT LISTCHAIN (LABEL('{{cert_label}}')) SITE
-          - RACDCERT ID({{owner_id}})  CONNECT(SITE LABEL('{{cert_label}}')  RING({{keyring}}) DEFAULT USAGE(PERSONAL))
-          - RACDCERT LISTRING({{keyring}}) ID({{owner_id}})
-      when: expiry_date == ''
+        - name: Create new SITE cert and connect to keyring.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - "RACDCERT SITE GENCERT SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') SIGNWITH(CERTAUTH LABEL('{{ sign_label }}')){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
+              - RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
+              - RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
+              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+          when: "'IRRD107I No matching certificate was found for this user.' in list_cert"
 
-    - include_role:
-        name: issue_operator_cmd
-      vars:
-        task_description: 'Stop TN3270 server'
-        command: 'p TN3270'
+    - name: Stop TN3270 server.
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'p TN3270'
 
-    - include_role:
-        name: issue_operator_cmd
-      vars:
-        task_description: 'Start TN3270 server'
-        command: 's TN3270'
+    - name: Start TN3270 server
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 's TN3270'
 
-    - include_role:
-        name: issue_operator_cmd
-      vars:
-        task_description: 'Run Health Checker'
-        command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+    - name: Run Healther Checker via operator command.
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
