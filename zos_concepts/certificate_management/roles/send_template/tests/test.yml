@@ -2,4 +2,4 @@
 - hosts: localhost
   remote_user: root
   roles:
-    - send-template
+    - send_template

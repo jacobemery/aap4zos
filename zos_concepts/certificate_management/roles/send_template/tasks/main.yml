@@ -1,0 +1,19 @@
+---
+###############################################################################
+# © Copyright IBM Corporation 2020, 2021
+###############################################################################
+
+# tasks file for send_template
+- name: Send template
+  ansible.builtin.template:
+    src: '{{ send_template_path }}'
+    dest: '{{ uss_file_path }}/{{ send_template_path | basename }}'
+    mode: '0755'
+
+- name: Encode all template files.
+  ansible.builtin.shell: "iconv -f ISO8859-1 -t IBM-1047 {{ send_template_path | basename }} > {{ send_template_path | basename }}1;\
+    chtag -tc IBM-1047 {{ send_template_path | basename }}1; mv {{ send_template_path | basename }}1 {{ send_template_path | basename }}"
+  args:
+    chdir: "{{ uss_file_path }}"
+  changed_when: false
+  check_mode: false
