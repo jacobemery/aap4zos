@@ -35,7 +35,7 @@
             commands:
               - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check.output[0].content[0]"
+          when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"
 
     - name: Check if certificate already exists and create it if it doesn't.
       block:
