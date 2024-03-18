@@ -33,17 +33,20 @@
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
           when: "'IRRD114I Ring' + keyring + 'does not exist.' in issue_tso_cmd_keyring_check"
 
-    - name: 'Displaying cert {{ cert_label }}'
-      ibm.ibm_zos_core.zos_tso_command:
-        commands: "RACDCERT CERTAUTH LIST(LABEL('{{ cert_label }}'))"
-      register: list_cert
+    - name: Check if certificate already exists and create it if it doesn't.
+      block:
+        - name: 'Displaying cert {{ cert_label }}'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT CERTAUTH LIST(LABEL('{{ cert_label }}'))"
+          register: list_cert
+          failed_when: false
 
-    - name: Create new CA cert and connect to keyring via TSO commands.
-      ibm.ibm_zos_core.zos_tso_command:
-        commands:
-          - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
-          - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
-      when: "'IRRD107I No matching certificate was found for this user.' in list_cert"
+        - name: Create new CA cert and connect to keyring via TSO commands.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
+              - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
+          when: "'IRRD107I No matching certificate was found for this user.' in list_cert"
       # when: not expiry_date == ''
 
     # - name: Create new CA cert and connect to keyring when expiry date is empty via TSO commands.
