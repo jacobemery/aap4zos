@@ -45,7 +45,6 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
-              - SETROPTS RACLIST(DIGTCERT) CLASSACT(DIGTCERT)
               - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
           when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content[0]"
       # when: not expiry_date == ''
