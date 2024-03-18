@@ -1,3 +1,3 @@
 ---
 # vars file for print_hc_buffer
-hc_check: ''
+print_hc_buffer_hc_check: ''

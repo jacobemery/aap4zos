@@ -1,4 +1,4 @@
 ---
 # vars file for issue_racf_cmd
-command: ''
-task_description: 'issue RACF commands'
+issue_racf_cmd_command: ''
+issue_racf_cmd_task_description: 'issue RACF commands'

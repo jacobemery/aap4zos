@@ -1,7 +1,7 @@
-{{ JOB_CARD }}
+{{ print_hc_buffer_job_card }}
 //HZSPRINT EXEC PGM=HZSPRNT,TIME=100,REGION=0M,PARMDD=SYSIN
 //SYSIN DD *,DLM='@@'
-CHECK({{ hc_check }})
+CHECK({{ print_hc_buffer_hc_check }})
 ,EXCEPTIONS
 @@
 //SYSOUT   DD SYSOUT=A,DCB=(LRECL=256)

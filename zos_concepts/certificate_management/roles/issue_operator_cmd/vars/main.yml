@@ -1,4 +1,4 @@
 ---
 # vars file for issue_operator_cmd
-command: ''
-task_description: 'issue operator command'
+issue_operator_cmd_command: ''
+issue_operator_cmd_task_description: 'issue operator command'

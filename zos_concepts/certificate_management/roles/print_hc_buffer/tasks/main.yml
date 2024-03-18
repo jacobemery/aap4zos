@@ -7,25 +7,59 @@
 ###########################################################################
 # skeleton for HZSPRNT
 ###########################################################################
-- name: Send JCL template
+
+- name: Send JCL template.
   block:
-    - ansible.builtin.set_fact:
-        eager_role_path: '{{ role_path }}'
+    - name: Set path to role.
+      ansible.builtin.set_fact:
+        send_template_eager_role_path: '{{ role_path }}'
 
-    - ansible.builtin.include_role:
-        name: send-template
+    - name: Template out JCL to z/OS and encode it properly.
+      ansible.builtin.include_role:
+        name: send_template
       vars:
-        path: '{{ eager_role_path }}/templates/HZSPRINT.J2'
+        send_template_path: '{{ send_template_eager_role_path }}/templates/HZSPRINT.J2'
 
-    - name: Get expiring certs report for {{ hc_check }}
+    - name: Get expiring certs report for {{ print_hc_buffer_hc_check }}
       ibm.ibm_zos_core.zos_job_submit:
         # src: USER.PRIVATE.PROCLIB(HZSPRINT)
         # location: DATA_SET
         # wait: true
         src: '{{ uss_file_path }}/HZSPRINT.J2'
         location: USS
-        wait_time_s: 150
+        wait_time_s: 60
       register: hc_job_output
+
+# - name: Send JCL template
+#   block:
+#     - ansible.builtin.set_fact:
+#         eager_role_path: '{{ role_path }}'
+
+    # - ansible.builtin.include_role:
+    #     name: send_template
+    #   vars:
+    #     path: '{{ eager_role_path }}/templates/HZSPRINT.jcl.j2'
+
+    # - name: Send template
+    #   ansible.builtin.template:
+    #     src: '{{ path }}'
+    #     dest: '{{ uss_file_path }}/{{ path | basename }}'
+
+    # - name: Encode all template files
+    #   ansible.builtin.shell: "iconv -f ISO8859-1 -t IBM-1047 {{ path | basename }} > {{ path | basename }}1; \
+    #      chtag -tc IBM-1047 {{ path | basename }}1; mv {{ path | basename }}1 {{ path | basename }}"
+    #   args:
+    #     chdir: '{{ uss_file_path }}'
+
+    # - name: Get expiring certs report for {{ hc_check }}
+    #   ibm.ibm_zos_core.zos_job_submit:
+        # src: USER.PRIVATE.PROCLIB(HZSPRINT)
+        # location: DATA_SET
+        # wait: true
+      #   src: '{{ uss_file_path }}/HZSPRINT.jcl.j2'
+      #   location: USS
+      #   wait_time_s: 150
+      # register: hc_job_output
 
     # - name: Set job id fact used in this playbook
     #   set_fact:

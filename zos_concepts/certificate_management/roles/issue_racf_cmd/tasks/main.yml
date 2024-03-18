@@ -8,7 +8,7 @@
 ###########################################################################
 # ISSUE RACF COMMANDS
 ###########################################################################
-- name: "{{task_description}}"
+- name: "{{ task_description }}"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: ikjeft01
     auth: true

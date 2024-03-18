@@ -9,5 +9,4 @@ galaxy_info:
   galaxy_tags:
     - z
     - zos
-    - z_os
-    - ibm_zos_core
+    - ibmzoscore

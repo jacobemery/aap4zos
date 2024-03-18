@@ -8,6 +8,6 @@
 ##########################################################################
 # Issue zos command
 ##########################################################################
-- name: "{{ task_description }}"
+- name: "{{ issue_tso_cmd_task_description }}"
   ibm.ibm_zos_core.zos_tso_command:
-    commands: "{{command}}"
+    commands: "{{ issue_tso_cmd_command }}"
