@@ -2,7 +2,7 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
-- name: Create CA and check it via TSO and operator commands.
+- name: Check if CA and keyring already exist. If not, create them and then run health check via TSO and operator commands.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
