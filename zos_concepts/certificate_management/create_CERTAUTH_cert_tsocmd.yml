@@ -26,7 +26,7 @@
           register: issue_tso_cmd_keyring_check
           failed_when: false
 
-        - name: Create a new keyring via TSO commands if keyring does not exist.
+        - name: Create a new keyring via TSO commands, skip if it already exists.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
@@ -35,13 +35,13 @@
 
     - name: Check if certificate already exists and create it if it doesn't.
       block:
-        - name: 'Displaying cert {{ cert_label }}'
+        - name: 'Check if cert to be created already exists.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RACDCERT CERTAUTH LIST(LABEL('{{ cert_label }}'))"
           register: list_cert
           failed_when: false
 
-        - name: Create new CA cert and connect to keyring via TSO commands.
+        - name: Create new CA cert and connect to keyring via TSO commands, skip if it already exists.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
