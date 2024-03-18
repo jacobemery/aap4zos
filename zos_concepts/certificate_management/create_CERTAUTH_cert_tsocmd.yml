@@ -31,7 +31,7 @@
             commands:
               - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check"
+          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check.output[0].content"
 
     - name: Check if certificate already exists and create it if it doesn't.
       block:
@@ -46,7 +46,7 @@
             commands:
               - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
               - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
-          when: "'IRRD107I No matching certificate was found for this user.' in list_cert"
+          when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content"
       # when: not expiry_date == ''
 
     # - name: Create new CA cert and connect to keyring when expiry date is empty via TSO commands.
