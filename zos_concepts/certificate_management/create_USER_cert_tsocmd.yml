@@ -57,7 +57,7 @@
         - name: Create new USER cert and connect to keyring.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT GENCERT ID({{ owner_id }}) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') {{ 'SIGNWITH(CERTAUTH LABEL(''' + sign_label + '''))' if sign_label != '' else '' }} {{ 'NOTAFTER(DATE(''' + expiry_date + '''))' if expiry_date != '' else '' }}
+              - RACDCERT GENCERT ID({{ owner_id }}) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') {{ "SIGNWITH(CERTAUTH LABEL('" + sign_label + "'))" if sign_label != '' else '' }} {{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}
               - RACDCERT ID({{ owner_id }}) CONNECT(LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT)
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
               - RACDCERT LISTCHAIN(LABEL('{{ cert_label }}')) ID({{ owner_id }})
