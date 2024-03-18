@@ -38,6 +38,7 @@
     - name: Get FQDN of this z/OS server from USS, if cn is undefined.
       ansible.builtin.command: hostname
       when: cn is undefined
+      changed_when: false
       register: get_hostname
 
     - name: Set cn fact from previous task, if cn is undefined.
@@ -52,6 +53,10 @@
             commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
           register: list_cert
           failed_when: false
+
+        - name: Debug.
+          ansible.builtin.debug:
+            var: list_cert
 
         - name: Create new SITE cert and connect to keyring.
           ibm.ibm_zos_core.zos_tso_command:
