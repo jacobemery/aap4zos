@@ -56,7 +56,7 @@
 
         - name: Debug.
           ansible.builtin.debug:
-            var: list_cert
+            var: list_cert.output[0].content
 
         - name: Create new SITE cert and connect to keyring.
           ibm.ibm_zos_core.zos_tso_command:
