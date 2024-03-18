@@ -33,7 +33,7 @@
             commands:
               - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check"
+          when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"
 
     - name: Get FQDN of this z/OS server from USS, if cn is undefined.
       ansible.builtin.command: hostname
@@ -54,10 +54,6 @@
           register: list_cert
           failed_when: false
 
-        - name: Debug.
-          ansible.builtin.debug:
-            var: list_cert.output[0].content
-
         - name: Create new SITE cert and connect to keyring.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
@@ -65,7 +61,7 @@
               - RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
               - RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content"
+          when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content[0]"
 
     - name: Stop TN3270 server.
       ibm.ibm_zos_core.zos_operator:
