@@ -38,25 +38,31 @@
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
           when: "'IRRD114I Ring' + keyring + 'does not exist.' in issue_tso_cmd_keyring_check"
 
-    - name: Create new CA cert and connect to keyring when expiry date is not empty via TSO commands.
-      ansible.builtin.include_role:
-        name: issue_tso_cmd
-      vars:
-        issue_tso_cmd_task_description: 'Create new CA cert and connect to keyring'
-        issue_tso_cmd_command:
-          - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') NOTAFTER(DATE({{ expiry_date }}))
-          - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
-      when: not expiry_date == ''
+    - name: 'Displaying cert {{ cert_label }}'
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "RACDCERT CERTAUTH LIST(LABEL('{{ cert_label }}'))"
+      register: list_cert
 
-    - name: Create new CA cert and connect to keyring when expiry date is empty via TSO commands.
+    - name: Create new CA cert and connect to keyring via TSO commands.
       ansible.builtin.include_role:
         name: issue_tso_cmd
       vars:
         issue_tso_cmd_task_description: 'Create new CA cert and connect to keyring'
         issue_tso_cmd_command:
-          - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}')
+          - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
           - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
-      when: expiry_date == ''
+      when: "'IRRD107I No matching certificate was found for this user.' in list_cert"
+      # when: not expiry_date == ''
+
+    # - name: Create new CA cert and connect to keyring when expiry date is empty via TSO commands.
+    #   ansible.builtin.include_role:
+    #     name: issue_tso_cmd
+    #   vars:
+    #     issue_tso_cmd_task_description: 'Create new CA cert and connect to keyring'
+    #     issue_tso_cmd_command:
+    #       - RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}')
+    #       - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
+    #   when: expiry_date == ''
 
     - name: Run Healther Checker via operator command.
       ansible.builtin.include_role:
