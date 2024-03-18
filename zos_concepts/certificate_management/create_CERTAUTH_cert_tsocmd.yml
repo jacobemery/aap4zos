@@ -36,7 +36,7 @@
             issue_tso_cmd_command:
               - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD114I Ring' + keyring + 'does not exist.' in issue_tso_cmd_keyring_check.output.content"
+          when: "'IRRD114I Ring' + keyring + 'does not exist.' in issue_tso_cmd_keyring_check.output[0].content"
 
     - name: Create new CA cert and connect to keyring when expiry date is not empty via TSO commands.
       ansible.builtin.include_role:
