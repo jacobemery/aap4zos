@@ -31,7 +31,7 @@
             commands:
               - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check.output[0].content"
+          when: "'IRRD114I Ring' + keyring + 'does not exist.' in keyring_check.output[0].content[0]"
 
     - name: Check if certificate already exists and create it if it doesn't.
       block:
@@ -45,7 +45,6 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - "RACDCERT GENCERT CERTAUTH KEYUSAGE(CERTSIGN) SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ ' NOTAFTER(DATE(' + expiry_date + ')' if not expiry_date == '' else '' }})"
-              - SETROPTS REFRESH
               - RACDCERT ID({{ owner_id }}) CONNECT(CERTAUTH LABEL('{{ cert_label }}') RING({{ keyring }}))
           when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content"
       # when: not expiry_date == ''
