@@ -28,18 +28,22 @@
         uss_file_path: '{{ playbook_tmp_dir.path }}'
       block:
         - name: Run health check via operator command.
-          ansible.builtin.include_role:
-            name: issue_operator_cmd
-          vars:
-            issue_operator_cmd_task_description: 'Run Health Checker'
-            issue_operator_cmd_command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
           changed_when: false
 
-        - name: Print health check.
-          ansible.builtin.include_role:
-            name: print_hc_buffer
-          vars:
-            print_hc_buffer_hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+        # - name: Print health check.
+        #   ansible.builtin.include_role:
+        #     name: print_hc_buffer
+        #   vars:
+        #     print_hc_buffer_hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
+
+        - name: Submit job to run health check.
+          ibm.ibm_zos.zos_job_submit:
+            src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
+            location: LOCAL
+            wait_time_s: 60
+          register: hc_job_output
 
         - name: Search report for {{ cert_label }}.
           ansible.builtin.set_fact:
@@ -62,49 +66,19 @@
             today: "{{ date_result.stdout }}"
           when: cert_found
 
-        - name: Back up current certificate when not USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Back up current certificate'
-            issue_tso_cmd_command:
-              - RACDCERT EXPORT(LABEL('{{ cert_label }}'))  DSN('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ cert_type }}
-              - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')
-          when: cert_found and not cert_type == 'USER'
+        - name: Back up current certificate via TSO commands.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT EXPORT(LABEL('{{ cert_label }}')) {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DSN('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')
+              - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}
 
-        - name: Back up current certificate when USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Back up current certificate'
-            issue_tso_cmd_command:
-              - RACDCERT EXPORT(LABEL('{{ cert_label }}')) ID({{ owner_id }})  DSN('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')
-              - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')  ID({{ owner_id }})
-          when: cert_found and cert_type == 'USER'
-
-        - name: Rekey and Generate new cert request when not USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Rekey and Generate new cert request for {{ cert_type }}'
-            issue_tso_cmd_command:
-              - RACDCERT {{ cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW')
-              - RACDCERT {{ cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
-              - RACDCERT {{ cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
-              - RACDCERT {{ cert_type }} DELETE(LABEL('{{ cert_label }}'))
-          when: cert_found and not cert_type == 'USER'
-
-        - name: Rekey and Generate new cert request when USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Rekey and Generate new cert request for {{ cert_type }}'
-            issue_tso_cmd_command:
-              - RACDCERT REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW') ID({{ owner_id }})
-              - RACDCERT ID({{ owner_id }}) LIST(LABEL('{{ cert_label }}-NEW'))
-              - RACDCERT GENREQ (LABEL('{{ cert_label }}-NEW')) ID({{ owner_id }}) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
-              - RACDCERT ID({{ owner_id }}) DELETE(LABEL('{{ cert_label }}'))
-          when: cert_found and cert_type == 'USER'
+        - name: 'Rekey and Generate new cert request when not USER cert via TSO commands for {{ cert_type }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW')
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))
 
         - name: Install and connect local cert when sign_label is not empty and not USER cert via TSO commands.
           ansible.builtin.include_role:
@@ -112,50 +86,14 @@
           vars:
             issue_tso_cmd_task_description: 'Install and connect local cert for {{ cert_type }}'
             issue_tso_cmd_command:
-              - RACDCERT {{ cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
-              - RACDCERT {{ cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label if sign_label != ' ' else cert_label + 'NEW' }}'))
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
               - RACDCERT ID({{ owner_id }}) CONNECT({{ cert_type }} LABEL('{{ cert_label }}') RING({{ keyring_name }}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and not sign_label == ' ' and not cert_type == 'USER'
-
-        - name: Install and connect local cert when sign_label is not empty and USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Install and connect local cert for {{ cert_type }}'
-            issue_tso_cmd_command:
-              - RACDCERT ID({{ owner_id }}) GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
-              - RACDCERT ID({{ owner_id }}) ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
-              - RACDCERT ID({{ owner_id }}) CONNECT(LABEL('{{ cert_label }}') RING({{ keyring_name }}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and not sign_label == ' ' and cert_type == 'USER'
-
-        - name: Install and connect local cert when sign_label is empty and not USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Install and connect self-signed cert for {{ cert_type }}'
-            issue_tso_cmd_command:
-              - RACDCERT {{ cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ cert_label }}NEW'))
-              - RACDCERT {{ cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
-              - RACDCERT ID({{ owner_id }}) CONNECT({{ cert_type }} LABEL('{{ cert_label }}') RING({{ keyring_name }}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and sign_label == ' ' and not cert_type == 'USER'
-
-        - name: Install and connect local cert when sign_label is empty and USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Install and connect self-signed cert for {{ cert_type }}'
-            issue_tso_cmd_command:
-              - RACDCERT ID({{ owner_id }}) GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ cert_label }}NEW'))
-              - RACDCERT ID({{ owner_id }}) ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
-              - RACDCERT ID({{ owner_id }}) CONNECT(LABEL('{{ cert_label }}') RING({{ keyring_name }}) DEFAULT USAGE(PERSONAL))
-          when: cert_found and sign_label == ' ' and cert_type == 'USER'
+          when: cert_found
 
         - name: Run health check via operator command.
-          ansible.builtin.include_role:
-            name: issue_operator_cmd
-          vars:
-            issue_operator_cmd_task_description: 'Run Health Check'
-            issue_operator_cmd_command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
           when: cert_found
 
       always:
