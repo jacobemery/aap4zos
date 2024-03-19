@@ -38,10 +38,6 @@
           changed_when: false
           register: sysname
 
-        - name: Debug sysname output.
-          ansible.builtin.debug:
-            var: sysname
-
         - name: Add a facility to the RACLIST.
           ibm.ibm_zos_core.zos_tso_command:
             commands: 
