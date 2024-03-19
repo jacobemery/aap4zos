@@ -31,9 +31,9 @@
           vars:
             task_description: 'Set up profiles'
             command:
-              - "RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.MESSAGES UACC(NONE)"
-              - "RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.RUN UACC(NONE)"
-              - "RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.QUERY UACC(NONE)"
+              - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
+              - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
+              - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
 
         - include_role:
             name: issue_racf_cmd
@@ -41,13 +41,13 @@
             task_description: 'Permit access to {{ owner_id }}'
             command:
               - >
-                  PERMIT HZS.{{ sysname.output }}.*.*.MESSAGES CLASS(XFACILIT) +
+                  PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) +
                     ID({{ owner_id }}) ACCESS(READ)
               - >
-                  PERMIT HZS.{{ sysname.output }}.*.*.RUN CLASS(XFACILIT) +
+                  PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) +
                     ID({{ owner_id }}) ACCESS(UPDATE)
               - >
-                  PERMIT HZS.{{ sysname.output }}.*.*.QUERY CLASS(XFACILIT) +
+                  PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) +
                     ID({{ owner_id }}) ACCESS(READ)
 
         - include_role:
