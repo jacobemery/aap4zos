@@ -35,9 +35,9 @@
         - name: Add a facility to the RACLIST.
           ibm.ibm_zos_core.zos_tso_command:
             commands: 
-              - SETROPTS GLOBAL(XFACILIT)
-              - RDEFINE GLOBAL XFACILIT
-              - SETROPTS GLOBAL(XFACILIT) REFRESH
+              - SETROPTS RACLIST(XFACILIT)
+              - RDEFINE RACLIST XFACILIT
+              - SETROPTS RACLIST(XFACILIT) REFRESH
               # - SETROPTS RACLIST(XFACILIT) REFRESH
 
         - name: Grant user access using RACF.
