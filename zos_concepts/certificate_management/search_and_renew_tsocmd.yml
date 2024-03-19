@@ -48,6 +48,46 @@
               # - SETROPTS CLASSACT(XFACILIT)
               # - SETROPTS RACLIST(XFACILIT)
               - SETROPTS RACLIST(XFACILIT) REFRESH
+              - SETROPTS RACLIST(DIGTCERT) REFRESH
+
+        # - name: Permit user to access health checker data.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - ADDUSER IBMRACF OMVS(UID(0) HOME('/') PROGRAM('/bin/sh')) NOPASSWORD
+
+        # - name: Permit user to access health checker data.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - ADDGROUP OMVSGRP OMVS(GID(1))
+
+        # - name: Permit user to access health checker data.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - CONNECT IBMRACF GROUP(OMVSGRP)
+
+        # - name: Permit user to access health checker data.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - RDEFINE FACILITY BPX.SUPERUSER UACC(NONE)
+
+        # - name: Permit user to access health checker data.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - SETROPTS CLASSACT(FACILITY) RACLIST(FACILITY)
+        #       - PERMIT BPX.SUPERUSER CLASS(FACILITY) ID(IBMRACF) ACCESS(READ)
+        #       - SETROPTS RACLIST(FACILITY) REFRESH
+
+        #       - SETROPTS GENERIC(STARTED)
+        #       - RDEFINE STARTED HZSPROC.* STDATA(USER(IBMRACF) GROUP(OMVSGRP))
+        #       - SETROPTS CLASSACT(STARTED)
+        #       - SETROPTS RACLIST(STARTED)
+        #       - SETROPTS RACLIST(STARTED) REFRESH
+
+        #       - ADDSD 'SYS1.PRODSYS.HZSPDATA' UACC(NONE)
+        #       - PERMIT SYS1.PRODSYS.HZSPDATA CLASS(DATASET) ID(IBMRACF) ACCESS(UPDATE)
+
+        #       - ADDSD 'SYS1.PARMLIB' UACC(NONE)
+        #       - PERMIT 'SYS1.PARMLIB' CLASS(DATASET) ID(IBMRACF) ACCESS(READ)
 
         # - name: Add a facility to the RACLIST.
         #   ibm.ibm_zos_core.zos_tso_command:
