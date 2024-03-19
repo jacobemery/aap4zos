@@ -2,48 +2,23 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: List certificates via TSO commands.
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     cert_type: "{{ cert_type_survey | default('SITE') }}"
     cert_label: "{{ cert_label_survey | default('TEST SITE') }}"
+    owner_id: "{{ owner_id_survey | default('') }}"
 
   tasks:
     - block:
-
-      - name: 'Displaying cert {{ cert_label }}'
+      - name: 'Displaying cert {{ cert_label }}.'
         ibm.ibm_zos_core.zos_tso_command:
-          commands: "RACDCERT ID({{ owner_id}}) LIST(LABEL('{{ cert_label }}'))"
-        when: cert_type == 'USER'
-        register: list_user_cert
-
-      - name: 'Displaying cert {{ cert_label }}'
-        ibm.ibm_zos_core.zos_tso_command:
-          commands: "RACDCERT CERTAUTH LIST(LABEL('{{ cert_label }}'))"
-        when: cert_type == 'CERTAUTH'
-        register: list_certauth
-
-      - name: 'Displaying cert {{ cert_label }}'
-        ibm.ibm_zos_core.zos_tso_command:
-          commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
-        when: cert_type == 'SITE'
-        register: list_site_cert
+          commands: "RACDCERT {{  'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}'))"
+        register: list_cert
 
       always:
         - name: Print results from list USER cert command.
-          debug:
-            var: list_user_cert.output[0].content
-          when: cert_type == 'USER'
-
-        - name: Print results from list CERTAUTH command.
-          debug:
-            var: list_certauth.output[0].content
-          when: cert_type == 'CERTAUTH'
-
-        - name: Print results from list SITE cert command.
-          debug:
-            var: list_site_cert.output[0].content
-          when: cert_type == 'SITE'
+          ansible.builtin.debug:
+            var: list_cert.output[0].content
