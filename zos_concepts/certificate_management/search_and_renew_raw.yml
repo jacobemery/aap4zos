@@ -30,6 +30,7 @@
           vars:
             task_description: 'Run Health Checker'
             command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          changed_when: false
 
         - include_role:
             name: print_hc_buffer

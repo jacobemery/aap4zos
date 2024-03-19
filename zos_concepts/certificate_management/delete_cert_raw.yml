@@ -53,3 +53,4 @@
       vars:
         task_description: 'Run Health Checker'
         command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+      changed_when: false

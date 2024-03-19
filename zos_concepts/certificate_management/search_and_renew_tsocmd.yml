@@ -33,6 +33,7 @@
           vars:
             issue_operator_cmd_task_description: 'Run Health Checker'
             issue_operator_cmd_command: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
+          changed_when: false
 
         - name: Print health check.
           ansible.builtin.include_role:

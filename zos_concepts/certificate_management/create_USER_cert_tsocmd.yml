@@ -65,6 +65,7 @@
               - RACDCERT LISTCHAIN(LABEL('{{ cert_label }}')) ID({{ owner_id }})
           when: "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content[0]"
 
-    - name: Run Healther Checker via operator command.
+    - name: Run Health Checker via operator command.
       ibm.ibm_zos_core.zos_operator:
         cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
+      changed_when: false
