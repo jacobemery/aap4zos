@@ -36,9 +36,9 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: SETROPTS RACLIST(FACILITY) REFRESH
 
-        - name: Grant user access using RACF.
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: PERMIT XFACILIT CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+        # - name: Grant user access using RACF.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: PERMIT XFACILIT CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
 
         - name: Submit job to run health check.
           ibm.ibm_zos_core.zos_job_submit:
