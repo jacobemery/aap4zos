@@ -10,13 +10,14 @@
     owner_id: 'IBMUSER'
 
   tasks:
-    - name: Get sysname.
-      ansible.builtin.command:
-        cmd: sysvar SYSNAME
-      changed_when: false
-      register: sysname
 
     - block:
+        - name: Get sysname.
+          ansible.builtin.command:
+            cmd: sysvar SYSNAME
+          changed_when: false
+          register: sysname
+
         - name: Start Health Check
           ibm.ibm_zos_core.zos_operator:
             cmd: "S HZSPROC"
@@ -26,9 +27,9 @@
           vars:
             task_description: 'Set up profiles'
             command:
-              - RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.MESSAGES UACC(NONE)
-              - RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.RUN UACC(NONE)
-              - RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.QUERY UACC(NONE)
+              - "RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.MESSAGES UACC(NONE)"
+              - "RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.RUN UACC(NONE)"
+              - "RDEFINE XFACILIT HZS.{{ sysname.output }}.*.*.QUERY UACC(NONE)"
 
         - include_role:
             name: issue_racf_cmd
