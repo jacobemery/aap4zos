@@ -22,6 +22,10 @@
           ibm.ibm_zos_core.zos_operator:
             cmd: "S HZSPROC"
 
+        - name: Print sysname.
+          ansible.builtin.debug:
+            var: sysname
+
         - include_role:
             name: issue_racf_cmd
           vars:
