@@ -39,7 +39,7 @@
         #     print_hc_buffer_hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
         - name: Submit job to run health check.
-          ibm.ibm_zos.zos_job_submit:
+          ibm.ibm_zos_core.zos_job_submit:
             src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
             location: LOCAL
             wait_time_s: 60
@@ -95,6 +95,7 @@
           ibm.ibm_zos_core.zos_operator:
             cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
           when: cert_found
+          changed_when: false
 
       always:
         - name: Delete the temporary directory.
