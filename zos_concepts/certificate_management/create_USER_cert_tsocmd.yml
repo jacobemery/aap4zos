@@ -50,7 +50,7 @@
       block:
         - name: 'Check if cert to be created already exists.'
           ibm.ibm_zos_core.zos_tso_command:
-            commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
+            commands: "RACDCERT ID({{ owner_id}}) LIST(LABEL('{{ cert_label }}'))"
           register: list_cert
           failed_when: false
 
