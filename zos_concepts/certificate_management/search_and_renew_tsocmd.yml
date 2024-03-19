@@ -45,12 +45,12 @@
         - name: Add a facility to the RACLIST.
           ibm.ibm_zos_core.zos_tso_command:
             commands: 
-              - RDEFINE XFACILIT HZS.{{ sysname.stdout }}.QUERY UACC(NONE)
-              - PERMIT HZS.{{ sysname.stdout }}.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
-              - RDEFINE XFACILIT HZS.{{ sysname.stdout }}.{{ owner_id }}.MESSAGES UACC(NONE)
-              - PERMIT HZS.{{ sysname.stdout }}.{{ owner_id }}.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
-              - SETROPTS CLASSACT(XFACILIT)
-              - SETROPTS RACLIST(XFACILIT)
+              # - RDEFINE XFACILIT HZS.{{ sysname.stdout }}.QUERY UACC(NONE)
+              # - PERMIT HZS.{{ sysname.stdout }}.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
+              # - RDEFINE XFACILIT HZS.{{ sysname.stdout }}.{{ owner_id }}.MESSAGES UACC(NONE)
+              # - PERMIT HZS.{{ sysname.stdout }}.{{ owner_id }}.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
+              # - SETROPTS CLASSACT(XFACILIT)
+              # - SETROPTS RACLIST(XFACILIT)
               - SETROPTS RACLIST(XFACILIT) REFRESH
 
         # - name: Add a facility to the RACLIST.
