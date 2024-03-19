@@ -42,15 +42,15 @@
           ansible.builtin.debug:
             var: sysname
 
-        # - name: Add a facility to the RACLIST.
-        #   ibm.ibm_zos_core.zos_tso_command:
-        #     commands: 
-        #       - RDEFINE XFACILIT HZS.sysname.QUERY UACC(NONE)
-        #       - PERMIT HZS.sysname.QUERY CLASS(XFACILIT) ID(hcprintid) ACCESS(READ)
-        #       - RDEFINE XFACILIT HZS.sysname.check_owner.MESSAGES UACC(NONE)
-        #       - PERMIT HZS.sysname.check_owner.MESSAGES CLASS(XFACILIT) ID(hcprintid) ACCESS(READ)
-        #       - SETROPTS CLASSACT(XFACILIT)
-        #       - SETROPTS RACLIST(XFACILIT)
+        - name: Add a facility to the RACLIST.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: 
+              - RDEFINE XFACILIT HZS.{{ sysname.stdout }}.QUERY UACC(NONE)
+              - PERMIT HZS.{{ sysname.stdout }}.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
+              - RDEFINE XFACILIT HZS.{{ sysname.stdout }}.{{ owner_id }}.MESSAGES UACC(NONE)
+              - PERMIT HZS.{{ sysname.stdout }}.{{ owner_id }}.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
+              - SETROPTS CLASSACT(XFACILIT)
+              - SETROPTS RACLIST(XFACILIT)
 
         # - name: Add a facility to the RACLIST.
         #   ibm.ibm_zos_core.zos_tso_command:
