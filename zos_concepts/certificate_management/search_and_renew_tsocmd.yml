@@ -32,12 +32,6 @@
             cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
           changed_when: false
 
-        # - name: Print health check.
-        #   ansible.builtin.include_role:
-        #     name: print_hc_buffer
-        #   vars:
-        #     print_hc_buffer_hc_check: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
-
         - name: Submit job to run health check.
           ibm.ibm_zos_core.zos_job_submit:
             src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
@@ -71,6 +65,7 @@
             commands:
               - RACDCERT EXPORT(LABEL('{{ cert_label }}')) {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DSN('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')
               - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}
+          when: cert_found
 
         - name: 'Rekey and Generate new cert request when not USER cert via TSO commands for {{ cert_type }}.'
           ibm.ibm_zos_core.zos_tso_command:
@@ -79,13 +74,11 @@
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))
+          when: cert_found
 
-        - name: Install and connect local cert when sign_label is not empty and not USER cert via TSO commands.
-          ansible.builtin.include_role:
-            name: issue_tso_cmd
-          vars:
-            issue_tso_cmd_task_description: 'Install and connect local cert for {{ cert_type }}'
-            issue_tso_cmd_command:
+        - name: 'Install and connect local cert via TSO commands for {{ cert_type }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label if sign_label != ' ' else cert_label + 'NEW' }}'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
               - RACDCERT ID({{ owner_id }}) CONNECT({{ cert_type }} LABEL('{{ cert_label }}') RING({{ keyring_name }}) DEFAULT USAGE(PERSONAL))
