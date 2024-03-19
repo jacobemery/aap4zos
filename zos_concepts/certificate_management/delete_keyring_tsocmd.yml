@@ -14,7 +14,7 @@
 
     - name: Check if keyring is already absent and delete it only if it isn't.
       block:
-        - name: Check if keyring to be created already exists.
+        - name: Check if keyring to be deleted is already absent.
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
@@ -22,7 +22,7 @@
           failed_when: false
           changed_when: false
 
-        - name: 'Deleting keyring {{ keyring }}.'
+        - name: 'Deleting keyring {{ keyring }} if it exists.'
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT ID({{ owner_id }}) DELRING({{ keyring }})
