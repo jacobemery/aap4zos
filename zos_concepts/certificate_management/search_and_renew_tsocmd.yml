@@ -34,7 +34,7 @@
 
         - name: Grant user access using RACF.
           ibm.ibm_zos_core.zos_tso_command:
-            cmd: PERMIT XFACILIT CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+            commands: PERMIT XFACILIT CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
 
         # - name: Add a facility to the RACLIST.
         #   ibm.ibm_zos_core.zos_tso_command:
