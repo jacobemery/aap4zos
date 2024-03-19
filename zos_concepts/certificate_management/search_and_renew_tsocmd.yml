@@ -32,6 +32,14 @@
             cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
           changed_when: false
 
+        - name: Grant user access using RACF.
+          ibm.ibm_zos_core.zos_tso_command:
+            cmd: PERMIT XFACILIT CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+
+        # - name: Add a facility to the RACLIST.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     cmd: SETROPTS RACLIST(FACILITY) REFRESH
+
         - name: Submit job to run health check.
           ibm.ibm_zos_core.zos_job_submit:
             src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
