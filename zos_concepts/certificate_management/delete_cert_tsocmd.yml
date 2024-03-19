@@ -2,9 +2,8 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Delete z/OS certificate via TSO commands.
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -14,32 +13,19 @@
     check_name: 'IBMRACF,RACF_CERTIFICATE_EXPIRATION'
 
   tasks:
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Deleting cert {{cert_label}}'
-        command:
-          - RACDCERT ID({{ owner_id}}) DELETE(LABEL('{{cert_label}}'))
-      when: cert_type == 'USER'
+    - name: Check if certificate is already absent and delete it only if it isn't.
+      block:
+        - name: Check if cert to be deleted is already absent.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
+          register: list_cert
+          failed_when: false
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Deleting cert {{cert_label}}'
-        command:
-          - RACDCERT CERTAUTH DELETE(LABEL('{{cert_label}}'))
-      when: cert_type == 'CERTAUTH'
+        - name: 'Deleting cert {{ cert_label }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))"
+          when: "'IRRD107I No matching certificate was found for this user.' not in list_cert.output[0].content[0]"
 
-    - include_role:
-        name: issue_tso_cmd
-      vars:
-        task_description: 'Deleting cert {{cert_label}}'
-        command:
-          - RACDCERT SITE DELETE(LABEL('{{cert_label}}'))
-      when: cert_type == 'SITE'
-
-    - include_role:
-        name: issue_operator_cmd
-      vars:
-        task_description: 'Run Health Checker'
-        command: "F HZSPROC,RUN,CHECK=({{check_name}})"
+    - name: Run Health Checker.
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
