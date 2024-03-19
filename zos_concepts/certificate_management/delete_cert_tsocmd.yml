@@ -19,6 +19,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}'))"
           register: list_cert
+          changed_when: false
           failed_when: false
 
         - name: 'Deleting cert {{ cert_label }}.'
