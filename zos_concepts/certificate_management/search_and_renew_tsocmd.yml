@@ -32,13 +32,33 @@
             cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
           changed_when: false
 
-        - name: Add a facility to the RACLIST.
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: 
-              - SETROPTS RACLIST(XFACILIT)
-              - RDEFINE RACLIST XFACILIT
-              - SETROPTS RACLIST(XFACILIT) REFRESH
-              # - SETROPTS RACLIST(XFACILIT) REFRESH
+        - name: Get sysname.
+          ansible.builtin.command:
+            cmd: sysvar SYSNAME
+          changed_when: false
+          register: sysname
+
+        - name: Debug sysname output.
+          ansible.builtin.debug:
+            var: sysname
+
+        # - name: Add a facility to the RACLIST.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - RDEFINE XFACILIT HZS.sysname.QUERY UACC(NONE)
+        #       - PERMIT HZS.sysname.QUERY CLASS(XFACILIT) ID(hcprintid) ACCESS(READ)
+        #       - RDEFINE XFACILIT HZS.sysname.check_owner.MESSAGES UACC(NONE)
+        #       - PERMIT HZS.sysname.check_owner.MESSAGES CLASS(XFACILIT) ID(hcprintid) ACCESS(READ)
+        #       - SETROPTS CLASSACT(XFACILIT)
+        #       - SETROPTS RACLIST(XFACILIT)
+
+        # - name: Add a facility to the RACLIST.
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: 
+        #       - SETROPTS GLOBAL(XFACILIT)
+        #       - RDEFINE GLOBAL XFACILIT
+        #       - SETROPTS GLOBAL(XFACILIT) REFRESH
+        #       # - SETROPTS RACLIST(XFACILIT) REFRESH
 
         - name: Grant user access using RACF.
           ibm.ibm_zos_core.zos_tso_command:
