@@ -12,7 +12,7 @@
     sign_with: "{{ sign_with_survey | default(omit) }}"
     sign_label: "{{ sign_label_survey | default(' ') }}"
     owner_id: "{{ owner_id_survey }}"
-    keyring_name: "{{ keyring_name_survey }}"
+    keyring: "{{ keyring_survey }}"
 
     cert_found: false
     today: ''
@@ -150,7 +150,7 @@
             commands:
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label if sign_label != ' ' else cert_label + 'NEW' }}'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
-              - RACDCERT ID({{ owner_id }}) CONNECT({{ cert_type }} LABEL('{{ cert_label }}') RING({{ keyring_name }}) DEFAULT USAGE(PERSONAL))
+              - RACDCERT ID({{ owner_id }}) CONNECT({{ cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
           when: cert_found
 
         - name: Run health check via operator command.
