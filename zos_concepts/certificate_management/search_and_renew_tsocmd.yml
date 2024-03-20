@@ -136,7 +136,7 @@
               - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}
           when: cert_found
 
-        - name: 'Rekey and Generate new cert request when not USER cert via TSO commands for {{ cert_type }}.'
+        - name: 'Rekey and Generate new cert request via TSO commands for {{ cert_type }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW')
