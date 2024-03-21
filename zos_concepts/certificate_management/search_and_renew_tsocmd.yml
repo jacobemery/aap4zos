@@ -9,7 +9,7 @@
   vars:
     cert_label: "{{ cert_label_survey }}"
     cert_type: "{{ cert_type_survey }}"
-    sign_with: "{{ sign_with_survey | default('') }}"
+    sign_with: "{{ sign_with_survey | default('Self-Signed') }}"
     sign_label: "{{ sign_label_survey | default('') }}"
     owner_id: "{{ owner_id_survey }}"
     keyring: "{{ keyring_survey }}"
@@ -81,7 +81,7 @@
         - name: 'Install and connect local cert via TSO commands for {{ cert_type }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label if sign_label != '' else cert_label + 'NEW' }}'))
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with if sign_with != 'Self-Signed' else ' ' }} LABEL('{{ sign_label if sign_with != 'Self-Signed' else cert_label + '-NEW' }}'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
               - RACDCERT ID({{ owner_id }}) CONNECT({{ cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
           when: cert_found
