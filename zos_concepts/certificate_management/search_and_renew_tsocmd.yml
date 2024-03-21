@@ -76,6 +76,7 @@
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))
+              - SETROPTS RACLIST(DIGTCERT) REFRESH
           when: cert_found
 
         - name: 'Install and connect local cert via TSO commands for {{ cert_type }}.'
