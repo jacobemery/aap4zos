@@ -76,12 +76,14 @@
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))
+              - SETROPTS RACLIST(XFACILIT) REFRESH
+              - SETROPTS RACLIST(DIGTCERT)
           when: cert_found
 
         - name: 'Install and connect local cert via TSO commands for {{ cert_type }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with + ' ' if sign_with != 'Self-Signed' else ' ' }}LABEL('{{ sign_label if sign_with != 'Self-Signed' else cert_label + 'NEW' }}'))
+              - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with + ' ' if sign_with != 'Self-Signed' else ' ' }}LABEL('{{ sign_label if sign_with != 'Self-Signed' else cert_label + '-NEW' }}'))
               #- RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') WITHLABEL('{{ cert_label + '-NEW' }}') SIGNWITH({{ sign_with + ' ' if sign_with != 'Self-Signed' else '' }}LABEL('{{ sign_label if sign_with != 'Self-Signed' else cert_label + '-NEW' }}'))
               - RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
               - RACDCERT ID({{ owner_id }}) CONNECT({{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ 'PERSONAL' if cert_type == 'USER' else cert_type }}))
