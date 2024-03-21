@@ -64,8 +64,7 @@
               - RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
               - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
           when:
-            - "'IRRD107I No matching certificate was found for this user.' in list_cert.output[0].content[0] or"
-            - "'IRRD105I No certificate information was found for user' in list_cert.output[0].content[0]"
+            - "'Digital certificate information for' not in list_cert.output[0].content[0]"
 
     - name: Stop TN3270 server.
       ibm.ibm_zos_core.zos_operator:
