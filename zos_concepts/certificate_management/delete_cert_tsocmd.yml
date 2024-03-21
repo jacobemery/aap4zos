@@ -25,7 +25,9 @@
         - name: 'Deleting cert {{ cert_label }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} DELETE(LABEL('{{ cert_label }}'))"
-          when: "'IRRD107I No matching certificate was found for this user.' not in list_cert.output[0].content[0]"
+          when: 
+            - "'IRRD107I No matching certificate was found for this user.' not in list_cert.output[0].content[0]"
+            - "'IRRD105I No certificate information was found for user' + owner_id + '.' not in list_cert.output[0].content"
 
     - name: Run Health Checker.
       ibm.ibm_zos_core.zos_operator:
