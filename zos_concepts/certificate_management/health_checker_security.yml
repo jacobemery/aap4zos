@@ -7,7 +7,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: 'IBMUSER'
+    owner_id: "{{ owner_id_survey }}"
 
   tasks:
 
