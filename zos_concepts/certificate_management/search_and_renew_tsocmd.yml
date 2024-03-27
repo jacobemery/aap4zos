@@ -38,13 +38,13 @@
         wait_time_s: 60
       register: hc_job_output
 
-    - name: "Search report for {{ cert_label }}."
+    - name: 'Search report for {{ cert_label }}.'
       tags: search_and_renew, search, search_hc
-      verbosity: 1
       ansible.builtin.set_fact:
         cert_found: true
       with_items: "{{ hc_job_output.jobs.0.ddnames }}"
       when: item.content is search(cert_label)
+      no_log: true
 
     - name: Print whether or not certificate is expiring.
       tags: search_and_renew, search, search_hc
