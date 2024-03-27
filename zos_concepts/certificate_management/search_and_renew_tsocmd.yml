@@ -122,6 +122,7 @@
           tags: search_and_renew, renew, delete
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
+          when: sign_with != 'Self'
           notify: Setropts refresh
 
         - name: Relabel new certificate to old name.
