@@ -77,7 +77,7 @@
             format_check_cert: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-            - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ format_check_cert }}
+              - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ format_check_cert }}
 
         - name: Rekey certificate with new temporary label.
           tags: search_and_renew, renew, rekey
@@ -96,7 +96,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT {{ format_cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
-        
+
         - name: Delete old certificate.
           tags: search_and_renew, renew, delete
           ibm.ibm_zos_core.zos_tso_command:
@@ -120,7 +120,7 @@
 
         - name: Connect renewed certificate to keyring.
           tags: search_and_renew, renew, connect
-          vars:  
+          vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands:
