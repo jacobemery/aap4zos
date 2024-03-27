@@ -2,78 +2,102 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Check if SITE cert and keyring already exist. If not, create them and then run health check via TSO and operator commands.
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
     cert_label: "{{ cert_label_survey | default('TESTSITE') }}"
-    sign_label: "{{ sign_label_survey | default('TEST CA') }}"
+    sign_with: "{{ sign_with_survey | default('Self') }}"
+    sign_label: "{{ sign_label_survey | default('') }}"
     ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
     cn: "{{ cn_survey }}"
     country: "{{ country_survey | default('US') }}"
-    expiry_date: "{{ expiry_date_survey | default('') }}"
+    expiry_date: "{{ expiry_date_survey | default('2030-01-01') }}"
     keyring: "{{ keyring_survey | default('SharedRing1') }}"
     check_name: "{{ check_name_survey | default('IBMRACF,RACF_CERTIFICATE_EXPIRATION') }}"
 
   tasks:
-    - name: Check if keyring already exists and create it if it doesn't.
+    - name: Check if keyring to be created already exists.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+      register: keyring_check
+      failed_when: false
+      changed_when: false
+
+    - name: Create a new keyring via TSO commands, skip if it already exists.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
+          - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+      when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"
+
+    - name: Get hostname to use as common name variable, if undefined.
+      when: cn is undefined
       block:
-        - name: Check if keyring to be created already exists.
+        - name: Get FQDN of this z/OS server from USS.
+          ansible.builtin.command: hostname
+          changed_when: false
+          register: get_hostname
+
+        - name: Set cn fact from previous task.
+          ansible.builtin.set_fact:
+            cn: "{{ get_hostname.stdout }}"
+
+    - name: Check if certificate to be created already exists.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
+      register: list_cert
+      failed_when: false
+      changed_when: false
+
+    - name: Create new SITE certificate if it doesn't exist already.
+      vars:
+        cert_not_found: "{{ true if 'Digital certificate information for' not in list_cert.output[0].content[0] }}"
+      when: cert_not_found
+      block:
+        - name: Generate new certificate.
+          vars:
+            format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
+            format_sign_with: "{{ sign_with + ' ' if sign_with != 'Self' else '' }}"
+            format_label: "{{ sign_label if sign_with != 'Self' else cert_label }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands:
-              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          register: keyring_check
-          failed_when: false
+            commands: RACDCERT GENCERT SITE SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') SIGNWITH({{ format_sign_with }}LABEL('{{ format_label }}')) {{ format_expiration }}
+          notify: Setropts refresh
+
+        - name: List chain for new certificate.
+          tags: 
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
+
+        - name: Connect new certificate to keyring.
+          tags: 
+          vars:
+            format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+
+        - name: List keyring.
+          tags: 
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
+
+        - name: Stop TN3270 server.
+          ibm.ibm_zos_core.zos_operator:
+            cmd: 'p TN3270'
+
+        - name: Start TN3270 server
+          ibm.ibm_zos_core.zos_operator:
+            cmd: 's TN3270'
+
+        - name: Run Health Checker via operator command.
+          ibm.ibm_zos_core.zos_operator:
+            cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
           changed_when: false
 
-        - name: Create a new keyring via TSO commands, skip if it already exists.
-          ibm.ibm_zos_core.zos_tso_command:
-            commands:
-              - RACDCERT ADDRING({{ keyring }}) ID({{ owner_id }})
-              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'IRRD114I Ring ' + keyring + ' does not exist.' in keyring_check.output[0].content[0]"
-
-    - name: Get FQDN of this z/OS server from USS, if cn is undefined.
-      ansible.builtin.command: hostname
-      when: cn is undefined
-      changed_when: false
-      register: get_hostname
-
-    - name: Set cn fact from previous task, if cn is undefined.
-      ansible.builtin.set_fact:
-        cn: "{{ get_hostname.stdout }}"
-      when: cn is undefined
-
-    - name: Check if certificate already exists and create it if it doesn't.
-      block:
-        - name: 'Check if cert to be created already exists.'
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
-          register: list_cert
-          failed_when: false
-          changed_when: false
-
-        - name: Create new SITE cert and connect to keyring.
-          ibm.ibm_zos_core.zos_tso_command:
-            commands:
-              - RACDCERT GENCERT SITE SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') SIGNWITH(CERTAUTH LABEL('{{ sign_label }}')) {{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}
-              - RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
-              - RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(PERSONAL))
-              - RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
-          when: "'Digital certificate information for' not in list_cert.output[0].content[0]"
-
-    - name: Stop TN3270 server.
-      ibm.ibm_zos_core.zos_operator:
-        cmd: 'p TN3270'
-
-    - name: Start TN3270 server
-      ibm.ibm_zos_core.zos_operator:
-        cmd: 's TN3270'
-
-    - name: Run Health Checker via operator command.
-      ibm.ibm_zos_core.zos_operator:
-        cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
-      changed_when: false
+  handlers:
+    - name: Setropts refresh
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: SETROPTS RACLIST(DIGTCERT) REFRESH
