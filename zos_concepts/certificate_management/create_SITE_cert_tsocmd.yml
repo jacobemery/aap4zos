@@ -65,10 +65,10 @@
         - name: Generate new certificate.
           tags: create_cert, gencert
           vars:
-            format_sign_with: "{{ 'SIGNWITH(' + sign_with + ' LABEL(' + sign_label + '))' if sign_with != 'Self' else '' }}"
+            format_sign_with: "{{ ' SIGNWITH(' + sign_with + ' LABEL(\"' + sign_label + '\")) ' if sign_with != 'Self' else ' ' }}"
             format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') {{ format_sign_with }} {{ format_expiration }}
+            commands: RACDCERT GENCERT {{ format_cert_type }} {{ 'KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}'){{ format_sign_with }}{{ format_expiration }}
           notify: Setropts refresh
 
         - name: List chain for new certificate.
