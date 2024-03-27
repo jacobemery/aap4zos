@@ -9,6 +9,7 @@
   vars:
     owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
     cert_label: "{{ cert_label_survey | default('TESTSITE') }}"
+    cert_type: "{{ cert_type_survey }}"
     sign_with: "{{ sign_with_survey | default('Self') }}"
     sign_label: "{{ sign_label_survey | default('') }}"
     ou: "{{ ou_survey | default('ANSIBLE CORE') }}"
@@ -47,37 +48,41 @@
             cn: "{{ get_hostname.stdout }}"
 
     - name: Check if certificate to be created already exists.
+      vars:
+        format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
       ibm.ibm_zos_core.zos_tso_command:
-        commands: "RACDCERT SITE LIST(LABEL('{{ cert_label }}'))"
+        commands: "RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}'))"
       register: list_cert
       failed_when: false
       changed_when: false
 
     - name: Create new SITE certificate if it doesn't exist already.
       vars:
-        cert_not_found: "{{ true if 'Digital certificate information for' not in list_cert.output[0].content[0] }}"
+        cert_not_found: "{{ true if 'Digital certificate information' not in list_cert.output[0].content[0] }}"
+        format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
       when: cert_not_found
       block:
         - name: Generate new certificate.
           tags: create_cert, gencert
           vars:
-            format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
             format_sign_with: "{{ 'SIGNWITH(' + sign_with + ' LABEL(' + sign_label + '))' if sign_with != 'Self' else '' }}"
+            format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT GENCERT SITE SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') {{ format_sign_with }} {{ format_expiration }}
+            commands: RACDCERT GENCERT {{ format_cert_type }}{{ ' KEYUSAGE(CERTSIGN) ' if cert_type == 'CERTAUTH' else '' }}SUBJECTSDN(CN('{{ cn }}') OU('{{ ou }}') C('{{ country }}')) WITHLABEL('{{ cert_label }}') {{ format_sign_with }} {{ format_expiration }}
           notify: Setropts refresh
 
         - name: List chain for new certificate.
           tags: create_cert, listchain
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
+            commands: RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) {{ format_cert_type }}
 
         - name: Connect new certificate to keyring.
           tags: create_cert, connect
           vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(SITE))
+            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+          notify: Setropts refresh
 
         - name: List keyring.
           tags: create_cert, listring
@@ -88,11 +93,13 @@
           tags: create_cert, restart_tn3270
           ibm.ibm_zos_core.zos_operator:
             cmd: 'p TN3270'
+          when: cert_type == 'SITE'
 
         - name: Start TN3270 server
           tags: create_cert, restart_tn3270
           ibm.ibm_zos_core.zos_operator:
             cmd: 's TN3270'
+          when: cert_type == 'SITE'
 
         - name: Run Health Checker via operator command.
           tags: create_cert, run_hc
