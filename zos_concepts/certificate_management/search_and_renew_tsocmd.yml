@@ -114,6 +114,8 @@
 
         - name: Relabel new certificate to old name.
           tags: search_and_renew, renew, relabel
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
               - RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
 
         - name: Connect renewed certificate to keyring.
@@ -123,9 +125,9 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+          notify: Setropts refresh
 
       handlers:
-        - name: Refresh class to activate changes.
-          tags: search_and_renew, renew, refresh
+        - name: Setropts refresh
           ibm.ibm_zos_core.zos_tso_command:
             commands: SETROPTS RACLIST(DIGTCERT) REFRESH
