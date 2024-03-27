@@ -106,7 +106,7 @@
             format_sign_with: "{{ 'SIGNWITH(' + sign_with + ' LABEL(' + sign_label + '))' if sign_with != 'Self' else '' }}"
             format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') {{ format_sign_with }} {{ format_expiration }}
+            commands: RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') WITHLABEL('{{ cert_label }}-NEW') {{ format_sign_with }} {{ format_expiration }}
           notify: Setropts refresh
 
         - name: Relabel new certificate to old name.
