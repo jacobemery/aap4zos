@@ -38,7 +38,7 @@
         wait_time_s: 60
       register: hc_job_output
 
-    - name: 'Search report for {{ cert_label }}.'
+    - name: "Search report for {{ cert_label }}."
       tags: search_and_renew, search, search_hc
       verbosity: 1
       ansible.builtin.set_fact:
