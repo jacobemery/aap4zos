@@ -77,7 +77,7 @@
           vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+            commands: RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE(SITE))
 
         - name: List keyring.
           tags: create_cert, listring
