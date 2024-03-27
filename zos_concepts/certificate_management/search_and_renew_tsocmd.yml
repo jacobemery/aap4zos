@@ -19,20 +19,19 @@
 
   tasks:
     - name: Run health check via operator command.
-      tags: run_health_check, hc
+      tags: search_and_renew, search, run_hc
       ibm.ibm_zos_core.zos_operator:
         cmd: "F HZSPROC,RUN,CHECK=(IBMRACF,RACF_CERTIFICATE_EXPIRATION)"
-      changed_when: false
 
     - name: Get sysname.
-      tags: run_health_check, hc
+      tags: search_and_renew, search, search_hc
       ansible.builtin.command:
         cmd: sysvar SYSNAME
       changed_when: false
       register: sysname
 
     - name: Submit job to run health check.
-      tags: run_health_check, hc
+      tags: search_and_renew, search, search_hc
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
         location: LOCAL
@@ -40,58 +39,93 @@
       register: hc_job_output
 
     - name: Search report for {{ cert_label }}.
-      tags: run_health_check, hc
+      tags: search_and_renew, search, search_hc
       ansible.builtin.set_fact:
         cert_found: true
       with_items: "{{ hc_job_output.jobs.0.ddnames }}"
       when: item.content is search(cert_label)
 
     - name: Print whether or not certificate is expiring.
-      tags: run_health_check, hc
+      tags: search_and_renew, search, search_hc
       ansible.builtin.debug:
         msg: "{{ cert_label }} expiring - {{ cert_found }}"
 
     - name: Renew certificate if it is expiring.
       when: cert_found
       block:
-        - name: Get date.
+        - name: Get date for timestamps.
+          tags: always
           ansible.builtin.command: "date '+%b%d%y'"
           register: date_result
           changed_when: false
 
-        - name: Set variables for use in the next tasks.
+        - name: Set variables for use in the rest of this block of tasks.
+          tags: always
           ansible.builtin.set_fact:
             today: "{{ date_result.stdout }}"
             format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
 
-        - name: Back up current certificate via TSO commands.
+        - name: Back up current certificate.
+          tags: search_and_renew, renew, backup
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT EXPORT(LABEL('{{ cert_label }}')) {{ format_cert_type }} DSN('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')
+
+        - name: List backup certificate.
+          tags: search_and_renew, renew, backup
           vars:
             format_check_cert: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT EXPORT(LABEL('{{ cert_label }}')) {{ format_cert_type }} DSN('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}')
-              - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ format_check_cert }}
+            - RACDCERT CHECKCERT('{{ owner_id }}.CERT.{{ cert_type }}.BACKUP.{{ today }}') {{ format_check_cert }}
 
-        - name: 'Rekey and Generate new cert request via TSO commands for {{ cert_type }}.'
+        - name: Rekey certificate with new temporary label.
+          tags: search_and_renew, renew, rekey
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW')
+
+        - name: List new certificate.
+          tags: search_and_renew, renew, list_new
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
               - RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
+
+        - name: Generate request for new certificate.
+          tags: search_and_renew, renew, genreq
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
               - RACDCERT {{ format_cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
+        
+        - name: Delete old certificate.
+          tags: search_and_renew, renew, delete
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
               - RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
 
-        - name: 'Install and connect local cert via TSO commands for {{ cert_type }}.'
+        - name: Install and connect local cert.
+          tags: search_and_renew, renew, install
           vars:
             format_sign_with: "{{ sign_with + ' ' if sign_with != 'Self' else '' }}"
             format_label: "{{ sign_label if sign_with != 'Self' else cert_label + '-NEW' }}"
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ format_sign_with }}LABEL('{{ format_label }}'))
+
+        - name: Relabel new certificate to old name.
+          tags: search_and_renew, renew, relabel
+              - RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
+
+        - name: Connect renewed certificate to keyring.
+          tags: search_and_renew, renew, connect
+          vars:  
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') \
-                  SIGNWITH({{ format_sign_with }}LABEL('{{ format_label }}'))
-              - RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
               - RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
 
+      handlers:
         - name: Refresh class to activate changes.
+          tags: search_and_renew, renew, refresh
           ibm.ibm_zos_core.zos_tso_command:
             commands: SETROPTS RACLIST(DIGTCERT) REFRESH
