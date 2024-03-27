@@ -59,6 +59,7 @@
       when: cert_not_found
       block:
         - name: Generate new certificate.
+          tags: create_cert, gencert
           vars:
             format_expiration: "{{ 'NOTAFTER(DATE(' + expiry_date + '))' if expiry_date != '' else '' }}"
             format_sign_with: "{{ sign_with + ' ' if sign_with != 'Self' else '' }}"
@@ -68,34 +69,36 @@
           notify: Setropts refresh
 
         - name: List chain for new certificate.
-          tags: 
+          tags: create_cert, listchain
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT LISTCHAIN (LABEL('{{ cert_label }}')) SITE
 
         - name: Connect new certificate to keyring.
-          tags: 
+          tags: create_cert, connect
           vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT ID({{ owner_id }}) CONNECT(SITE LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
 
         - name: List keyring.
-          tags: 
+          tags: create_cert, listring
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT LISTRING({{ keyring }}) ID({{ owner_id }})
 
         - name: Stop TN3270 server.
+          tags: create_cert, restart_tn3270
           ibm.ibm_zos_core.zos_operator:
             cmd: 'p TN3270'
 
         - name: Start TN3270 server
+          tags: create_cert, restart_tn3270
           ibm.ibm_zos_core.zos_operator:
             cmd: 's TN3270'
 
         - name: Run Health Checker via operator command.
+          tags: create_cert, run_hc
           ibm.ibm_zos_core.zos_operator:
             cmd: "F HZSPROC,RUN,CHECK=({{ check_name }})"
-          changed_when: false
 
   handlers:
     - name: Setropts refresh
