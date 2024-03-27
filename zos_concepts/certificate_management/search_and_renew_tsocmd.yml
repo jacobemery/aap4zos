@@ -44,7 +44,6 @@
         cert_found: true
       with_items: "{{ hc_job_output.jobs.0.ddnames }}"
       when: item.content is search(cert_label)
-      no_log: true
 
     - name: Print whether or not certificate is expiring.
       tags: search_and_renew, search, search_hc
