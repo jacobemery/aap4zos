@@ -104,7 +104,7 @@
           tags: search_and_renew, renew, gencert
           vars:
             format_sign_with: "{{ sign_with + ' ' if sign_with != 'Self' else '' }}"
-            format_sign_label: "{{ sign_label if sign_with != 'Self' else cert_label }}"
+            format_sign_label: "{{ sign_label if sign_with != 'Self' else cert_label + '-NEW' }}"
             format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ format_sign_with }}LABEL('{{ format_sign_label }}')) {{ format_expiration }}
