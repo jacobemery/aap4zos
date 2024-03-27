@@ -81,7 +81,7 @@
         - name: Rekey certificate with new temporary label.
           tags: search_and_renew, renew, rekey
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW')
+            commands: RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW') {{ format_expiration }}
           notify: Setropts refresh
 
         - name: List new certificate.
@@ -93,12 +93,13 @@
           tags: search_and_renew, renew, genreq
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}')
+          when: sign_with != 'Self'
 
-        - name: Delete old certificate.
-          tags: search_and_renew, renew, delete
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
-          notify: Setropts refresh
+        # - name: Delete old certificate.
+        #   tags: search_and_renew, renew, delete
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
+        #   notify: Setropts refresh
 
         - name: Generate new certificate.
           tags: search_and_renew, renew, gencert
@@ -108,6 +109,19 @@
             format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ format_sign_with }}LABEL('{{ format_sign_label }}')) {{ format_expiration }}
+          when: sign_with != 'Self'
+          notify: Setropts refresh
+
+        - name: Rollover new key.
+          tags: search_and_renew, renew, rollover
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT {{ format_cert_type }} ROLLOVER(LABEL('{{ cert_label }}')) NEWLABEL('{{ cert_label }}-NEW')
+          notify: Setropts refresh
+
+        - name: Delete old certificate, if SITE or CERTAUTH.
+          tags: search_and_renew, renew, delete
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
           notify: Setropts refresh
 
         - name: Relabel new certificate to old name.
@@ -115,12 +129,12 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
 
-        - name: Connect renewed certificate to keyring.
-          tags: search_and_renew, renew, connect
-          vars:
-            format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
+        # - name: Connect renewed certificate to keyring.
+        #   tags: search_and_renew, renew, connect
+        #   vars:
+        #     format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
+        #   ibm.ibm_zos_core.zos_tso_command:
+        #     commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
 
   handlers:
     - name: Setropts refresh
