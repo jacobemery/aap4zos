@@ -84,6 +84,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW')
+          notify: Setropts refresh
 
         - name: List new certificate.
           tags: search_and_renew, renew, list_new
@@ -102,6 +103,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
+          notify: Setropts refresh
 
         - name: Install and connect local cert.
           tags: search_and_renew, renew, install
@@ -111,6 +113,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ format_sign_with }}LABEL('{{ format_label }}'))
+          notify: Setropts refresh
 
         - name: Relabel new certificate to old name.
           tags: search_and_renew, renew, relabel
@@ -125,7 +128,6 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
-          notify: Setropts refresh
 
   handlers:
     - name: Setropts refresh
