@@ -127,7 +127,7 @@
               - RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
           notify: Setropts refresh
 
-      handlers:
-        - name: Setropts refresh
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: SETROPTS RACLIST(DIGTCERT) REFRESH
+  handlers:
+    - name: Setropts refresh
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: SETROPTS RACLIST(DIGTCERT) REFRESH
