@@ -101,7 +101,7 @@
           notify: Setropts refresh
 
         - name: Generate new certificate.
-          tags: search_and_renew, renew, install
+          tags: search_and_renew, renew, gencert
           vars:
             format_sign_with: "{{ 'SIGNWITH(' + sign_with + ' LABEL(' + sign_label + '))' if sign_with != 'Self' else '' }}"
             format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
