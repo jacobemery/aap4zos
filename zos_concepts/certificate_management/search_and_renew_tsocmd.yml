@@ -13,6 +13,7 @@
     sign_label: "{{ sign_label_survey | default('') }}"
     owner_id: "{{ owner_id_survey }}"
     keyring: "{{ keyring_survey }}"
+    new_expiry_date: "{{ new_expiry_date_survey | default('2030-01-01') }}"
 
     cert_found: false
     today: ''
@@ -99,13 +100,13 @@
             commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
           notify: Setropts refresh
 
-        - name: Install and connect local cert.
+        - name: Generate new certificate.
           tags: search_and_renew, renew, install
           vars:
-            format_sign_with: "{{ sign_with + ' ' if sign_with != 'Self' else '' }}"
-            format_label: "{{ sign_label if sign_with != 'Self' else cert_label + '-NEW' }}"
+            format_sign_with: "{{ 'SIGNWITH(' + sign_with + ' LABEL(' + sign_label + '))' if sign_with != 'Self' else '' }}"
+            format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ format_sign_with }}LABEL('{{ format_label }}'))
+            commands: RACDCERT {{ format_cert_type }} GENCERT('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') {{ format_sign_with }} {{ format_expiration }}
           notify: Setropts refresh
 
         - name: Relabel new certificate to old name.
