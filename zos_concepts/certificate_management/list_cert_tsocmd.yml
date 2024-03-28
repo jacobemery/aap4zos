@@ -12,14 +12,17 @@
     owner_id: "{{ owner_id_survey | default('') }}"
 
   tasks:
-    - block:
-      - name: 'Displaying cert {{ cert_label }}.'
-        ibm.ibm_zos_core.zos_tso_command:
-          commands: "RACDCERT {{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }} LIST(LABEL('{{ cert_label }}'))"
-        register: list_cert
-        changed_when: false
+    - name: List cert, print results whether it exists or not.
+      block:
+        - name: 'Displaying cert {{ cert_label }}.'
+          vars:
+            format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}'))"
+          register: list_cert
+          changed_when: false
 
       always:
-        - name: Print results from list USER cert command.
+        - name: Print results from list cert command.
           ansible.builtin.debug:
             var: list_cert.output[0].content
