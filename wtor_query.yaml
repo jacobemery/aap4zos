@@ -2,13 +2,14 @@
 - name: Query Operator console for actionable messages.
   hosts: zos_host
   environment: "{{ environment_vars }}"
-  gather_facts: no
+  gather_facts: false
   tasks:
     - name: Detecting system name for later use.
       ansible.builtin.command: uname -n
       register: result
+      changed_when: false
 
-    - name: Setting fact `system_name` for later use. 
+    - name: Setting fact `system_name` for later use.
       ansible.builtin.set_fact:
         system_name: "{{ result.stdout }}"
 
