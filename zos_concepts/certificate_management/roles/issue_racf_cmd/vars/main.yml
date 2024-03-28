@@ -1,4 +1,0 @@
----
-# vars file for issue_racf_cmd
-issue_racf_cmd_command: ''
-issue_racf_cmd_task_description: 'issue RACF commands'

@@ -83,7 +83,6 @@ ansible-playbook -i inventories <playbook-name>
 
 ## Role Summary
 - [**issue_operator_cmd**](roles/issue_operator_cmd/README.md) - Issue an operator command
-- [**issue_racf_cmd**](roles/issue_racf_cmd/README.md) - Isuue RACF command(s)
 - [**print_hc_buffer**](roles/print_hc_buffer/README.md) - Pull data from Health Checker
 - [**send_template**](roles/send_template/README.md) - send template to a zOS host
 

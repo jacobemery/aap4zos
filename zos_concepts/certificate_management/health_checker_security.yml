@@ -8,52 +8,37 @@
   environment: "{{ environment_vars }}"
   vars:
     owner_id: "{{ owner_id_survey }}"
-
   tasks:
+    - name: Get sysname.
+      ansible.builtin.command:
+        cmd: sysvar SYSNAME
+      changed_when: false
+      register: sysname
 
-    - block:
-        - name: Get sysname.
-          ansible.builtin.command:
-            cmd: sysvar SYSNAME
-          changed_when: false
-          register: sysname
+    - name: Start Health Check
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "S HZSPROC"
 
-        - name: Start Health Check
-          ibm.ibm_zos_core.zos_operator:
-            cmd: "S HZSPROC"
+    - name: Print sysname.
+      ansible.builtin.debug:
+        var: sysname
 
-        - name: Print sysname.
-          ansible.builtin.debug:
-            var: sysname
+    - name: Setup profiles in RACF.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
+          - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
+          - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
 
-        - include_role:
-            name: issue_racf_cmd
-          vars:
-            task_description: 'Set up profiles'
-            command:
-              - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
-              - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
-              - "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
+    - name: 'Permit access to {{ owner_id }}.'
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
+          - PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(UPDATE)
+          - PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)
 
-        - include_role:
-            name: issue_racf_cmd
-          vars:
-            task_description: 'Permit access to {{ owner_id }}'
-            command:
-              - >
-                  PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) +
-                    ID({{ owner_id }}) ACCESS(READ)
-              - >
-                  PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) +
-                    ID({{ owner_id }}) ACCESS(UPDATE)
-              - >
-                  PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) +
-                    ID({{ owner_id }}) ACCESS(READ)
-
-        - include_role:
-            name: issue_racf_cmd
-          vars:
-            task_description: 'Activate and refresh RACF profile '
-            command:
-              - SETROPTS CLASSACT(XFACILIT)
-              - SETROPTS RACLIST(XFACILIT) REFRESH
+    - name: Activate and refresh RACF profile.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - SETROPTS CLASSACT(XFACILIT)
+          - SETROPTS RACLIST(XFACILIT) REFRESH
