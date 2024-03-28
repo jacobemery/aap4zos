@@ -11,7 +11,7 @@
   tasks:
     - name: Get sysname.
       ansible.builtin.command:
-        cmd: sysvar SYSNAME
+        cmd: "sysvar SYSNAME"
       changed_when: false
       register: sysname
 
