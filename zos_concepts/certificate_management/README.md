@@ -50,11 +50,11 @@ ansible-playbook -i inventories <playbook-name>
 
 ## Playbook
 - [**health_checker_security**](health_checker_security.yml) - Set up security profile for accessing Health Checker functions.
-- [**create_cert_tsocmd.yml**](create_CERTAUTH_cert_tsocmd.yml) - Create a SITE, CERTAUTH, or USER certificate.
-- [**delete_cert_tsocmd.yml**](delete_cert_tsocmd.yml) - Delete a certificate.
-- [**delete_keyring_tsocmd.yml**](delete_keyring_tsocmd.yml) - Delete a keyring.
-- [**list_cert_tsocmd.yml**](list_cert_tsocmd.yml) - Display a certificate details.
-- [**search_and_renew_tsocmd.yml**](search_and_renew_tsocmd.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report.
+- [**create_cert.yml**](create_CERTAUTH_cert.yml) - Create a SITE, CERTAUTH, or USER certificate.
+- [**delete_cert.yml**](delete_cert.yml) - Delete a certificate.
+- [**delete_keyring.yml**](delete_keyring.yml) - Delete a keyring.
+- [**list_cert.yml**](list_cert.yml) - Display a certificate details.
+- [**search_and_renew.yml**](search_and_renew.yml) - Search and a renew a matching certificate found in the RACF_CERTIFCATE_EXPIRATION health check report.
 
 # Changelog
 All changes are maintained chronologically by date found in the
