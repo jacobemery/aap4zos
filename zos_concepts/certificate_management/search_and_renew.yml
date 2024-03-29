@@ -110,7 +110,7 @@
             commands: RACDCERT {{ format_cert_type }} ROLLOVER(LABEL('{{ cert_label }}')) NEWLABEL('{{ cert_label }}-NEW')
           notify: Setropts refresh
 
-        - name: Delete old certificate, if SITE or CERTAUTH.
+        - name: Delete old certificate.
           tags: search_and_renew, renew, delete
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
