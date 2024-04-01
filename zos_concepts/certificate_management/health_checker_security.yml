@@ -40,7 +40,7 @@
       block:
         - name: Check if HZS.<sysname>.*.*.RUN profile is already defined in RACF.
           ibm.ibm_zos_core.zos_tso_command:
-            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
+            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN"
           register: run_check
       rescue:
         - name: Define HZS.<sysname>.*.*.RUN profile in RACF.
@@ -53,7 +53,7 @@
       block:
         - name: Check if HZS.<sysname>.*.*.QUERY profile is already defined in RACF.
           ibm.ibm_zos_core.zos_tso_command:
-            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
+            commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY"
           register: query_check
       rescue:
         - name: Define HZS.<sysname>.*.*.QUERY profile in RACF.
