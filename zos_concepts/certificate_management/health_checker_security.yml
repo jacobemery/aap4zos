@@ -21,7 +21,7 @@
 
     - name: Print sysname.
       ansible.builtin.debug:
-        var: sysname
+        var: sysname.stdout
 
     - name: Setup profiles in RACF.
       ibm.ibm_zos_core.zos_tso_command:
