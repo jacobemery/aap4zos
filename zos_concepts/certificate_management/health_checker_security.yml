@@ -29,6 +29,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES"
           register: messages_check
+          changed_when: false
       rescue:
         - name: Define HZS.<sysname>.*.*.MESSAGES profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
@@ -42,6 +43,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN"
           register: run_check
+          changed_when: false
       rescue:
         - name: Define HZS.<sysname>.*.*.RUN profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
@@ -55,6 +57,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RLIST XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY"
           register: query_check
+          changed_when: false
       rescue:
         - name: Define HZS.<sysname>.*.*.QUERY profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
@@ -68,6 +71,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
           register: search_perms
+          changed_when: false
 
       rescue:
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
