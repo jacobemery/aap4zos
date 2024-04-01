@@ -72,6 +72,10 @@
             commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
           register: search_perms
           changed_when: false
+          failed_when:
+            - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.stdout"
+            - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.stdout"
+            - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.stdout"
 
       rescue:
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
