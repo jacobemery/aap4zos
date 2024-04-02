@@ -72,20 +72,15 @@
             commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
           register: search_perms
           changed_when: false
-          # failed_when:
-            # - "'MESSAGES' not in search_perms"
-            # - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
-            # - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
-            # - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
+          failed_when:
+            - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
+            - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
+            - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
 
       rescue:
         - name: Print given user's current permissions to XFACILIT.
           ansible.builtin.debug:
             msg: "{{ search_perms.output[0].content[0:] }}"
-
-        - name: Print given user's current permissions to XFACILIT.
-          ansible.builtin.debug:
-            msg: "{{ 'HZS.' + sysname.stdout + '.*.*.MESSAGES' }}"
 
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
