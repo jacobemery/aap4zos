@@ -56,12 +56,20 @@
       failed_when: false
       changed_when: false
 
+    - name: Debug command output.
+      ansible.builtin.debug:
+        msg: "{{ list_cert.output[0].content[0] }}"
+
     - name: Create new SITE certificate if it doesn't exist already.
       vars:
         cert_not_found: "{{ true if 'Digital certificate information' not in list_cert.output[0].content[0] }}"
         format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
       when: cert_not_found
       block:
+        - name: Debug.
+          ansible.builtin.debug:
+            var: cert_not_found
+
         - name: Generate new certificate.
           tags: create_cert, gencert
           vars:
