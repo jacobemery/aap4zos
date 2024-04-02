@@ -80,7 +80,11 @@
       rescue:
         - name: Print given user's current permissions to XFACILIT.
           ansible.builtin.debug:
-            msg: "{{ search_perms.output[0].content[0:] }}"
+            msg: "{{ 'HZS.' + sysname.stdout + '.*.*.MESSAGES' }}"
+
+        - name: Print given user's current permissions to XFACILIT.
+          ansible.builtin.debug:
+            var: search_perms
 
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
