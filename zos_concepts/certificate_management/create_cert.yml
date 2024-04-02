@@ -83,7 +83,7 @@
           vars:
             format_usage: "{{ 'PERSONAL' if cert_type == 'USER' else cert_type }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}') +
+            commands: RACDCERT ID({{ owner_id }}) CONNECT({{ format_cert_type }} LABEL('{{ cert_label }}')
               RING({{ keyring }}) DEFAULT USAGE({{ format_usage }}))
           notify: Setropts refresh
 
