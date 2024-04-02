@@ -99,7 +99,7 @@
       always:
         - name: Debug.
           ansible.builtin.debug:
-            msg: "{{ search_perms.output[0].content[0] }}"
+            msg: "{{ search_perms.output[0].content[0:] }}"
 
   handlers:
     - name: Setropts refresh
