@@ -77,13 +77,6 @@
             - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
             - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
 
-
-
-          # failed_when:
-          #   - "'HZS.' + sysname.stdout + '.\\*.\\*.MESSAGES' not in search_perms.output[0].content[0:]"
-          #   - "'HZS.' + sysname.stdout + '.\\*.\\*.RUN' not in search_perms.output[0].content[0:]"
-          #   - "'HZS.' + sysname.stdout + '.\\*.\\*.QUERY' not in search_perms.output[0].content[0:]"
-
       rescue:
         - name: Print given user's current permissions to XFACILIT.
           ansible.builtin.debug:
@@ -97,21 +90,18 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
           when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.MESSAGES') is none
-          # when: "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
           notify: Setropts refresh
 
         - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(UPDATE)"
           when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
-          # when: "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
           notify: Setropts refresh
 
         - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
           when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
-          # when: "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
           notify: Setropts refresh
 
   handlers:
