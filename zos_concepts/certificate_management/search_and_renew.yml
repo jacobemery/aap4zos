@@ -100,8 +100,8 @@
         - name: Sign new certificate, if not self-signed.
           tags: search_and_renew, renew, gencert
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') +
-              SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
+            commands:
+              - RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
           when: sign_with != 'Self'
           notify: Setropts refresh
 
