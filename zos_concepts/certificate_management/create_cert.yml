@@ -58,7 +58,7 @@
 
     - name: Debug command output.
       ansible.builtin.debug:
-        msg: "{{ list_cert.output[0].content[0] }}"
+        msg: "{{ list_cert.output[0].content[0:] }}"
 
     - name: Create new SITE certificate if it doesn't exist already.
       vars:
