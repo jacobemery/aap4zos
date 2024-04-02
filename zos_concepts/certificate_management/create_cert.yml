@@ -58,11 +58,11 @@
 
     - name: Debug command output.
       ansible.builtin.debug:
-        msg: "{{ list_cert.output[0].content[0] }}"
+        msg: "{{ list_cert.output[0].content[] }}"
 
     - name: Create new SITE certificate if it doesn't exist already.
       vars:
-        cert_not_found: "{{ true if 'Digital certificate information' not in list_cert.output[0].content[0] }}"
+        cert_not_found: "{{ true if 'Digital certificate information' not in list_cert.output[0].content[] }}"
         format_cert_type: "{{ 'ID(' + owner_id + ')' if cert_type == 'USER' else cert_type }}"
       when: cert_not_found
       block:
