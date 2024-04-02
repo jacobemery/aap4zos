@@ -77,23 +77,27 @@
             - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0]"
             - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0]"
 
+        - name: Debug.
+          ansible.builtin.debug:
+            msg: "{{ search_perms.output[0].content[0] }}"
+
       rescue:
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.MESSAGES CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
-          when: "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.stdout"
+          when: "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0]"
           notify: Setropts refresh
 
         - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(UPDATE)"
-          when: "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.stdout"
+          when: "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0]"
           notify: Setropts refresh
 
         - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
-          when: "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.stdout"
+          when: "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0]"
           notify: Setropts refresh
 
   handlers:
