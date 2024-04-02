@@ -31,7 +31,7 @@
       changed_when: false
       register: sysname
 
-    - name: Submit job to run health check.
+    - name: Submit job to pull health check report.
       tags: search_and_renew, search, search_hc
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/templates/HZPRINT.jcl.j2"
@@ -100,7 +100,8 @@
         - name: Sign new certificate, if not self-signed.
           tags: search_and_renew, renew, gencert
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
+            commands:
+              - RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
           when: sign_with != 'Self'
           notify: Setropts refresh
 
