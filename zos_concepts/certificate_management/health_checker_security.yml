@@ -73,7 +73,7 @@
           register: search_perms
           changed_when: false
           failed_when:
-            - "'MESSAGES' not in search_perms.output[0].content[0:]"
+            - "'MESSAGES' not in search_perms"
             # - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
             # - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
             # - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
@@ -93,17 +93,17 @@
           when: "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
           notify: Setropts refresh
 
-        # - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ owner_id }}.'
-        #   ibm.ibm_zos_core.zos_tso_command:
-        #     commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(UPDATE)"
-        #   when: "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
-        #   notify: Setropts refresh
+        - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ owner_id }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(UPDATE)"
+          when: "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
+          notify: Setropts refresh
 
-        # - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ owner_id }}.'
-        #   ibm.ibm_zos_core.zos_tso_command:
-        #     commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
-        #   when: "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
-          # notify: Setropts refresh
+        - name: 'Permit read access for HZS.<sysname>.*.*.QUERY to {{ owner_id }}.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
+          when: "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
+          notify: Setropts refresh
 
   handlers:
     - name: Setropts refresh
