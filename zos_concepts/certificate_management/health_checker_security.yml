@@ -72,7 +72,7 @@
             commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
           register: search_perms
           changed_when: false
-          failed_when:
+          # failed_when:
             # - "'MESSAGES' not in search_perms"
             # - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
             # - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
