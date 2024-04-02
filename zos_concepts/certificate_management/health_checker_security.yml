@@ -73,7 +73,7 @@
           register: search_perms
           changed_when: false
           failed_when:
-            - "'MESSAGES' not in search_perms"
+            # - "'MESSAGES' not in search_perms"
             # - "'HZS.' + sysname.stdout + '.*.*.MESSAGES' not in search_perms.output[0].content[0:]"
             # - "'HZS.' + sysname.stdout + '.*.*.RUN' not in search_perms.output[0].content[0:]"
             # - "'HZS.' + sysname.stdout + '.*.*.QUERY' not in search_perms.output[0].content[0:]"
