@@ -22,7 +22,7 @@
           failed_when: false
           changed_when: false
 
-        - name: 'Deleting keyring {{ keyring }} if it exists.'
+        - name: 'If it exists, delete keyring {{ keyring }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands:
               - RACDCERT ID({{ owner_id }}) DELRING({{ keyring }})
