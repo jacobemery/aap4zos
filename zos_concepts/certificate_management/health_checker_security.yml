@@ -101,20 +101,21 @@
           when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
           notify: Setropts refresh
 
-        - name: 'Search again for permissions for the given user. For visual confirmation.'
+  handlers:
+    - name: Setropts refresh
+      block:
+        - name: Setropts refresh
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              - "SETROPTS CLASSACT(XFACILIT)"
+              - "SETROPTS RACLIST(XFACILIT) REFRESH"
+
+        - name: Search again for permissions for the given user.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
           register: search_perms
           changed_when: false
 
-      always:
-        - name: Print the given user's permissions.
+        - name: Print the given user's permissions afterwards for visual confirmation.
           ansible.builtin.debug:
             msg: "{{ search_perms.output[0].content }}"
-
-  handlers:
-    - name: Setropts refresh
-      ibm.ibm_zos_core.zos_tso_command:
-        commands:
-          - "SETROPTS CLASSACT(XFACILIT)"
-          - "SETROPTS RACLIST(XFACILIT) REFRESH"
