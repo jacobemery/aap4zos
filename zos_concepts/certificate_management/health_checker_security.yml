@@ -35,6 +35,7 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
           when: messages_check.output[0].rc == 4
+
           notify: Setropts refresh
 
     - name: Check if HZS.<sysname>.*.*.RUN is already defined in RACF. Define it if not.
@@ -92,6 +93,7 @@
         - name: 'Permit update access for HZS.<sysname>.*.*.RUN to {{ user_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.RUN CLASS(XFACILIT) ID({{ user_id }}) ACCESS(UPDATE)"
+
           when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.RUN') is none
           notify: Setropts refresh
 
