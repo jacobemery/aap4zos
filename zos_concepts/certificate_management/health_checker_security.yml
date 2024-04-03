@@ -34,7 +34,7 @@
         - name: Define HZS.<sysname>.*.*.MESSAGES profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.MESSAGES UACC(NONE)"
-          when: "'NOT FOUND' in messages_check.output[0].content[0:]"
+          when: messages_check.output[0].rc == 4
           notify: Setropts refresh
 
     - name: Check if HZS.<sysname>.*.*.RUN is already defined in RACF. Define it if not.
@@ -48,7 +48,7 @@
         - name: Define HZS.<sysname>.*.*.RUN profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.RUN UACC(NONE)"
-          when: "'NOT FOUND' in run_check.output[0].content[0:]"
+          when: run_check.output[0].rc == 4
           notify: Setropts refresh
 
     - name: Check if HZS.<sysname>.*.*.QUERY is already defined in RACF. Define it if not.
@@ -62,7 +62,7 @@
         - name: Define HZS.<sysname>.*.*.QUERY profile in RACF.
           ibm.ibm_zos_core.zos_tso_command:
             commands: "RDEFINE XFACILIT HZS.{{ sysname.stdout }}.*.*.QUERY UACC(NONE)"
-          when: "'NOT FOUND' in query_check.output[0].content[0:]"
+          when: query_check.output[0].rc == 4
           notify: Setropts refresh
 
     - name: Check if the given user has correct permissions, set them correctly if they don't.
