@@ -78,13 +78,10 @@
             - search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
 
       rescue:
-        - name: Print given user's current permissions to XFACILIT.
-          ansible.builtin.debug:
-            msg: "{{ 'HZS.' + sysname.stdout + '.*.*.MESSAGES' }}"
 
-        - name: Print given user's current permissions to XFACILIT.
+        - name: Print the given user's current permissions.
           ansible.builtin.debug:
-            var: search_perms
+            msg: "{{ search_perms.output[0].content }}"
 
         - name: 'Permit read access for HZS.<sysname>.*.*.MESSAGES to {{ owner_id }}.'
           ibm.ibm_zos_core.zos_tso_command:
@@ -103,6 +100,17 @@
             commands: "PERMIT HZS.{{ sysname.stdout }}.*.*.QUERY CLASS(XFACILIT) ID({{ owner_id }}) ACCESS(READ)"
           when: search_perms.output[0].content | regex_search('HZS\\.' + sysname.stdout + '\\.\\*\\.\\*\\.QUERY') is none
           notify: Setropts refresh
+
+        - name: 'Search again for permissions for the given user. For visual confirmation.'
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: "SEARCH USER({{ owner_id }}) CLASS(XFACILIT)"
+          register: search_perms
+          changed_when: false
+
+      always:
+        - name: Print the given user's permissions.
+          ansible.builtin.debug:
+            msg: "{{ search_perms.output[0].content }}"
 
   handlers:
     - name: Setropts refresh
