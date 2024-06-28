@@ -56,38 +56,38 @@
     # Fact setting for use by this playbook
     # ##########################################################################
     - name: Setting fact data_set_name for use by this sample
-      ansibl.builtin.set_fact:
+      ansible.builtin.set_fact:
         data_set_name: "{{ tmp_ds.stdout }}"
 
     - name: Fact `data_set_name` set with value
-      ansibl.builtin.debug:
+      ansible.builtin.debug:
         msg: "{{ data_set_name }}"
 
     - name: Detect character set for locale on target {{ inventory_hostname }}
-      ansibl.builtin.command: locale -c charmap
+      ansible.builtin.command: locale -c charmap
       register: result
 
     - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
         target {{ inventory_hostname }}
-      ansibl.builtin.debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Set variable `target_charset` with target {{ inventory_hostname }}
         charset
-      ansibl.builtin.set_fact:
+      ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
     - name: Detecting system name
       # shell: "uname -a |awk '{print $2}'"
-      ansibl.builtin.command: uname -n
+      ansible.builtin.command: uname -n
       register: result
 
     - name: Setting fact `system_name` for use by this sample
-      ansibl.builtin.set_fact:
+      ansible.builtin.set_fact:
         system_name: "{{ result.stdout }}"
 
     - name: Fact `system_name` set with value
-      ansibl.builtin.debug:
+      ansible.builtin.debug:
         msg: "{{ system_name }}"
 
 
