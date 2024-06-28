@@ -9,11 +9,13 @@
   delegate_to: localhost
   register: temp
 
-- block:
+- name: Evaluate and copy template, delete at the end.
+  block:
     - name: Evaluate template
       ansible.builtin.template:
         src: "{{ item.src }}"
         dest: "{{ temp.path }}"
+        mode: '755'
       delegate_to: localhost
 
     - name: Copy evaluated template to z/OS system
