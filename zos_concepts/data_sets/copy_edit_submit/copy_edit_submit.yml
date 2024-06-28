@@ -31,8 +31,9 @@
     # ##########################################################################
     # Generate a temporary data set name
     # ##########################################################################
-    - name: Create temp data set name
+    - name: Create temp data set name.
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
+      changed_when: "'created' in tmp_ds.stdout"
       register: tmp_ds
 
     - name: Set tmp_data_set fact from previous output.
