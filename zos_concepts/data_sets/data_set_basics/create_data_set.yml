@@ -8,10 +8,10 @@
     - name: Create a z/OS data set.
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ ds_name | default('IBMUSER.ANSIBLE.DATASET') }}"
-        type: "{{ ds_type | default('PDS') }}"
+        type: "{{ ds_type | default('pds') }}"
         space_primary: "{{ ds_space_primary | default('5') }}"
-        space_type: "{{ ds_space_type | default('M') }}"
-        record_format: "{{ ds_record_format | default('FB') }}"
+        space_type: "{{ ds_space_type | default('m') }}"
+        record_format: "{{ ds_record_format | default('fb') }}"
         record_length: "{{ ds_record_length | default('80') }}"
       register: ds_create
 
