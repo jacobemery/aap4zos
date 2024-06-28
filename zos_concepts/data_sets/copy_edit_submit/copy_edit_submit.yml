@@ -95,7 +95,7 @@
     - name: "Submit the JCL tmp_data_set(PSA)"
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(PSA)"
-        location: DATA_SET
+        location: data_set
         wait: true
       register: result_submit_psa
 
@@ -106,7 +106,7 @@
     - name: "Submit the JCL tmp_data_set(UPTIME)"
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tmp_data_set }}(UPTIME)"
-        location: DATA_SET
+        location: data_set
         wait: true
       register: result_submit_uptime
 

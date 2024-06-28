@@ -29,7 +29,7 @@
     - name: Submit {{ job_name }} job. Ignore failure initially so that results can be captured and printed.
       zos_job_submit:
         src: "/tmp/{{ job_name }}.jcl"
-        location: USS
+        location: uss
         wait_time_s: 60
       register: job_submit
       no_log: true

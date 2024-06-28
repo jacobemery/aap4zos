@@ -63,7 +63,7 @@
         type: seq
         state: present
         replace: true
-        format: fb
+        record_format: fb
         record_length: 100
         space_primary: 5
         space_type: m
@@ -110,7 +110,7 @@
         type: pds
         space_primary: 5
         space_type: m
-        format: fba
+        record_format: fba
         record_length: 100
       register: result
 

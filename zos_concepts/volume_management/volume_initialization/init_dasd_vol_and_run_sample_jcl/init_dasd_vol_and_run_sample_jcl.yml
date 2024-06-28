@@ -122,7 +122,7 @@
     - name: Submit the JCL at mount_point/HELLO.JCL.
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ mount_point }}/HELLO.JCL"
-        location: USS
+        location: uss
       register: result
 
     - name: Setting fact `job_id` for id of job submitted above.

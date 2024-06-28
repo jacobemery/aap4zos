@@ -79,7 +79,7 @@
     #   zos_data_set:
     #     name: "{{ data_set_name }}(MEM{{ item }})"
     #     state: absent
-    #     type: MEMBER
+    #     type: member
     #   with_sequence: count=1
     #   register: delete_member
 
