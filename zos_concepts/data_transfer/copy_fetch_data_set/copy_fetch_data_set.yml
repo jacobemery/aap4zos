@@ -50,6 +50,7 @@
 
     - name: Create temp data set name
       ansible.builtin.command: "mvstmp {{ ansible_user | upper }}"
+      changed_when: "'created' in tmp_ds.stdout"
       register: tmp_ds
 
     # ##########################################################################
@@ -63,23 +64,23 @@
       ansible.builtin.debug:
         msg: "{{ data_set_name }}"
 
-    - name: Detect character set for locale on target {{ inventory_hostname }}
+    - name: Detect character set for locale
       ansible.builtin.command: locale -c charmap
+      changed_when: false
       register: result
 
-    - name: Response for create shell script {{ tgt_tmp_dir }}/date.sh on
-        target {{ inventory_hostname }}
+    - name: Response for create shell script tgt_tmp_dir/date.sh
       ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Set variable `target_charset` with target {{ inventory_hostname }}
-        charset
+    - name: Set variable `target_charset` with target inventory_hostname charset
       ansible.builtin.set_fact:
         target_charset: "{{ result.stdout | default('IBM-1047') }}"
 
-    - name: Detecting system name
+    - name: Detecting system name.
       # shell: "uname -a |awk '{print $2}'"
       ansible.builtin.command: uname -n
+      changed_when: false
       register: result
 
     - name: Setting fact `system_name` for use by this sample
@@ -146,6 +147,7 @@
       ansible.builtin.file:
         path: "{{ ctl_tmp_dir }}/{{ data_set_name }}/file{{ item }}"
         state: touch
+        mode: '644'
       with_sequence: count=4
       delegate_to: localhost
       register: result
