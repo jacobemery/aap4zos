@@ -1,7 +1,6 @@
 ---
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Fetch a z/OS data set.
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
@@ -9,52 +8,54 @@
     src_file: "{{ src_file | default('HELLO.jcl')}}"
     dest_path: "{{ dest_path | default('/tmp/data_set') }}"
   tasks:
-    
+
     - name: Create a sequential data set for demonstration purposes.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ ds_name }}"
         type: seq
         state: present
         replace: true
         format: fb
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: m
       register: result
 
     - name: Remove old /tmp/ds_temp if it exists already, for idempotency.
-      file:
+      ansible.builtin.file:
         path: "/tmp/ds_temp"
         state: absent
       register: result
 
-    - name: Copy {{ playbook_dir }}/files/{{ src_file }} from project to USS file.
-      zos_copy:
+    - name: Copy /files/src_file from project to USS file.
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/{{ src_file }}"
         dest: "/tmp/ds_temp"
       register: result
 
     - name: Copy the USS file to the sequential data set.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "/tmp/ds_temp"
         dest: "{{ ds_name }}"
         remote_src: true
       register: result
 
-    - name: Fetch the created sequential data set and store in {{ dest_path }}.
-      zos_fetch:
+    - name: "Fetch the created sequential data set and store in {{ dest_path }}."
+      ibm.ibm_zos_core.zos_fetch:
         src: "{{ ds_name }}"
         dest: "{{ dest_path }}"
         flat: true
 
-- hosts: localhost
+- name: Fetch and print the copied data set's contents on control node's side.
+  hosts: localhost
   gather_facts: false
   tasks:
 
     - name: Get copied data set.
-      shell: "cat {{ dest_path }}"
+      ansible.builtin.slurp:
+        src: "{{ dest_path }}"
       register: ds_contents
-      changed_when: False
 
-    - name: Print copied data set's contents from Linux's side.
-      debug:
-        msg: "{{ ds_contents.stdout_lines }}"
+    - name: Print copied data set's contents from control node's side.
+      ansible.builtin.debug:
+        msg: "{{ ds_contents.content | b64decode }}"
