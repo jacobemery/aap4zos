@@ -1,5 +1,5 @@
 ---
-- name: Delete a z/OS dataset.
+- name: Delete a z/OS data set.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
