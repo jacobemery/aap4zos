@@ -33,9 +33,8 @@
 
 ---
 
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Demonstrate basic z/OS data set operations.
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -59,89 +58,90 @@
     # +-------------------------------------------------------------------------
 
     - name: Create a sequential data set
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: seq
         state: present
         replace: true
         format: fb
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: m
       register: result
 
     - name: Response for data set creation
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Remove old {{ tgt_tmp_dir }}/HELLO if it exists, for idempotency.
-      file:
+    - name: Remove old tgt_tmp_dir/HELLO if it exists, for idempotency.
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
       register: result
 
     - name: Response for USS file deletion.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy HELLO.jcl from project to USS file.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
       register: result
 
-    - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
-        on target {{ inventory_hostname }}
-      debug:
+    - name: Response for populating USS file tgt_tmp_dir/HELLO.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy the USS file to the sequential data set.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
       register: result
 
     - name: Response for copying USS file to data set
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Create a PDS
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}"
         type: pds
-        size: 5M
+        space_primary: 5
+        space_type: m
         format: fba
         record_length: 100
       register: result
 
     - name: Response for creating the PDS
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Remove the target PDS member if it exists, for idempotency.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}(HELLO)"
-        type: MEMBER
+        type: member
         state: absent
       register: result
 
     - name: Response for creating the PDS member
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy the sequential data set to PDS member
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         remote_src: true
       register: result
 
-    - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
-      debug:
+    - name: Response for copying data_set_name to pds_name(HELLO)
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Delete the data sets
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         batch:
           - name: "{{ data_set_name }}"
             state: absent
@@ -150,16 +150,16 @@
       register: result
 
     - name: Response for deleting the data sets
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Clean up {{ tgt_tmp_dir }}
-      file:
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
 
     - name: List tasks this playbook completed.
-      debug:
+      ansible.builtin.debug:
         msg:
           - "#########################################################################"
           - "z/OS modules used: zos_copy, zos_data_set, zos_fetch"
