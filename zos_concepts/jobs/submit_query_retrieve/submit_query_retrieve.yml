@@ -31,9 +31,8 @@
 ###############################################################################
 
 ---
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+- name: Demonstrate how to submit jobs, query and retrieve job output.
+  hosts: zos_host
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -54,18 +53,19 @@
     # +-------------------------------------------------------------------------
     ############################################################################
 
-    - name: Create a PDS data set {{ data_set_name }}
-      zos_data_set:
+    - name: "Create a PDS data set {{ data_set_name }}."
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: pds
-        size: 5M
-        format: fb
+        space_primary: 5
+        space_type: m
+        record_format: fb
         record_length: 80
         replace: true
       register: create_pds
 
-    - name: Response for create a PDS data set {{ data_set_name }}
-      debug:
+    - name: "Response for create a PDS data set {{ data_set_name }}."
+      ansible.builtin.debug:
         msg: "{{ create_pds }}"
 
     # +-------------------------------------------------------------------------
@@ -78,7 +78,7 @@
     # - name: Delete PDS member, if it exists, for idempotency
     #   zos_data_set:
     #     name: "{{ data_set_name }}(MEM{{ item }})"
-    #     state: absent 
+    #     state: absent
     #     type: MEMBER
     #   with_sequence: count=1
     #   register: delete_member
@@ -87,50 +87,46 @@
     #   debug:
     #     msg: "{{ delete_member }}"
 
-    - name: Ensure JCL folder exists in USS to manage JCL
-      file:
+    - name: Ensure JCL folder exists in USS to manage JCL.
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl"
         state: directory
+        mode: '644'
       register: create_dir
 
     - name: Response for ensure JCL folder exists in USS to manage JCL
-      debug:
+      ansible.builtin.debug:
         msg: "{{ create_dir }}"
 
-    - name: Ensure {{ tgt_tmp_dir }}/ansible/jcl/HELLO does not already exists in USS, for idempotency
-      file:
+    - name: Ensure tgt_tmp_dir/ansible/jcl/HELLO does not already exists in USS, for idempotency.
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         state: absent
       register: delete_file
 
     - name: Response for deleting USS file.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ delete_file }}"
 
-    - name: Write HELLO JCL to USS in {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
-        on target {{ inventory_hostname }}
-      zos_copy:
+    - name: Write HELLO JCL to USS in tgt_tmp_dir/ansible/jcl/HELLO
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
       register: result
 
-    - name: Response for write HELLO JCL to USS
-        in {{ tgt_tmp_dir }}/ansible/jcl/HELLO" on
-        target {{ inventory_hostname }}
-      debug:
+    - name: Response for write HELLO JCL to USS in tgt_tmp_dir/ansible/jcl/HELLO
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Populate {{ data_set_name }} member with data from USS file
-        in {{ tgt_tmp_dir }}/ansible/jcl
-      zos_copy:
+    - name: Populate data_set_name member with data from USS file in tgt_tmp_dir/ansible/jcl
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         remote_src: true
         dest: "{{ data_set_name }}(MEM1)"
       register: result
 
-    - name: Response for populate {{ data_set_name }} member with data from
-        USS file in {{ tgt_tmp_dir }}/ansible/jcl
-      debug:
+    - name: Response for populate data_set_name member with data from USS file in tgt_tmp_dir/ansible/jcl
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     # +-------------------------------------------------------------------------
@@ -139,15 +135,15 @@
     # | jobs could be submitted under a single task for members of a single PDS
     # +-------------------------------------------------------------------------
 
-    - name: Submit the JCL {{ data_set_name }}(MEM1)
-      zos_job_submit:
+    - name: Submit the JCL data_set_name(MEM1)
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
-        location: DATA_SET
+        location: data_set
       register: job_submit
       with_sequence: count=1
 
-    - name: Response for submit the JCL {{ data_set_name }}.(MEM1)
-      debug:
+    - name: Response for submit the JCL data_set_name.(MEM1)
+      ansible.builtin.debug:
         msg: "{{ job_submit }}"
 
     # +-------------------------------------------------------------------------
@@ -158,30 +154,29 @@
     # +-------------------------------------------------------------------------
 
     - name: Set job id fact used in this playbook
-      set_fact:
+      ansible.builtin.set_fact:
         submit_job_id: "{{ job_submit.results[0]['jobs'][0]['job_id'] }}"
 
     - name: Fact `submit_job_id` set with value
-      debug:
+      ansible.builtin.debug:
         msg: "{{ submit_job_id }}"
 
     - name: Query submitted job by job_id
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ submit_job_id }}"
       register: query_job
 
     - name: Response for query submitted job by job_id
-      debug:
+      ansible.builtin.debug:
         msg: "{{ query_job }}"
 
-    - name: Get job output for job {{ submit_job_id }} from PDS member
-      zos_job_output:
+    - name: Get job output for job submit_job_id from PDS member.
+      ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ submit_job_id }}"
       register: query_output
 
-    - name: Response for get job output for job "{{ submit_job_id }}" from PDS
-        member
-      debug:
+    - name: Response for get job output for job submit_job_id from PDS member.
+      ansible.builtin.debug:
         msg: "{{ query_output }}"
 
     # +-------------------------------------------------------------------------
@@ -189,35 +184,31 @@
     # | zos_job_submit module.
     # +-------------------------------------------------------------------------
 
-    - name: Submit {{ job_name }} JCL located on target
-            in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
-      zos_job_submit:
+    - name: "Submit job_name JCL located on target in tgt_tmp_dir/ansible/jcl/{{ job_name }}."
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
-        location: USS
+        location: uss
       register: job_submit_uss
 
-    - name: Response for submit {{ job_name }} JCL located on target
-            in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
-      debug:
-        msg:
-          - "{{ job_submit_uss }}"
+    - name: "Response for submit job_name JCL located on target in tgt_tmp_dir/ansible/jcl/job_name"
+      ansible.builtin.debug:
+        msg: "{{ job_submit_uss }}"
 
     - name: Set job id fact used in this playbook
-      set_fact:
+      ansible.builtin.set_fact:
         job_id_uss: "{{ job_submit_uss['jobs'][0]['job_id'] }}"
 
     - name: Print fact `job_id_uss` set with value
-      debug:
+      ansible.builtin.debug:
         msg: "{{ job_id_uss }}"
 
-    - name: Query the submitted job {{ job_name }} on USS target
-      zos_job_query:
+    - name: Query the submitted job job_name on USS target
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ job_id_uss }}"
       register: query_output_uss
 
-    - name: Response for query the submitted job {{ job_name }}
-            on USS target
-      debug:
+    - name: Response for query the submitted job job_name on USS target
+      ansible.builtin.debug:
         msg: "{{ query_output_uss }}"
 
     # +-------------------------------------------------------------------------
@@ -242,29 +233,28 @@
     # +-------------------------------------------------------------------------
     ############################################################################
 
-    - name: Remove {{ job_name }} JCL and folder on USS target
-      file:
+    - name: Remove job_name JCL and folder on USS target.
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/ansible"
         state: absent
       register: delete_dir
 
-    - name: Response for remove {{ job_name }} JCL and folder on
-            USS target
-      debug:
+    - name: Response for remove job_name JCL and folder on USS target.
+      ansible.builtin.debug:
         msg: "{{ delete_dir }}"
 
-    - name: Delete data set {{ data_set_name }}
-      zos_data_set:
+    - name: "Delete data set {{ data_set_name }}"
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         state: absent
       register: delete_ds
 
     - name: Response for delete data set {{ data_set_name }}
-      debug:
+      ansible.builtin.debug:
         msg: "{{ delete_ds }}"
 
     - name: List tasks this playbook completed.
-      debug:
+      ansible.builtin.debug:
         msg:
           - "############################################################################"
           - "# z/OS modules used: zos_data_set, zos_job_submit, zos_job_query, "
