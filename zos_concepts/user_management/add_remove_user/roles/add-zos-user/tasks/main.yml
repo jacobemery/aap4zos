@@ -41,7 +41,8 @@
   ibm.ibm_zos_core.zos_tso_command:
     commands: "{{ lookup('template', '../templates/add-user.j2') }}"
 
-- block:
+- name: Create generic profile with support for enhanced generic naming.
+  block:
     - name: Create generic profile
       tags: profile
       ibm.ibm_zos_core.zos_tso_command:
@@ -67,8 +68,11 @@
   when: groups_to_connect is defined and groups_to_connect and groups_to_connect | length > 0
 
 - name: Debug
-  debug:
-    msg: "DEFINE ALIAS ( NAME('{{ userid | upper }}'){%- if user_catalog is defined and user_catalog %} RELATE('{{ user_catalog | upper }}'){%- endif %}{%- if master_catalog is defined and master_catalog %} CATALOG('{{ master_catalog | upper }}'){%- endif %}"
+  ansible.builtin.debug:
+    msg:
+      - "DEFINE ALIAS ( NAME('{{ userid | upper }}'){%- if user_catalog is defined and user_catalog %}"
+      - "RELATE('{{ user_catalog | upper }}'){%- endif %}{%- if master_catalog is defined and master_catalog %}"
+      - "CATALOG('{{ master_catalog | upper }}'){%- endif %}"
 
 - name: Define alias for user ID
   tags: alias
@@ -90,7 +94,7 @@
 - name: Set omvs_zfs_data_set_name
   tags: home_dir
   ansible.builtin.set_fact:
-    omvs_zfs_data_set_name: "{{ ( omvs_zfs_data_set_name | default('OMVS.USER.' + userid | upper + '.ZFS', true) ) | upper }}"
+    omvs_zfs_data_set_name: "{{ (omvs_zfs_data_set_name | default('OMVS.USER.' + userid | upper + '.ZFS', true)) | upper }}"
 
 - name: Create LDS for ZFS data set
   tags: zfs_data_set, data_set
@@ -104,7 +108,7 @@
     space_type: cyl
   register: lds_create_response
 
-- name: Format LDS as ZFS
+- name: Format LDS as ZFS.
   tags: zfs_data_set, data_set
   ansible.builtin.command: zfsadm format -aggregate {{ omvs_zfs_data_set_name | upper }}
 
@@ -113,6 +117,7 @@
   ansible.builtin.file:
     path: "{{ omvs_home_directory }}"
     state: directory
+    mode: '755'
     owner: "{{ userid | lower }}"
     group: "{{ omvs_gid if omvs_gid | default(false) else omit }}"
 
@@ -173,9 +178,10 @@
       tags: mount
       ansible.builtin.shell: cp "//'{{ bpxprm_data_set | upper }}(BPXPRM{{ bpxprm_member | upper }})'" {{ backup.path }}
 
-    - name: Get file contents
+    - name: Get file contents.
       tags: mount
       ansible.builtin.command: cat {{ temp.path }}
+      changed_when: false
       register: cat_response
 
     - name: Insert mount into contents
@@ -234,7 +240,7 @@
   when: print_pass is true
 
 - name: Skip email task if send_email is false
-  meta: end_host
+  ansible.builtin.meta: end_host
   when: send_email is not true
 
 - name: Send email containing login credentials to owner of new user
@@ -251,4 +257,3 @@
   delegate_to: localhost
   when: send_email is defined and send_email is not none and send_email
   no_log: true
-
