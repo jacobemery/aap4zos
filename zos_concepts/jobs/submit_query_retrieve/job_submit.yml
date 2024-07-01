@@ -2,8 +2,6 @@
 - name: Demonstrates submitting JCL.
   hosts: zos_host
   gather_facts: false
-  collections:
-    - ibm.ibm_zos_core==1.9.0
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "{{ jcl | default('HELLO') }}"
