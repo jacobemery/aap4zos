@@ -53,7 +53,7 @@
     ############################################################################
 
     - name: Create a PDS data set {{ data_set_name }}
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: pds
         size: 5M
@@ -107,7 +107,7 @@
 
     - name: Write HELLO JCL to USS in {{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         on target {{ inventory_hostname }}
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
       register: result
@@ -120,7 +120,7 @@
 
     - name: Populate {{ data_set_name }} member with data from USS file
         in {{ tgt_tmp_dir }}/ansible/jcl
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/HELLO"
         remote_src: true
         dest: "{{ data_set_name }}(MEM1)"
@@ -164,7 +164,7 @@
         msg: "{{ submit_job_id }}"
 
     - name: Query submitted job by job_id
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ submit_job_id }}"
       register: query_job
 
@@ -173,7 +173,7 @@
         msg: "{{ query_job }}"
 
     - name: Get job output for job {{ submit_job_id }} from PDS member
-      zos_job_output:
+      ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ submit_job_id }}"
       register: query_output
 
@@ -189,7 +189,7 @@
 
     - name: Submit {{ job_name }} JCL located on target
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
         location: USS
       register: job_submit_uss
@@ -209,7 +209,7 @@
         msg: "{{ job_id_uss }}"
 
     - name: Query the submitted job {{ job_name }} on USS target
-      zos_job_query:
+      ibm.ibm_zos_core.zos_job_query:
         job_id: "{{ job_id_uss }}"
       register: query_output_uss
 
@@ -252,7 +252,7 @@
         msg: "{{ delete_dir }}"
 
     - name: Delete data set {{ data_set_name }}
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         state: absent
       register: delete_ds

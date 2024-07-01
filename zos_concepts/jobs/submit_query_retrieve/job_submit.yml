@@ -8,7 +8,7 @@
   tasks:
 
     - name: Submit {{ job_name }} job.
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
         location: LOCAL
         wait_time_s: 60
@@ -46,7 +46,7 @@
           - Return Code Message={{ submit_job_ret_code_msg }}
 
     - name: Get job output for job ID {{ submit_job_id }}
-      zos_job_output:
+      ibm.ibm_zos_core.zos_job_output:
         job_id: "{{ submit_job_id }}"
       register: job_output_result
 
