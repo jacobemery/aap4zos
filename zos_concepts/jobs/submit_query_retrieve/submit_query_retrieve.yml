@@ -32,8 +32,6 @@
 
 ---
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
