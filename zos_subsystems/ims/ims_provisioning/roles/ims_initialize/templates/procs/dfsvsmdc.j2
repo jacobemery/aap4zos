@@ -1,0 +1,43 @@
+**********************************************************************
+*       DFSVSM00
+*
+*       Sample DFSVSM00 member of the IMS PROCLIB data set.
+*
+*       Use the DFSVSM00 member to define settings for buffer
+*       pools, trace options, DASD logging, coupling facility
+*       structures, IRLM lock timeout, and transactions in a
+*       HALDB partition.
+*
+*************** C O N D I T I O N A L   C H A N G E ******************
+*    IMPORTANT:
+*
+*    This sample assumes a DB/DC or DBCTL system.
+*    If this is a DCCTL system, then remove the following
+*    definitions in the sample below:
+*    - VSRBF (both instances)
+*    - IOBF (both instances)
+*
+*************** E N D   C O N D I T I O N A L   C H A N G E **********
+*
+*************************************************************@SCPYRT**
+*
+*    Licensed Materials - Property of IBM
+*
+*    5635-A06
+*
+*        Copyright IBM Corp. 2016      All Rights Reserved
+*
+*    US Government Users Restricted Rights - Use, duplication or
+*    disclosure restricted by GSA ADP Schedule contract with
+*    IBM Corp.
+*
+*************************************************************@ECPYRT**
+VSRBF=20480,4
+VSRBF=8192,4
+VSRBF=2048,4
+VSRBF=1024,8
+IOBF=(8192,4,N,N)
+IOBF=(6144,4,N,N)
+IOBF=(2048,4,N,N)
+OPTIONS,DISP=ON,DL/I=ON,DLOG=ON,LATC=ON,LOCK=ON,QMGR=ON,SCHD=ON,SQTT=ON
+OPTIONS,STRG=ON

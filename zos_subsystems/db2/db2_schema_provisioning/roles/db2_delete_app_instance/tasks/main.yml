@@ -1,0 +1,13 @@
+---
+# tasks file for db2_delete_app_instance
+
+- name: Delete an instance of the application
+  ansible.builtin.uri:
+    url: "{{ base_url }}/instances/{{inst_name}}/"
+    validate_certs: false
+    user: "{{ username }}"
+    password: "{{ password }}"
+    method: DELETE
+    headers:
+      Authorization: "Bearer {{ACCESS_TOKEN}}"
+    status_code: 200
