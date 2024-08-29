@@ -1,19 +1,19 @@
-
-- hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
+---
+- name: Execute one or more TSO commands.
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
 
-    - block:
-      - name: Run z/OS TSO command(s).
-        ibm.ibm_zos_core.zos_tso_command:
-          commands: 
-            "{{ zos_tso_command.split('\n') | default(\"NOP\") }}"
-        register: command
+    - name: Execute the command(s) and return output.
+      block:
+        - name: Run z/OS TSO command(s).
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              "{{ zos_tso_command.split('\n') | default(\"NOP\") }}"
+          register: command
 
       always:
         - name: "Print results from command(s). Click on the output and go to the 'JSON' tab to show more output."
-          debug:
+          ansible.builtin.debug:
             var: command.output
