@@ -100,14 +100,14 @@
         - name: Generate signing request for new certificate.
           tags: search_and_renew, renew, genreq
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') {{ format_expiration }}
+            commands: RACDCERT {{ format_cert_type }} GENREQ (LABEL('{{ cert_label }}-NEW')) DSN('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') 
           when: sign_with != 'Self'
 
         - name: Sign new certificate, if not self-signed.
           tags: search_and_renew, renew, gencert
           ibm.ibm_zos_core.zos_tso_command:
             commands:
-              - RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}'))
+              - RACDCERT {{ format_cert_type }} GENCERT ('{{ owner_id }}.CSR.{{ cert_type }}.{{ today }}') SIGNWITH({{ sign_with }} LABEL('{{ sign_label }}')) {{ format_expiration }}
           when: sign_with != 'Self'
 
         - name: Issue setropts refresh
