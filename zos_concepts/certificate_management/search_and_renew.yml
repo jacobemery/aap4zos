@@ -109,17 +109,6 @@
             commands: RACDCERT {{ format_cert_type }} ROLLOVER(LABEL('{{ cert_label }}')) NEWLABEL('{{ cert_label }}-NEW')
           notify: Setropts refresh
 
-        - name: Delete old certificate.
-          tags: search_and_renew, renew, delete
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
-          notify: Setropts refresh
-
-        - name: Relabel new certificate to old name.
-          tags: search_and_renew, renew, relabel
-          ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
-
   handlers:
     - name: Setropts refresh
       ibm.ibm_zos_core.zos_tso_command:
