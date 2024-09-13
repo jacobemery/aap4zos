@@ -112,11 +112,25 @@
         - name: Rollover certificate.
           tags: search_and_renew, renew, rollover
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} ROLLOVER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
+            commands: RACDCERT {{ format_cert_type }} ROLLOVER(LABEL('{{ cert_label }}')) NEWLABEL('{{ cert_label }}-NEW')
 
         - name: Issue setropts refresh
           ibm.ibm_zos_core.zos_tso_command:
             commands: SETROPTS RACLIST(DIGTCERT) REFRESH
+
+        - name: Delete old certificate.
+          tags: search_and_renew, renew, delete
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT {{ format_cert_type }} DELETE(LABEL('{{ cert_label }}'))
+
+        - name: Issue setropts refresh
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: SETROPTS RACLIST(DIGTCERT) REFRESH
+
+        - name: Relabel new certificate to old name.
+          tags: search_and_renew, renew, relabel
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT {{ format_cert_type }} ALTER(LABEL('{{ cert_label }}-NEW')) NEWLABEL('{{ cert_label }}')
 
         - name: List renewed certificate with old label.
           tags: search_and_renew, renew, list_old_label
