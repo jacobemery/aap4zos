@@ -92,6 +92,11 @@
           ibm.ibm_zos_core.zos_tso_command:
             commands: RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}-NEW'))
 
+        - name: List new certificate with temporary label.
+          tags: search_and_renew, renew, list_new
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT {{ format_cert_type }} LIST(LABEL('{{ cert_label }}'))
+
         - name: Generate signing request for new certificate.
           tags: search_and_renew, renew, genreq
           ibm.ibm_zos_core.zos_tso_command:
