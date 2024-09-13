@@ -80,10 +80,8 @@
 
         - name: Rekey certificate with new temporary label.
           tags: search_and_renew, renew, rekey
-          vars:
-            format_expiration: "{{ 'NOTAFTER(DATE(' + new_expiry_date + '))' if new_expiry_date != '' else '' }}"
           ibm.ibm_zos_core.zos_tso_command:
-            commands: RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW') {{ format_expiration }}
+            commands: "RACDCERT {{ format_cert_type }} REKEY(LABEL('{{ cert_label }}')) WITHLABEL('{{ cert_label }}-NEW') {{ 'NOTAFTER(DATE(' + new_expiry_date + '))' }}"
           notify: Setropts refresh
 
         - name: List new certificate with temporary label.
