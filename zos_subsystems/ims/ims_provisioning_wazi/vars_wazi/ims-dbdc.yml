@@ -67,7 +67,7 @@ DFS_AUTH_LIB_SYSHLQ1: IMS
 # The second HLQ for system datasets that will be used
 # by IMS during provisioning. These should exist prior to
 # running playbooks
-DFS_AUTH_LIB_SYSHLQ2:
+DFS_AUTH_LIB_SYSHLQ2: V15R1M0
 
 DFS_AUTH_LIB_SYSHLQ:
 # ---------------------------------------------------------------------------- #
