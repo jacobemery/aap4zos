@@ -38,7 +38,7 @@ TCPIP_PROFILE_TLS: ADCD.{{ ZOS_RELEASE }}.TCPPARMS(TLSPOLY1)
 # or dataset member to store the profile changes
 TCPIP_PROFILE_TMP_MEMBER: IMSPROF
 # ---------------------------------------------------------------------------- #
-STEPLIB: DFSF10.SDFSRESL
+STEPLIB: MQCD.V9R3M0.SCSQAUTH
 
 # The API key to use for artifactory repositories
 api_key: ''
