@@ -1,6 +1,6 @@
 ---
 - name: IMS TMDB Provisioning
-  hosts: all
+  hosts: zos_host
   gather_facts: false
   vars_files:
     - vars_wazi/ims-dbdc.yml
