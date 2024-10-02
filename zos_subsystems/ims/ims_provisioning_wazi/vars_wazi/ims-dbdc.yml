@@ -19,18 +19,18 @@ IMS_CONNECT_SSLPORT: 9901
 # TCPIP information, including default ports and port reservation behavior
 # Desired port information for IMS 15
 # if DYNAMICALLY_RESERVE_PORTS=yes, playbooks will attempt to reserve ports
-DYNAMICALLY_RESERVE_PORTS: no
+DYNAMICALLY_RESERVE_PORTS: false
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=yes, playbook will attempt
 # to reserve the port numbers provided below. If any are in use the playbook will fail
 # If DYNAMICALLY_RESERVE_PORTS=yes and RESERVE_SPECIFIC_PORT=no, playbook will reserve an open
 # port within the default range of the Ansible zport module
-RESERVE_SPECIFIC_PORT: yes
+RESERVE_SPECIFIC_PORT: true
 
 ZOS_RELEASE: ''
 # location of system tcpip profile
 # TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
-TCPIP_PROFILE:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(PROFILE)
-TCPIP_PROFILE_TLS:  ADCD.{{ZOS_RELEASE}}.TCPPARMS(TLSPOLY1)
+TCPIP_PROFILE: ADCD.{{ ZOS_RELEASE }}.TCPPARMS(PROFILE)
+TCPIP_PROFILE_TLS: ADCD.{{ ZOS_RELEASE }}.TCPPARMS(TLSPOLY1)
 # TCPIP_PROFILE_TLS:  IBMUSER.TEST(TLSPOLY1)
 # A dataset is needed to store a TCPIP profile containing
 # changes to the default for dynamic port reservation
@@ -45,7 +45,7 @@ api_key: ''
 
 zos_job_submit_wait: true
 zos_job_submit_wait_s: 60
-zos_job_submit_return_output: False
+zos_job_submit_return_output: false
 
 # The user ID to use for IMS related provisioning steps
 DFS_IMS_USERID: '{{ TARGET_USERNAME | upper }}'
@@ -189,8 +189,8 @@ DXR_IRLM_Procedure: IRLM23D
 CSQ_SSID: CSQ1
 
 ## SVC Values
-zCloud_IMS_SVC_Type2: '203'  #'229'
-zCloud_IMS_SVC_Type4: '202'  #'249'
+zCloud_IMS_SVC_Type2: '203'  # '229'
+zCloud_IMS_SVC_Type4: '202'  # '249'
 
 
 # Optimizes runtime if user is provisioning IMS

@@ -2,48 +2,48 @@
 - name: IMS TMDB Provisioning
   hosts: all
   gather_facts: false
-  # Variable file for Wazi environment 
   vars_files:
     - vars_wazi/ims-dbdc.yml
-  environment: '{{ system_environment }}'
-
-  collections:
-    - ibm.ibm_zos_core
-    - ibm.ibm_zos_ims
+  environment: '{{ environment_vars }}'
 
   tasks:
-    - block:
-      - include_role:
-          name: set_up_run_environment
-      
-      - name: Validate user inputs
-        include_role: 
-          name: check_inputs
-        vars:
-          fail_task: true
+    - name: Provision IMS for Wazi.
+      vars:
+        uss_file_path: '{{ tmdb_tmp_dir.path }}'
+      block:
 
-      - name: Check if IMS already up
-        include_role: 
-          name: check_duplicate_ims
+        - name: Run set_up_run_environment role.
+          ansible.builtin.include_role:
+            name: set_up_run_environment
 
-      - name: Check if IMSPlex already up
-        include_role: 
-          name: check_duplicate_imsplex
+        - name: Validate user inputs
+          ansible.builtin.include_role:
+            name: check_inputs
+          vars:
+            fail_task: true
 
-      - name: Check if ports are available
-        include_role:
-          name: check_port
+        - name: Check if IMS already up
+          ansible.builtin.include_role:
+            name: check_duplicate_ims
 
-      - include_role:
-          name: provision_ims
+        - name: Check if IMSPlex already up
+          ansible.builtin.include_role:
+            name: check_duplicate_imsplex
 
-      - include_role:
-          name: monitor_ims
+        - name: Check if ports are available
+          ansible.builtin.include_role:
+            name: check_port
+
+        - name: Run provision_ims role.
+          ansible.builtin.include_role:
+            name: provision_ims
+
+        - name: Run monitor_ims role.
+          ansible.builtin.include_role:
+            name: monitor_ims
 
       always:
         - name: Delete the temporary provision files directory
-          file:
+          ansible.builtin.file:
             path: "{{ tmdb_tmp_dir.path }}"
             state: absent
-      vars:
-        uss_file_path: '{{ tmdb_tmp_dir.path }}'
