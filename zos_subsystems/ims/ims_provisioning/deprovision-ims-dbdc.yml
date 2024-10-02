@@ -7,7 +7,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - "{{ vars_folder_name }}/ims-dbdc.yml"
-  environment: '{{ system_environment }}'
+  environment: '{{ environment_vars }}'
 
   # TODO: add removal of reserved ports
   tasks:

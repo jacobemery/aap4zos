@@ -5,7 +5,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - vars_wazi/ims-dbdc.yml
-  environment: '{{ system_environment }}'
+  environment: '{{ environment_vars }}'
 
   collections:
     - ibm.ibm_zos_core
@@ -43,10 +43,10 @@
           - DFS_DS_VOLUME1
 
     - set_fact:
-        system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'
+        environment_vars: '{{ environment_vars | combine(new_item, recursive=true) }}'
       vars:
         new_item: { STEPLIB: '{{ STEPLIB }}' }
-      with_dict: '{{ system_environment }}'
+      with_dict: '{{ environment_vars }}'
 
     - block:
 

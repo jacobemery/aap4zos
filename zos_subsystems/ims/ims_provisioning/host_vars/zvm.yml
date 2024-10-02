@@ -1,7 +1,7 @@
 PYZ: /allpython/3.9/usr/lpp/IBM/cyp/v3r9/pyz
 ZOAU: /zoau/v1.2.4
 
-system_environment:
+environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"

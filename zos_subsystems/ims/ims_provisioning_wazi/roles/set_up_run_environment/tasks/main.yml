@@ -30,10 +30,10 @@
 
 - name: Set variables.
   ansible.builtin.set_fact:
-    system_environment: '{{ system_environment | combine(new_item, recursive=true) }}'
+    environment_vars: '{{ environment_vars | combine(new_item, recursive=true) }}'
   vars:
     new_item: { STEPLIB: '{{ STEPLIB }}' }
-  with_dict: '{{ system_environment }}'
+  with_dict: '{{ environment_vars }}'
 
 - block:
 

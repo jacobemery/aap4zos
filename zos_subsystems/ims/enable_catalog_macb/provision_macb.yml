@@ -6,7 +6,7 @@
   gather_facts: false
   vars_files:
     - "host_vars/zos_host.yml"
-  environment: "{{ system_environment }}"
+  environment: "{{ environment_vars }}"
 
   tasks: 
     - ansible.builtin.include_role: 

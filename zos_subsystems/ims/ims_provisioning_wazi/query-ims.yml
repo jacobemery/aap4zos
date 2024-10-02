@@ -4,7 +4,7 @@
   # Variable file for Wazi environment 
   vars_files:
     - vars_wazi/ims-dbdc.yml
-  environment: '{{ system_environment }}'
+  environment: '{{ environment_vars }}'
 
   tasks:
 

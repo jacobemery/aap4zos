@@ -6,7 +6,7 @@
   # ansible-playbook -i inventories/zvm deprovision-ims-dbdc.yml &
   vars_files:
     - "{{ vars_folder_name }}/ims-dbdc.yml"
-  environment: '{{ system_environment }}'
+  environment: '{{ environment_vars }}'
 
   vars:
     - provision: true

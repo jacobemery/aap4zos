@@ -1,7 +1,7 @@
 PYZ: "path_to_python_installation_on_zos_target"
 ZOAU: "path_to_zoau_installation_on_zos_target"
 
-system_environment:
+environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"

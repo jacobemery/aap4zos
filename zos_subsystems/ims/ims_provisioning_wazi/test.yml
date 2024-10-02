@@ -5,7 +5,7 @@
   # * Include different variable files depending on environment/inventory used
   vars_files:
     - vars_wazi/ims-dbdc.yml
-  environment: '{{ system_environment }}'
+  environment: '{{ environment_vars }}'
 
   vars:
     eager_role_path: "/Users/adn/workspaces/nazare/z_ansible_collections_samples/zos_subsystems/ims/ims_provisioning_wazi/roles/ims_sysdef"

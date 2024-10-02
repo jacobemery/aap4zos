@@ -6,7 +6,7 @@ ZOAU: /zoau/v1.1.0-spr5
 # PYZ: /python3/usr/lpp/IBM/cyp/<version_major>/pyz/bin/python3
 # ZOAU: /zoau/v1.1.0-spr7
 
-system_environment:
+environment_vars:
   _BPXK_AUTOCVT: "ON"
   ZOAU_HOME: "{{ ZOAU }}"
   PYTHONPATH: "{{ ZOAU }}/lib"

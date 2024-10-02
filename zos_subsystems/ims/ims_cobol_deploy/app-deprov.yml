@@ -6,7 +6,7 @@
   gather_facts: false
   vars_files:
     - "{{ vars_folder_name }}/ims_cobol.yml"
-  environment: '{{ system_environment }}'
+  environment: '{{ environment_vars }}'
 
   tasks:
     - name: IMS COBOL App De-provision
