@@ -26,7 +26,7 @@ DYNAMICALLY_RESERVE_PORTS: false
 # port within the default range of the Ansible zport module
 RESERVE_SPECIFIC_PORT: true
 
-ZOS_RELEASE: ''
+ZOS_RELEASE: 'Z25A'
 # location of system tcpip profile
 # TCPIP_PROFILE:  SYS1.TCPPARMS(PROFILE)
 TCPIP_PROFILE: ADCD.{{ ZOS_RELEASE }}.TCPPARMS(PROFILE)
