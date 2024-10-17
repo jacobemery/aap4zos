@@ -104,7 +104,7 @@ DFS_SMS_MCLASS: NONE
 # ------------------------ for when SMS is not in use ------------------------ #
 
 # first volume to use to store IMS datasets
-DFS_DS_VOLUME1: ''
+DFS_DS_VOLUME1: USER00
 # DFS_DS_VOLUME1: USER00
 # second volume to use to store IMS datasets
 # DFS_DS_VOLUME2: C4IMF1
@@ -125,7 +125,7 @@ zCloud_CSSLIB: SYS1.CSSLIB
 # ---------------------------------------------------------------------------- #
 
 # The location to create and reference the profile that has environment settings and JVM options.
-JAVA_CONF_PATH: '{{DFS_workingdir}}/dfsjvmpr.props'
+JAVA_CONF_PATH: '{{ DFS_workingdir }}/dfsjvmpr.props'
 REGION_NUM: 1
 
 # Working directory for the IMS Java region (JMP)
