@@ -14,7 +14,7 @@
         plex: "{{ ims_plex }}"
         route: "{{ ims_ssid }}"
       register: command_output
-      ignore_erorrs: true
+      ignore_errors: true
 
     - name: Print IMS command output.
       ansible.builtin.debug:
