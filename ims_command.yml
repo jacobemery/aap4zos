@@ -4,7 +4,7 @@
   gather_facts: false
   environment: '{{ environment_vars }}'
   vars:
-    ims_command: "{{ ims_command_survey | default('display status') }}"
+    ims_command: "{{ ims_command_survey }}"
     ims_plex: "{{ ims_plex_survey | default('PLEX1') }}"
     ims_ssid: "{{ ims_ssid | default('IVP1') }}"
   tasks:
@@ -14,6 +14,7 @@
         plex: "{{ ims_plex }}"
         route: "{{ ims_ssid }}"
       register: command_output
+      ignore_erorrs: true
 
     - name: Print IMS command output.
       ansible.builtin.debug:
@@ -25,3 +26,7 @@
   # - query db name(*) show(all)
   #   - dis tran all
   #   - dis pgm all
+
+# Operator Commands:
+#   - s ims15om1
+#   - s ims15sci
