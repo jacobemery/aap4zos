@@ -1,0 +1,27 @@
+---
+- name: Execute IMS Commands
+  hosts: zos_host
+  gather_facts: false
+  environment: '{{ environment_vars }}'
+  vars:
+    ims_command: "{{ ims_command_survey | default('display status') }}"
+    ims_plex: "{{ ims_plex_survey | default('PLEX1') }}"
+    ims_ssid: "{{ ims_ssid | default('IVP1') }}"
+  tasks:
+    - name: Execute IMS command.
+      ibm.ibm_zos_ims.ims_command:
+        command: "{{ ims_command }}"
+        plex: "{{ ims_plex }}"
+        route: "{{ ims_ssid }}"
+      register: command_output
+
+    - name: Print IMS command output.
+      ansible.builtin.debug:
+        msg: "{{ command_output.ims_output }}"
+
+# Other example commands to try:
+  # - display status
+  # - display act reg
+  # - query db name(*) show(all)
+  #   - dis tran all
+  #   - dis pgm all
