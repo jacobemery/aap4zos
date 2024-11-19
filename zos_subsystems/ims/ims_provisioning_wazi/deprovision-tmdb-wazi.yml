@@ -1,6 +1,6 @@
 ---
 - name: IMS TMDB De-provisioning
-  hosts: all
+  hosts: zos_host
   gather_facts: false
   # Variable file for Wazi environment
   vars_files:
