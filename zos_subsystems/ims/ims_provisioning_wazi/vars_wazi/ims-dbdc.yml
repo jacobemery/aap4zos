@@ -67,7 +67,7 @@ DFS_AUTH_LIB_SYSHLQ1: IMS.V15R1M0
 # The second HLQ for system datasets that will be used
 # by IMS during provisioning. These should exist prior to
 # running playbooks
-DFS_AUTH_LIB_SYSHLQ2: 
+DFS_AUTH_LIB_SYSHLQ2:
 
 DFS_AUTH_LIB_SYSHLQ:
 # ---------------------------------------------------------------------------- #
@@ -104,7 +104,7 @@ DFS_SMS_MCLASS: NONE
 # ------------------------ for when SMS is not in use ------------------------ #
 
 # first volume to use to store IMS datasets
-DFS_DS_VOLUME1: USER00
+DFS_DS_VOLUME1: USER01
 # DFS_DS_VOLUME1: USER00
 # second volume to use to store IMS datasets
 # DFS_DS_VOLUME2: C4IMF1

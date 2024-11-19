@@ -1,5 +1,5 @@
 ---
- 
+
 # Catalog Services
 - name: Catalog Services
   collections:
@@ -10,10 +10,10 @@
 
     - block:
 
-      - set_fact:
-          eager_role_path: '{{role_path}}'
+      - ansible.builtin.set_fact:
+          eager_role_path: '{{ role_path }}'
 
-      - include_role:
+      - ansible.builtin.include_role:
           name: send-template
         vars:
           path: '{{ eager_role_path }}/templates/DFSALCAT.j2'
@@ -21,7 +21,7 @@
       when: catalog == "allocate" and not provision
 
     - name: Allocate IMS catalog DB
-      command: "jsub -f {{ uss_file_path }}/DFSALCAT.j2"
+      ansible.builtin.command: "jsub -f {{ uss_file_path }}/DFSALCAT.j2"
     #   zos_job_submit:
     #     src: '{{ uss_file_path }}/DFSALCAT.j2'
     #     location: USS
@@ -31,9 +31,10 @@
       when: catalog == "allocate"
 
     - name: Load Catalog
-      ims_catalog_populate:
+      ibm.ibm_zos_ims.ims_catalog_populate:
         mode: LOAD
-        dbrc: False
+        dbrc: false
+        dfsdf_member: '000'
         modstat: "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.MODSTAT"
         acb_lib: [
           "{{ DFS_AUTH_LIB_HLQ1 }}.{{ DFS_IMS_SSID }}.ACBLIB"
