@@ -8,7 +8,7 @@
     - name: Copy common_cacert in USS to a sequential data set.
       ibm.ibm_zos_core.zos_copy:
         src: /u/ibmuser/common_cacert
-        dest: IBMUSER.COMMON.ZOSCACERT
+        dest: IBMUSER.COMMON.ZCACERT
         remote_src: true
         dest_data_set:
           type: SEQ
