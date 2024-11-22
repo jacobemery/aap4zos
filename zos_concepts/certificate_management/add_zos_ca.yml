@@ -10,6 +10,7 @@
         src: /u/ibmuser/common_cacert
         dest: IBMUSER.COMMON.ZCACERT
         remote_src: true
+        force: true
         dest_data_set:
           type: SEQ
           record_format: VB
