@@ -15,6 +15,11 @@
           type: SEQ
           record_format: VB
 
+    - name: Ensure data set is catalogued.
+      ibm.ibm_zos_core.zos_data_set:
+        name: IBMUSER.COMMON.ZCACERT
+        state: cataloged
+
     - name: Add common_cacert data set to RACF.
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT ADD(IBMUSER.COMMON.ZCACERT) CERTAUTH TRUST WITHLABEL('ZCACERT')
