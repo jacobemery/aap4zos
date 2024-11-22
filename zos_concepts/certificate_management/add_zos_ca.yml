@@ -14,6 +14,9 @@
         dest_data_set:
           type: SEQ
           record_format: VB
+        encoding:
+          from: ASCII
+          to: EBCDIC
 
     - name: Ensure data set is catalogued.
       ibm.ibm_zos_core.zos_data_set:
