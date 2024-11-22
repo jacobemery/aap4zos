@@ -19,6 +19,8 @@
       ibm.ibm_zos_core.zos_data_set:
         name: IBMUSER.COMMON.ZCACERT
         state: cataloged
+        type: SEQ
+        record_format: VB
 
     - name: Add common_cacert data set to RACF.
       ibm.ibm_zos_core.zos_tso_command:
