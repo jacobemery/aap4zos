@@ -7,7 +7,7 @@
   tasks:
     - name: Copy common_cacert in USS to a sequential data set.
       ibm.ibm_zos_core.zos_copy:
-        src: /u/ibmuser/common_cacert
+        src: /u/ibmuser/common_cacert_conv1
         dest: IBMUSER.COMMON.ZCACERT
         remote_src: true
         force: true
