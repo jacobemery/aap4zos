@@ -14,9 +14,6 @@
         dest_data_set:
           type: SEQ
           record_format: VB
-        encoding:
-          from: UTF-8
-          to: IBM-1047
 
     - name: Ensure data set is catalogued.
       ibm.ibm_zos_core.zos_data_set:
