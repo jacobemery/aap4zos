@@ -1,0 +1,40 @@
+---
+- name: Add staged CA cert from USS to RACF.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: Copy common_cacert in USS to a sequential data set.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/common_cacert
+        dest: IBMUSER.COMMON.CACERT
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: Add common_cacert data set to RACF.
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ADD(IBMUSER.COMMON.CACERT) CERTAUTH TRUST WITHLABEL('ZCACERT')
+
+    - name: Add common_cacert to keyring.
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT CONNECT CERTAUTH LABEL('ZCACERT') RING('SharedRing1') USAGE(CERTAUTH) ID(IBMUSER)
+
+    - name: Issue a SETROPTS REFRESH to initialize changes.
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+
+    - name: List cert, print results whether it exists or not.
+      block:
+        - name: List cert.
+          ibm.ibm_zos_core.zos_tso_command:
+            commands: RACDCERT CERTAUTH LIST(LABEL('ZCACERT'))
+          register: list_cert
+          changed_when: false
+
+      always:
+        - name: Print results from list cert command.
+          ansible.builtin.debug:
+            var: list_cert.output[0].content
