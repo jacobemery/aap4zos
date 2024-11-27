@@ -5,6 +5,10 @@
   environment: "{{ environment_vars }}"
   tasks:
 
+    - name: Debug zos_ca_cert.
+      ansible.builtin.debug:
+        var: zos_ca_cert
+
     - name: Create sequential data set with certificate content.
       ibm.ibm_zos_core.zos_copy:
         content: "{{ zos_ca_cert }}"
