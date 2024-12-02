@@ -36,7 +36,7 @@
         src: IBMUSER.COMMON.ZCACERT
         dest: IBMUSER.COMMON.ZCACERT.ENC
         encoding:
-          from: ASCII
+          from: UTF-8
           to: IBM-1047
 
     - name: Add common_cacert data set to RACF.
