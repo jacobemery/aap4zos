@@ -31,12 +31,12 @@
         - IBMUSER.COMMON.ZCACERT
         - IBMUSER.COMMON.ZCACERT.ENC
 
-    - name: Convert dataset encoding from UTF-8 to IBM-1047 to another dataset with backup.
+    - name: Convert dataset encoding from ASCII to IBM-1047 to another dataset with backup.
       ibm.ibm_zos_core.zos_encode:
         src: IBMUSER.COMMON.ZCACERT
         dest: IBMUSER.COMMON.ZCACERT.ENC
         encoding:
-          from: UTF-8
+          from: ASCII
           to: IBM-1047
         backup: true
         backup_name: IBMUSER.COMMON.ZCACERT.BAK
