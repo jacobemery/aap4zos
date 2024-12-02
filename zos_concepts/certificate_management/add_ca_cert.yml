@@ -14,6 +14,24 @@
           type: SEQ
           record_format: VB
 
+    - name: Create target sequential data set with certificate content.
+      ibm.ibm_zos_core.data_set:
+        dest: IBMUSER.COMMON.ZCACERT.ENC
+        force: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: Ensure datasets are catalogued.
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ item }}"
+        state: cataloged
+        type: SEQ
+        record_format: VB
+      loop: 
+        - IBMUSER.COMMON.ZCACERT
+        - IBMUSER.COMMON.ZCACERT.ENC
+
     - name: Convert dataset encoding from UTF-8 to IBM-1047 to another dataset with backup.
       ibm.ibm_zos_core.zos_encode:
         src: IBMUSER.COMMON.ZCACERT
@@ -23,13 +41,6 @@
           to: IBM-1047
         backup: true
         backup_name: IBMUSER.COMMON.ZCACERT.BAK
-
-    - name: Ensure data set is catalogued.
-      ibm.ibm_zos_core.zos_data_set:
-        name: IBMUSER.COMMON.ZCACERT.ENC
-        state: cataloged
-        type: SEQ
-        record_format: VB
 
     - name: Add common_cacert data set to RACF.
       ibm.ibm_zos_core.zos_tso_command:
