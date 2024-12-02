@@ -9,7 +9,6 @@
       ibm.ibm_zos_core.zos_copy:
         content: "{{ zos_ca_cert }}"
         dest: IBMUSER.COMMON.ZCACERT
-        remote_src: true
         force: true
         dest_data_set:
           type: SEQ
