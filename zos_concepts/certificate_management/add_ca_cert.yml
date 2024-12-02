@@ -15,12 +15,11 @@
           record_format: VB
 
     - name: Create target sequential data set with certificate content.
-      ibm.ibm_zos_core.data_set:
-        dest: IBMUSER.COMMON.ZCACERT.ENC
+      ibm.ibm_zos_core.zos_data_set:
+        name: IBMUSER.COMMON.ZCACERT.ENC
         force: true
-        dest_data_set:
-          type: SEQ
-          record_format: VB
+        type: SEQ
+        record_format: VB
 
     - name: Ensure datasets are catalogued.
       ibm.ibm_zos_core.zos_data_set:
@@ -28,7 +27,7 @@
         state: cataloged
         type: SEQ
         record_format: VB
-      loop: 
+      loop:
         - IBMUSER.COMMON.ZCACERT
         - IBMUSER.COMMON.ZCACERT.ENC
 
