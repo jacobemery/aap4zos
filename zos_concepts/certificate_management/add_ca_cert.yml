@@ -41,7 +41,7 @@
 
     - name: Add common_cacert data set to RACF.
       ibm.ibm_zos_core.zos_tso_command:
-        command: RACDCERT ADD(IBMUSER.COMMON.ZCACERT.ENC) CERTAUTH TRUST WITHLABEL('ZCACERT')
+        command: RACDCERT ADD('IBMUSER.COMMON.ZCACERT.ENC') CERTAUTH TRUST WITHLABEL('ZCACERT')
 
     # - name: Add common_cacert to keyring.
     #   ibm.ibm_zos_core.zos_tso_command:
