@@ -7,19 +7,25 @@
 
     - name: Create sequential data set with certificate content.
       ibm.ibm_zos_core.zos_copy:
-        content: "{{ zos_ca_cert }}"
-        dest: IBMUSER.COMMON.ZCACERT
+        content: "{{ item.content }}"
+        dest: "{{ item.dest_name }}"
         force: true
         dest_data_set:
           type: SEQ
           record_format: VB
+      loop:
+        - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.ZCACERT }
+        - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
 
     - name: Create target sequential data set with certificate content.
       ibm.ibm_zos_core.zos_data_set:
-        name: IBMUSER.COMMON.ZCACERT.ENC
+        name: "{{ item }}"
         force: true
         type: SEQ
         record_format: VB
+      loop:
+        - IBMUSER.COMMON.ZCACERT.ENC
+        - IBMUSER.COMMON.ZCERT.ENC
 
     - name: Ensure datasets are catalogued.
       ibm.ibm_zos_core.zos_data_set:
@@ -30,18 +36,26 @@
       loop:
         - IBMUSER.COMMON.ZCACERT
         - IBMUSER.COMMON.ZCACERT.ENC
+        - IBMUSER.COMMON.ZCERT
+        - IBMUSER.COMMON.ZCERT.ENC
 
     - name: Convert dataset encoding from UTF-8 to IBM-1047 to another dataset.
       ibm.ibm_zos_core.zos_encode:
-        src: IBMUSER.COMMON.ZCACERT
-        dest: IBMUSER.COMMON.ZCACERT.ENC
+        src: "{{ item.src }}"
+        dest: "{{ item.dest }}"
         encoding:
           from: UTF-8
           to: IBM-1047
+      loop:
+        - { src: IBMUSER.COMMON.ZCACERT, dest: IBMUSER.COMMON.ZCACERT.ENC }
+        - { src: IBMUSER.COMMON.ZCERT, dest: IBMUSER.COMMON.ZCERT.ENC }
 
     - name: Add common_cacert data set to RACF.
       ibm.ibm_zos_core.zos_tso_command:
-        command: RACDCERT ADD('IBMUSER.COMMON.ZCACERT.ENC') CERTAUTH TRUST WITHLABEL('ZCACERT')
+        command: "RACDCERT ADD('{{ item.data_set }}') CERTAUTH TRUST WITHLABEL('{{ item.label }}')"
+      loop:
+        - { data_set: IBMUSER.COMMON.ZCACERT.ENC, label: ZCACERT}
+        - { data_set: IBMUSER.COMMON.ZCERT.ENC, label: ZCERT }
 
     # - name: Add common_cacert to keyring.
     #   ibm.ibm_zos_core.zos_tso_command:
