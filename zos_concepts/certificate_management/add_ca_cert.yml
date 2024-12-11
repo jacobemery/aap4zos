@@ -5,6 +5,12 @@
   environment: "{{ environment_vars }}"
   tasks:
 
+    - name: Copy certificate private key data into USS file.
+      ibm.ibm_zos_core.zos_copy:
+        content: "{{ zos_cert_key }}"
+        dest: /u/ibmuser/zos_cert_private_key.pem
+        mode: '600'
+
     - name: Create sequential data set with certificate content.
       ibm.ibm_zos_core.zos_copy:
         content: "{{ item.content }}"
