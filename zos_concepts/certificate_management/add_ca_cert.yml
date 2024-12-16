@@ -1,4 +1,12 @@
 ---
+- name: Install community.crypto collection.
+  host: localhost
+  gather_facts: false
+  tasks:
+    - name: Install collection.
+      ansible.builtin.command:
+        cmd: ansible-galaxy collection install community.crypto
+
 - name: Stage pkcs12 package on controller.
   hosts: automationcontroller
   gather_facts: false
