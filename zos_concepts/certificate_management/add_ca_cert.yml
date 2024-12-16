@@ -1,17 +1,38 @@
 ---
+- name: Stage pkcs12 package on controller.
+  hosts: automationcontroller
+  gather_facts: false
+  tasks:
+
+    - name: Copy z/OS certificate data to controller.
+      ansible.builtin.copy:
+        content: "{{ zos_cert }}"
+        dest: ~/zos_cert.pem
+        mode: '600'
+
+    - name: Generate PKCS#12 file from private key and certificate.
+      community.crypto.openssl_pkcs12:
+        action: export
+        path: ~/keyStore.p12
+        friendly_name: zospkcs12
+        privatekey_content: "{{ zos_cert_key }}"
+        passphrase: "{{ ansible_become_password }}"
+        certificate_path: ~/zos_cert.pem
+        state: present
+        return_content: true
+      register: pkcs_output
+
+    - name: Print PKCS12 generation task's output.
+      ansible.builtin.debug:
+        var: pkcs_output
+
 - name: Add staged CA cert to RACF.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
 
-    - name: Copy certificate private key data into USS file.
-      ibm.ibm_zos_core.zos_copy:
-        content: "{{ zos_cert_key }}"
-        dest: /u/ibmuser/zos_cert_private_key.pem
-        mode: '600'
-
-    - name: Create sequential data set with certificate content.
+    - name: Create sequential data sets with z/OS certificates and intermediate CA content.
       ibm.ibm_zos_core.zos_copy:
         content: "{{ item.content }}"
         dest: "{{ item.dest_name }}"
@@ -20,48 +41,75 @@
           type: SEQ
           record_format: VB
       loop:
-        - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.ZCACERT }
+        - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTERCERT }
         - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
 
-    - name: Create target sequential data set with certificate content.
-      ibm.ibm_zos_core.zos_data_set:
-        name: "{{ item }}"
+    - name: Create sequential data set from staged pkcs12 package on controller.
+      ibm.ibm_zos_core.zos_copy:
+        src: ~/keyStore.p12
+        dest: IBMUSER.COMMON.P12PKG
         force: true
-        type: SEQ
-        record_format: VB
-      loop:
-        - IBMUSER.COMMON.ZCACERT.ENC
-        - IBMUSER.COMMON.ZCERT.ENC
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+          record_length: 84
 
-    - name: Ensure datasets are catalogued.
-      ibm.ibm_zos_core.zos_data_set:
-        name: "{{ item }}"
-        state: cataloged
-        type: SEQ
-        record_format: VB
-      loop:
-        - IBMUSER.COMMON.ZCACERT
-        - IBMUSER.COMMON.ZCACERT.ENC
-        - IBMUSER.COMMON.ZCERT
-        - IBMUSER.COMMON.ZCERT.ENC
+    - name: Pull root CA certificate content and save to file.
+      ansible.builtin.get_url:
+        url: https://letsencrypt.org/certs/isrgrootx1.pem
+        dest: /u/ibmuser/root_ca_cert.pem
+        mode: '600'
+      register: get_root_ca
 
-    - name: Convert dataset encoding from UTF-8 to IBM-1047 to another dataset.
-      ibm.ibm_zos_core.zos_encode:
-        src: "{{ item.src }}"
-        dest: "{{ item.dest }}"
-        encoding:
-          from: UTF-8
-          to: IBM-1047
-      loop:
-        - { src: IBMUSER.COMMON.ZCACERT, dest: IBMUSER.COMMON.ZCACERT.ENC }
-        - { src: IBMUSER.COMMON.ZCERT, dest: IBMUSER.COMMON.ZCERT.ENC }
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/root_ca_cert.pem
+        dest: IBMUSER.COMMON.ROOTCA
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
 
-    - name: Add common_cacert data set to RACF.
-      ibm.ibm_zos_core.zos_tso_command:
-        command: "RACDCERT ADD('{{ item.data_set }}') CERTAUTH TRUST WITHLABEL('{{ item.label }}')"
-      loop:
-        - { data_set: IBMUSER.COMMON.ZCACERT.ENC, label: ZCACERT}
-        - { data_set: IBMUSER.COMMON.ZCERT.ENC, label: ZCERT }
+    # - name: Create target sequential data set with certificate content.
+    #   ibm.ibm_zos_core.zos_data_set:
+    #     name: "{{ item }}"
+    #     force: true
+    #     type: SEQ
+    #     record_format: VB
+    #   loop:
+    #     - IBMUSER.COMMON.INTERCERT.ENC
+    #     - IBMUSER.COMMON.ZCERT.ENC
+    #     - IBMUSER.COMMON.P12PKG
+
+    # - name: Ensure datasets are catalogued.
+    #   ibm.ibm_zos_core.zos_data_set:
+    #     name: "{{ item }}"
+    #     state: cataloged
+    #     type: SEQ
+    #     record_format: VB
+    #   loop:
+    #     - IBMUSER.COMMON.INTERCERT
+    #     - IBMUSER.COMMON.ZCERT
+    #     - IBMUSER.COMMON.P12PKG
+
+    # - name: Convert dataset encoding from UTF-8 to IBM-1047 to another dataset.
+    #   ibm.ibm_zos_core.zos_encode:
+    #     src: "{{ item.src }}"
+    #     dest: "{{ item.dest }}"
+    #     encoding:
+    #       from: UTF-8
+    #       to: IBM-1047
+    #   loop:
+    #     - { src: IBMUSER.COMMON.INTERCERT, dest: IBMUSER.COMMON.INTERCERT.ENC }
+    #     - { src: IBMUSER.COMMON.ZCERT, dest: IBMUSER.COMMON.ZCERT.ENC }
+
+    # - name: Add common_cacert data set to RACF.
+    #   ibm.ibm_zos_core.zos_tso_command:
+    #     command: "RACDCERT ADD('{{ item.data_set }}') CERTAUTH TRUST WITHLABEL('{{ item.label }}')"
+    #   loop:
+    #     - { data_set: IBMUSER.COMMON.INTERCERT.ENC, label: ZCACERT}
+    #     - { data_set: IBMUSER.COMMON.ZCERT.ENC, label: ZCERT }
 
     # - name: Add common_cacert to keyring.
     #   ibm.ibm_zos_core.zos_tso_command:
