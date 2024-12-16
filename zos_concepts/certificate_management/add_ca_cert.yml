@@ -5,6 +5,10 @@
   gather_facts: false
   tasks:
 
+    - name: Install dependencies.
+      ansible.builtin.pip:
+        name: PyOpenSSL
+
     - name: Copy z/OS certificate data to controller.
       ansible.builtin.copy:
         content: "{{ zos_cert }}"
