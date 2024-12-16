@@ -1,36 +1,5 @@
 ---
 
-- name: Stage pkcs12 package on controller.
-  hosts: automationcontroller
-  gather_facts: false
-  tasks:
-
-    - name: Install dependencies.
-      ansible.builtin.pip:
-        name: PyOpenSSL
-
-    - name: Copy z/OS certificate data to controller.
-      ansible.builtin.copy:
-        content: "{{ zos_cert }}"
-        dest: ~/zos_cert.pem
-        mode: '600'
-
-    - name: Generate PKCS#12 file from private key and certificate.
-      community.crypto.openssl_pkcs12:
-        action: export
-        path: ~/keyStore.p12
-        friendly_name: zospkcs12
-        privatekey_content: "{{ zos_cert_key }}"
-        passphrase: "{{ ansible_become_password }}"
-        certificate_path: ~/zos_cert.pem
-        state: present
-        return_content: true
-      register: pkcs_output
-
-    - name: Print PKCS12 generation task's output.
-      ansible.builtin.debug:
-        var: pkcs_output
-
 - name: Add staged CA cert to RACF.
   hosts: zos_host
   gather_facts: false
