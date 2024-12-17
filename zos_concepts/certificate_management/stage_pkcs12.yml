@@ -19,6 +19,7 @@
     - name: Create file from passphrase for later use.
       ansible.builtin.copy:
         content: "{{ pkcs12_passphrase }}"
+        dest: ~/pkcs12-passphrase.txt
         mode: '600'
 
     - name: Install expect module dependency.
