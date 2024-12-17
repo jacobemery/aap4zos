@@ -24,7 +24,8 @@
 
     - name: Install expect module dependency.
       ansible.builtin.pip:
-        name: pexpect>= 3.3
+        name: pexpect>=3.3
+        executable: "{{ ansible_python.interpreter }}"
 
     - name: Generate PKCS#12 file from private key and certificate.
       ansible.builtin.expect:
