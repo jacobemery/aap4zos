@@ -31,7 +31,7 @@
         command: openssl pkcs12 -legacy -export -out ~/keyStore.p12 -inkey ~/zos_cert_private_key.pem -in ~/zos_cert.pem
         creates: ~/keyStore.p12
         responses:
-          - "Enter Export Password:":
-              - "{{ pkcs12_passphrase }}"
-          - "Verifying - Enter Export Password:":
-              - "{{ pkcs12_passphrase }}"
+          "Enter Export Password:":
+            - "{{ pkcs12_passphrase }}"
+          "Verifying - Enter Export Password:":
+            - "{{ pkcs12_passphrase }}"
