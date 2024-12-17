@@ -1,6 +1,6 @@
 - name: Stage pkcs12 package on controller.
   hosts: automationcontroller
-  gather_facts: true 
+  gather_facts: true
   tasks:
 
     - name: Copy z/OS certificate data to controller.
@@ -25,7 +25,7 @@
     - name: Install expect module dependency.
       ansible.builtin.pip:
         name: pexpect>=3.3
-        executable: "{{ ansible_python_interpreter }}"
+        executable: "{{ ansible_python.executable }}"
 
     - name: Generate PKCS#12 file from private key and certificate.
       ansible.builtin.expect:
