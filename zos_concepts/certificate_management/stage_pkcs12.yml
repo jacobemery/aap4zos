@@ -1,6 +1,6 @@
 - name: Stage pkcs12 package on controller.
   hosts: automationcontroller
-  gather_facts: false
+  gather_facts: true 
   tasks:
 
     - name: Copy z/OS certificate data to controller.
