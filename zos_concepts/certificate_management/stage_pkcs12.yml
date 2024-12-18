@@ -22,9 +22,9 @@
         dest: ~/pkcs12-passphrase.txt
         mode: '600'
 
-    - name: Install expect module dependency.
+    - name: Install expect and dnf module dependencies.
       ansible.builtin.pip:
-        name: pexpect>=3.3
+        name: [pexpect>=3.3, python3-dnf]
 
     - name: Install higher openssl version.
       ansible.builtin.dnf:
