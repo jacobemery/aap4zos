@@ -18,6 +18,16 @@
         - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTCERT }
         - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
 
+    - name: Create USS files with z/OS certificates and private key.
+      ibm.ibm_zos_core.zos_copy:
+        content: "{{ item.content }}"
+        dest: "{{ item.dest_name }}"
+        force: true
+        mode: '600'
+      loop:
+        - { content: "{{ zos_cert }}", dest_name: /u/ibmuser/zos_cert.pem }
+        - { content: "{{ zos_cert_key }}", dest_name: /u/ibmuser/zos_cert_private_key.pem }
+
     # - name: Create sequential data set from staged pkcs12 package on controller.
     #   ibm.ibm_zos_core.zos_copy:
     #     src: ~/keyStore.p12
