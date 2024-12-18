@@ -1,5 +1,5 @@
 - name: Stage pkcs12 package on controller.
-  hosts: automationcontroller
+  hosts: localhost
   gather_facts: true
   tasks:
 
@@ -22,15 +22,9 @@
         dest: ~/pkcs12-passphrase.txt
         mode: '600'
 
-    # - name: Install expect module dependency.
-    #   ansible.builtin.pip:
-    #     name: pexpect>=3.3
-
-    - name: Install pexpect with the correct pip
-      ansible.builtin.command: "{{ discovered_interpreter_python }} install python3-pip"
-
-    - name: Install pexpect with the correct pip
-      ansible.builtin.command: "{{ discovered_interpreter_python }} -m pip install pexpect>=3.3"
+    - name: Install expect module dependency.
+      ansible.builtin.pip:
+        name: pexpect>=3.3
 
     - name: Generate PKCS#12 file from private key and certificate.
       ansible.builtin.expect:
