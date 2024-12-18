@@ -15,18 +15,18 @@
           type: SEQ
           record_format: VB
       loop:
-        - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTERCERT }
+        - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTCERT }
         - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
 
-    - name: Create sequential data set from staged pkcs12 package on controller.
-      ibm.ibm_zos_core.zos_copy:
-        src: ~/keyStore.p12
-        dest: IBMUSER.COMMON.P12PKG
-        force: true
-        dest_data_set:
-          type: SEQ
-          record_format: VB
-          record_length: 84
+    # - name: Create sequential data set from staged pkcs12 package on controller.
+    #   ibm.ibm_zos_core.zos_copy:
+    #     src: ~/keyStore.p12
+    #     dest: IBMUSER.COMMON.P12PKG
+    #     force: true
+    #     dest_data_set:
+    #       type: SEQ
+    #       record_format: VB
+    #       record_length: 84
 
     - name: Pull root CA certificate content and save to file.
       ansible.builtin.get_url:
@@ -52,7 +52,7 @@
     #     type: SEQ
     #     record_format: VB
     #   loop:
-    #     - IBMUSER.COMMON.INTERCERT.ENC
+    #     - IBMUSER.COMMON.INTCERT.ENC
     #     - IBMUSER.COMMON.ZCERT.ENC
     #     - IBMUSER.COMMON.P12PKG
 
@@ -63,7 +63,7 @@
     #     type: SEQ
     #     record_format: VB
     #   loop:
-    #     - IBMUSER.COMMON.INTERCERT
+    #     - IBMUSER.COMMON.INTCERT
     #     - IBMUSER.COMMON.ZCERT
     #     - IBMUSER.COMMON.P12PKG
 
@@ -75,14 +75,14 @@
     #       from: UTF-8
     #       to: IBM-1047
     #   loop:
-    #     - { src: IBMUSER.COMMON.INTERCERT, dest: IBMUSER.COMMON.INTERCERT.ENC }
+    #     - { src: IBMUSER.COMMON.INTCERT, dest: IBMUSER.COMMON.INTCERT.ENC }
     #     - { src: IBMUSER.COMMON.ZCERT, dest: IBMUSER.COMMON.ZCERT.ENC }
 
     # - name: Add common_cacert data set to RACF.
     #   ibm.ibm_zos_core.zos_tso_command:
     #     command: "RACDCERT ADD('{{ item.data_set }}') CERTAUTH TRUST WITHLABEL('{{ item.label }}')"
     #   loop:
-    #     - { data_set: IBMUSER.COMMON.INTERCERT.ENC, label: ZCACERT}
+    #     - { data_set: IBMUSER.COMMON.INTCERT.ENC, label: ZCACERT}
     #     - { data_set: IBMUSER.COMMON.ZCERT.ENC, label: ZCERT }
 
     # - name: Add common_cacert to keyring.
