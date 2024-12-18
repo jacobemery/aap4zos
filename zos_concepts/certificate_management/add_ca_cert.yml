@@ -33,6 +33,7 @@
         url: https://letsencrypt.org/certs/isrgrootx1.pem
         dest: /u/ibmuser/root_ca_cert.pem
         mode: '600'
+        validate_certs: false
       register: get_root_ca
 
     - name: Create sequential data set from root CA in USS.
