@@ -24,11 +24,11 @@
 
     - name: Install expect and dnf module dependencies.
       ansible.builtin.pip:
-        name: [pexpect>=3.3, python3-dnf]
+        name: pexpect>=3.3
 
-    - name: Install higher openssl version.
-      ansible.builtin.dnf:
-        name: openssl>=3.0.0
+    # - name: Install higher openssl version.
+    #   ansible.builtin.dnf:
+    #     name: openssl>=3.0.0
 
     - name: Generate PKCS#12 file from private key and certificate.
       ansible.builtin.expect:
