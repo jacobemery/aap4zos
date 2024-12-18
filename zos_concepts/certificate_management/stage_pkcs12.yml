@@ -28,7 +28,7 @@
 
     - name: Install higher openssl version.
       ansible.builtin.package:
-        name: openssl
+        name: openssl>=3.0.0
 
     - name: Generate PKCS#12 file from private key and certificate.
       ansible.builtin.expect:
