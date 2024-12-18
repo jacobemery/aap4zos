@@ -27,7 +27,7 @@
     #     name: pexpect>=3.3
 
     - name: Install pexpect with the correct pip
-      ansible.builtin.command: "{{ ansible_facts.discovered_python_interpreter }} -m pip install pexpect>=3.3"
+      ansible.builtin.command: "{{ discovered_python_interpreter }} -m pip install pexpect>=3.3"
 
     - name: Generate PKCS#12 file from private key and certificate.
       ansible.builtin.expect:
