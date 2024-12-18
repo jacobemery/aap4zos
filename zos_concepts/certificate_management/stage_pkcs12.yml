@@ -27,7 +27,7 @@
         name: pexpect>=3.3
 
     - name: Install higher openssl version.
-      ansible.builtin.package:
+      ansible.builtin.dnf:
         name: openssl>=3.0.0
 
     - name: Generate PKCS#12 file from private key and certificate.
