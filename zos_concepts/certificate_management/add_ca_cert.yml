@@ -67,52 +67,61 @@
     #     - IBMUSER.COMMON.ZCERT.ENC
     #     - IBMUSER.COMMON.P12PKG
 
-    # - name: Ensure datasets are catalogued.
-    #   ibm.ibm_zos_core.zos_data_set:
-    #     name: "{{ item }}"
-    #     state: cataloged
-    #     type: SEQ
-    #     record_format: VB
-    #   loop:
-    #     - IBMUSER.COMMON.INTCERT
-    #     - IBMUSER.COMMON.ZCERT
-    #     - IBMUSER.COMMON.P12PKG
+    - name: Delete existing Server cert in RACF keyring (ZOSMF_RING).
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT REMOVE(ID(IZUSVR) LABEL('VS01zOSMFCert') RING(ZOSMF_RING)) ID(IZUSVR)
 
-    # - name: Convert dataset encoding from UTF-8 to IBM-1047 to another dataset.
-    #   ibm.ibm_zos_core.zos_encode:
-    #     src: "{{ item.src }}"
-    #     dest: "{{ item.dest }}"
-    #     encoding:
-    #       from: UTF-8
-    #       to: IBM-1047
-    #   loop:
-    #     - { src: IBMUSER.COMMON.INTCERT, dest: IBMUSER.COMMON.INTCERT.ENC }
-    #     - { src: IBMUSER.COMMON.ZCERT, dest: IBMUSER.COMMON.ZCERT.ENC }
+    - name: Delete existing CA cert in RACF keyring (ZOSMF_RING).
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT REMOVE(CERTAUTH LABEL('VSICA') RING(ZOSMF_RING)) ID(IZUSVR)
 
-    # - name: Add common_cacert data set to RACF.
-    #   ibm.ibm_zos_core.zos_tso_command:
-    #     command: "RACDCERT ADD('{{ item.data_set }}') CERTAUTH TRUST WITHLABEL('{{ item.label }}')"
-    #   loop:
-    #     - { data_set: IBMUSER.COMMON.INTCERT.ENC, label: ZCACERT}
-    #     - { data_set: IBMUSER.COMMON.ZCERT.ENC, label: ZCERT }
+    - name: Issue a SETROPTS REFRESH to initialize changes
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
 
-    # - name: Add common_cacert to keyring.
-    #   ibm.ibm_zos_core.zos_tso_command:
-    #     command: RACDCERT CONNECT CERTAUTH LABEL('ZCACERT') RING('SharedRing1') USAGE(CERTAUTH) ID(IBMUSER)
+    - name: Define ROOT CA Certificate to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.ROOTCA') WITHLABEL('ROOTCA') TRUST
 
-    # - name: Issue a SETROPTS REFRESH to initialize changes.
-    #   ibm.ibm_zos_core.zos_tso_command:
-    #     command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+    - name: Define Intermediate Certificate to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.INTCERT') WITHLABEL('INTERCERT') TRUST
 
-    # - name: List cert, print results whether it exists or not.
-    #   block:
-    #     - name: List cert.
-    #       ibm.ibm_zos_core.zos_tso_command:
-    #         commands: RACDCERT CERTAUTH LIST(LABEL('ZCACERT'))
-    #       register: list_cert
-    #       changed_when: false
+   # - name: Define Server/PKCS12 file to RACF
+   #   ibm.ibm_zos_core.zos_tso_command:
+   #     command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('WELCOME12')
 
-    #   always:
-    #     - name: Print results from list cert command.
-    #       ansible.builtin.debug:
-    #         var: list_cert.output[0].content
+    - name: Issue a SETROPTS REFRESH to initialize changes
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+
+   # - name: Verify the certificate chain is complete
+   #   ibm.ibm_zos_core.zos_tso_command:
+   #     command: RACDCERT ID(IZUSVR) LISTCHAIN(LABEL('SERVERCERT'))
+
+    - name: Connect ROOT CA certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(CERTAUTH LABEL('ROOTCA') RING(ZOSMF_RING))
+
+    - name: Connect Intermediate certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(CERTAUTH LABEL('INTERCERT') RING(ZOSMF_RING))
+
+    - name: Connect Server/PKCS12 certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(LABEL('SERVERCERT') RING(ZOSMF_RING) DEFAULT)
+
+    - name: Issue a SETROPTS REFRESH to initialize changes
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+
+    - name: Add line to SYS1.PARMLIB(IZUPRM00) member to CSRF_SWITCH(OFF).
+      ibm.ibm_zos_core.zos_lineinfile:
+        src: SYS1.PARMLIB(IZUPRM00)
+        line: CSRF_SWITCH(OFF)
+
+#### NEXT TASK: NEED TO ADD A TASK TO ADD A LINE TO THE SYS1.PARMLIB(IZUPRM00) MEMBER/DATASET --> ADD: "CSRF_SWITCH(OFF)"" AND SAVE IT
+
+#### DON'T ADD YET --> NEXT TASK: NEED TO ADD A TASK TO RUN THE FOLLOWING OPERATOR COMMANDS TO STOP AND RESTART IZUSVR1
+  # /P IZUSVR1
+  # /S IZUSVR1
