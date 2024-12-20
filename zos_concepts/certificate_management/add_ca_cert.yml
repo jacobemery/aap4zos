@@ -67,6 +67,11 @@
     #     - IBMUSER.COMMON.ZCERT.ENC
     #     - IBMUSER.COMMON.P12PKG
 
+    - name: Add line to SYS1.PARMLIB(IZUPRM00) member to CSRF_SWITCH(OFF).
+      ibm.ibm_zos_core.zos_lineinfile:
+        src: SYS1.PARMLIB(IZUPRM00)
+        line: CSRF_SWITCH(OFF)
+
     - name: Delete existing Server cert in RACF keyring (ZOSMF_RING).
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT REMOVE(ID(IZUSVR) LABEL('VS01zOSMFCert') RING(ZOSMF_RING)) ID(IZUSVR)
@@ -114,11 +119,6 @@
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
-
-    - name: Add line to SYS1.PARMLIB(IZUPRM00) member to CSRF_SWITCH(OFF).
-      ibm.ibm_zos_core.zos_lineinfile:
-        src: SYS1.PARMLIB(IZUPRM00)
-        line: CSRF_SWITCH(OFF)
 
 #### NEXT TASK: NEED TO ADD A TASK TO ADD A LINE TO THE SYS1.PARMLIB(IZUPRM00) MEMBER/DATASET --> ADD: "CSRF_SWITCH(OFF)"" AND SAVE IT
 
