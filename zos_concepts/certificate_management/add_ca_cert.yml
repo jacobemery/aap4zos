@@ -107,9 +107,9 @@
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT ID(IZUSVR) CONNECT(CERTAUTH LABEL('INTERCERT') RING(ZOSMF_RING))
 
-    - name: Connect Server/PKCS12 certificate to key ring
-      ibm.ibm_zos_core.zos_tso_command:
-        command: RACDCERT ID(IZUSVR) CONNECT(LABEL('SERVERCERT') RING(ZOSMF_RING) DEFAULT)
+    # - name: Connect Server/PKCS12 certificate to key ring
+    #   ibm.ibm_zos_core.zos_tso_command:
+    #     command: RACDCERT ID(IZUSVR) CONNECT(LABEL('SERVERCERT') RING(ZOSMF_RING) DEFAULT)
 
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
