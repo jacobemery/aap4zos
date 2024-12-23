@@ -55,8 +55,6 @@
         dest: /u/ibmuser/max.p12
         force: true
         mode: '600'
-      loop:
-        - { content: "{{ binary_file.ansible }}", dest_name: /u/ibmuser/max.p12 }
 
     # - name: Create sequential data set from staged pkcs12 package on controller.
     #   ibm.ibm_zos_core.zos_copy:
