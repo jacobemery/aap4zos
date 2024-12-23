@@ -127,6 +127,10 @@
 #        content: "{{ zos_cert_p12_tdes_base64 | b64decode }}"
 #      delegate_to: localhost
 
+    - name: decode base64 file
+        dest: "{{ pfxfile }}"
+        content: "{{ zos_cert_p12_tdes_base64 | b64decode }}"
+      delegate_to: localhost
 
 #    - name: Create sequential data sets with z/OS certificates and intermediate CA content.
 #      ibm.ibm_zos_core.zos_copy:
