@@ -51,8 +51,8 @@
 
     - name: Create USS file with P12 in binary format
       ibm.ibm_zos_core.zos_copy:
-        content: "{{ item.content }}"
-        dest: "{{ item.dest_name }}"
+        src: ./binary_file1.ansible
+        dest: /u/ibmuser/max.p12
         force: true
         mode: '600'
       loop:
