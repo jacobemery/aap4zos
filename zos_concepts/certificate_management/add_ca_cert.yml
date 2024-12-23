@@ -22,7 +22,7 @@
   tasks:
 
     - copy:
-        dest: binary_file1.ansible
+        dest: ~/max.p12
         content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
 
     - name: Create sequential data sets with z/OS certificates and intermediate CA content.
@@ -51,7 +51,7 @@
 
     - name: Create USS file with P12 in binary format
       ibm.ibm_zos_core.zos_copy:
-        src: ./binary_file1.ansible
+        src: ~/max.p12
         dest: /u/ibmuser/max.p12
         force: true
         mode: '600'
