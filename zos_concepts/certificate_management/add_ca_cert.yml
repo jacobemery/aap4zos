@@ -121,23 +121,23 @@
       ibm.ibm_zos_core.zos_tso_command:
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
 
-    - name: decode base64 file
+#    - name: decode base64 file
 #      ansible.builtin.b64decode:
-        dest: "{{ pfxfile }}"
-        content: "{{ zos_cert_p12_tdes_base64 | b64decode }}"
-      delegate_to: localhost
+#        dest: "{{ pfxfile }}"
+#        content: "{{ zos_cert_p12_tdes_base64 | b64decode }}"
+#      delegate_to: localhost
 
 
-    - name: Create sequential data sets with z/OS certificates and intermediate CA content.
-      ibm.ibm_zos_core.zos_copy:
-        content: "{{ item.content }}"
-        dest: "{{ item.dest_name }}"
-        force: true
-        dest_data_set:
-          type: SEQ
-          record_format: VB
-      loop:
-        - { content: "{{ pfxfile }}", dest_name: IBMUSER.COMMON.BINTEST }
+#    - name: Create sequential data sets with z/OS certificates and intermediate CA content.
+#      ibm.ibm_zos_core.zos_copy:
+#        content: "{{ item.content }}"
+#        dest: "{{ item.dest_name }}"
+#        force: true
+#        dest_data_set:
+#          type: SEQ
+#          record_format: VB
+#      loop:
+#        - { content: "{{ pfxfile }}", dest_name: IBMUSER.COMMON.BINTEST }
         
 
 #### DON'T ADD YET --> NEXT TASK: NEED TO ADD A TASK TO RUN THE FOLLOWING OPERATOR COMMANDS TO STOP AND RESTART IZUSVR1
