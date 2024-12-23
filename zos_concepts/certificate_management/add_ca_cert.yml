@@ -8,11 +8,11 @@
       string_in_base64: 'sxZARwIVokeqOMGPygc1S20CaGPiKDRGRzg0oSVGmCF2oXHua+9fVhriUQRd8vkmvpHoBmSsI6Y='
   - copy:
       dest: binary_file.ansible
-      content: '{{ string_in_base64 | b64decode }}'
-  - shell: |
-      echo '{{ string_in_base64 }}' | base64 --decode > binary_file
-      shasum -a 1 binary_file
-      shasum -a 1 binary_file.ansible
+      content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
+#  - shell: |
+#      echo '{{ string_in_base64 }}' | base64 --decode > binary_file
+#      shasum -a 1 binary_file
+#      shasum -a 1 binary_file.ansible
 
 
 - name: Add staged CA cert to RACF.
