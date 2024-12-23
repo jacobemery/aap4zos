@@ -32,7 +32,7 @@
       loop:
         - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTCERT }
         - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
-        - { content: "{{ zos_cert_p12_tdes_base64 }}", dest_name: IBMUSER.COMMON.P12PKG }
+   #     - { content: "{{ zos_cert_p12_tdes_base64 }}", dest_name: IBMUSER.COMMON.P12PKG }
 
     - name: Create USS files with z/OS certificates and private key.
       ibm.ibm_zos_core.zos_copy:
