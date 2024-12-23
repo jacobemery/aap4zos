@@ -122,7 +122,7 @@
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
 
     - name: decode base64 file
-      ansible.builtin.b64decode:
+#      ansible.builtin.b64decode:
         dest: "{{ pfxfile }}"
         content: "{{ zos_cert_p12_tdes_base64 | b64decode }}"
       delegate_to: localhost
