@@ -1,18 +1,18 @@
 ---
 
-#- hosts: localhost
-#  connection: local
-#  gather_facts: no
-#  tasks:
-#  - set_fact:
-#      string_in_base64: 'sxZARwIVokeqOMGPygc1S20CaGPiKDRGRzg0oSVGmCF2oXHua+9fVhriUQRd8vkmvpHoBmSsI6Y='
-#  - copy:
-#      dest: binary_file.ansible
-#      content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
-#  - shell: |
-#      echo '{{ string_in_base64 }}' | base64 --decode > binary_file
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - set_fact:
+      string_in_base64: 'sxZARwIVokeqOMGPygc1S20CaGPiKDRGRzg0oSVGmCF2oXHua+9fVhriUQRd8vkmvpHoBmSsI6Y='
+  - copy:
+      dest: ~/max.p12
+      content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
+  - shell: 
+      echo '{{ zos_cert_p12_tdes_base64 }}' | base64 --decode > binary_file
 #      shasum -a 1 binary_file
-#      shasum -a 1 binary_file.ansible
+ #     shasum -a 1 binary_file.ansible
 
 
 - name: Add staged CA cert to RACF.
