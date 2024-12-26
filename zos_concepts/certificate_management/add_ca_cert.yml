@@ -10,6 +10,7 @@
       dest: ~/max.p12
       content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
   - shell: 
+      cat ~/max.p12
       echo '{{ zos_cert_p12_tdes_base64 }}' | base64 --decode > binary_file
 #      shasum -a 1 binary_file
  #     shasum -a 1 binary_file.ansible
