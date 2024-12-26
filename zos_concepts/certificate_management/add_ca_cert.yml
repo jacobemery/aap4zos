@@ -28,6 +28,10 @@
           type: SEQ
           record_format: VB
 
+    - name: Define Server/PKCS12 dataset to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('MAXCERT') PASSWORD('{{ zos_cert_p12_password }}')
+  
     - name: Create sequential data sets with z/OS certificates and intermediate CA content.
       ibm.ibm_zos_core.zos_copy:
         content: "{{ item.content }}"
@@ -97,9 +101,9 @@
    #   ibm.ibm_zos_core.zos_tso_command:
    #     command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('WELCOME12')
 
-    - name: Define Server/PKCS12 dataset to RACF
-      ibm.ibm_zos_core.zos_tso_command:
-        command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('{{ zos_cert_p12_password }}')
+    #- name: Define Server/PKCS12 dataset to RACF
+    #  ibm.ibm_zos_core.zos_tso_command:
+    #    command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('{{ zos_cert_p12_password }}')
 
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
