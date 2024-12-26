@@ -97,6 +97,10 @@
    #   ibm.ibm_zos_core.zos_tso_command:
    #     command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('WELCOME12')
 
+    - name: Define Server/PKCS12 dataset to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('{{ zos_cert_p12_password }}')
+
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
