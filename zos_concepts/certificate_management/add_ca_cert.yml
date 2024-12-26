@@ -21,10 +21,10 @@
   environment: "{{ environment_vars }}"
   tasks:
 
-    - copy:
-        dest: ~/max.p12
-        content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
-      delegate_to: localhost
+#    - copy:
+#        dest: ~/max.p12
+#        content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
+#      delegate_to: localhost
 
     - name: Create sequential data sets with z/OS certificates and intermediate CA content.
       ibm.ibm_zos_core.zos_copy:
@@ -37,7 +37,7 @@
       loop:
         - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTCERT }
         - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
-   #     - { content: "{{ zos_cert_p12_tdes_base64 }}", dest_name: IBMUSER.COMMON.P12PKG }
+        - { content: "{{ zos_cert_p12_tdes_base64 }}", dest_name: IBMUSER.COMMON.P12PKG }
 
     - name: Create USS files with z/OS certificates and private key.
       ibm.ibm_zos_core.zos_copy:
@@ -50,12 +50,12 @@
         - { content: "{{ zos_cert_key }}", dest_name: /u/ibmuser/zos_cert_private_key.pem }
 
 
-    - name: Create USS file with P12 in binary format
-      ibm.ibm_zos_core.zos_copy:
-        src: ~/max.p12
-        dest: /u/ibmuser/max.p12
-        force: true
-        mode: '600'
+    #- name: Create USS file with P12 in binary format
+    #  ibm.ibm_zos_core.zos_copy:
+    #    src: ~/max.p12
+    #    dest: /u/ibmuser/max.p12
+    #    force: true
+    #    mode: '600'
 
     # - name: Create sequential data set from staged pkcs12 package on controller.
     #   ibm.ibm_zos_core.zos_copy:
@@ -173,9 +173,6 @@
 #        - { content: "{{ pfxfile }}", dest_name: IBMUSER.COMMON.BINTEST }
         
 
-#### DON'T ADD YET --> NEXT TASK: NEED TO ADD A TASK TO RUN THE FOLLOWING OPERATOR COMMANDS TO STOP AND RESTART IZUSVR1
-  # /P IZUSVR1
-  # /S IZUSVR1
 
   #  - name: STOP z/OSMF Started task
   #    zos_operator:
