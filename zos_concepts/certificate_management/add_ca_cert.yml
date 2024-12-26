@@ -4,21 +4,12 @@
   connection: local
   gather_facts: no
   tasks:
-  - set_fact:
-      string_in_base64: 'sxZARwIVokeqOMGPygc1S20CaGPiKDRGRzg0oSVGmCF2oXHua+9fVhriUQRd8vkmvpHoBmSsI6Y='
   - copy:
-      dest: ~/max.p12
+      dest: ~/pkcs12.p12
       content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
   - shell: 
-      cmd: cat ~/max.p12
+      cmd: cat ~/pkcs12.p12
     register: out
-#  - debug: 
-#      var: out.stdout
-#      msg: "{{ out.stdout }}"
-      #cat ~/max.p12
-      #echo '{{ zos_cert_p12_tdes_base64 }}' | base64 --decode > binary_file
-#      shasum -a 1 binary_file
- #     shasum -a 1 binary_file.ansible
 
 
 - name: Add staged CA cert to RACF.
@@ -26,28 +17,16 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
-
-#    - copy:
-#        dest: ~/max.p12
-#        content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
-#      delegate_to: localhost
-
-
+  
     - name: Copy local p12 file to z/OS dataset
       ibm.ibm_zos_core.zos_copy:
-        src: ~/max.p12
-        dest: IBMUSER.COMMON.MAXP12
+        src: ~/pkcs12.p12
+        dest: IBMUSER.COMMON.P12PKG
         force: true
         is_binary: true 
         dest_data_set:
           type: SEQ
           record_format: VB
-    #  loop:
-    #    - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTCERT }
-    #    - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
-    #    - { content: "{{ zos_cert_p12_tdes_base64 | b64decode }}", dest_name: IBMUSER.COMMON.P12 }
-
-
 
     - name: Create sequential data sets with z/OS certificates and intermediate CA content.
       ibm.ibm_zos_core.zos_copy:
@@ -60,7 +39,6 @@
       loop:
         - { content: "{{ zos_ca_cert }}", dest_name: IBMUSER.COMMON.INTCERT }
         - { content: "{{ zos_cert }}", dest_name: IBMUSER.COMMON.ZCERT }
-    #    - { content: "{{ zos_cert_p12_tdes_base64 | b64decode }}", dest_name: IBMUSER.COMMON.P12 }
 
     - name: Create USS files with z/OS certificates and private key.
       ibm.ibm_zos_core.zos_copy:
@@ -71,24 +49,6 @@
       loop:
         - { content: "{{ zos_cert }}", dest_name: /u/ibmuser/zos_cert.pem }
         - { content: "{{ zos_cert_key }}", dest_name: /u/ibmuser/zos_cert_private_key.pem }
-
-
-    #- name: Create USS file with P12 in binary format
-    #  ibm.ibm_zos_core.zos_copy:
-    #    src: ~/max.p12
-    #    dest: /u/ibmuser/max.p12
-    #    force: true
-    #    mode: '600'
-
-    # - name: Create sequential data set from staged pkcs12 package on controller.
-    #   ibm.ibm_zos_core.zos_copy:
-    #     src: ~/keyStore.p12
-    #     dest: IBMUSER.COMMON.P12PKG
-    #     force: true
-    #     dest_data_set:
-    #       type: SEQ
-    #       record_format: VB
-    #       record_length: 84
 
     - name: Pull root CA certificate content and save to file.
       ansible.builtin.get_url:
@@ -107,17 +67,6 @@
         dest_data_set:
           type: SEQ
           record_format: VB
-
-    # - name: Create target sequential data set with certificate content.
-    #   ibm.ibm_zos_core.zos_data_set:
-    #     name: "{{ item }}"
-    #     force: true
-    #     type: SEQ
-    #     record_format: VB
-    #   loop:
-    #     - IBMUSER.COMMON.INTCERT.ENC
-    #     - IBMUSER.COMMON.ZCERT.ENC
-    #     - IBMUSER.COMMON.P12PKG
 
     - name: Add line to SYS1.PARMLIB(IZUPRM00) member to CSRF_SWITCH(OFF).
       ibm.ibm_zos_core.zos_lineinfile:
@@ -144,7 +93,7 @@
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.INTCERT') WITHLABEL('INTERCERT') TRUST
 
-   # - name: Define Server/PKCS12 file to RACF
+   # - name: Define Server/PKCS12 dataset to RACF
    #   ibm.ibm_zos_core.zos_tso_command:
    #     command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('WELCOME12')
 
@@ -152,9 +101,9 @@
       ibm.ibm_zos_core.zos_tso_command:
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
 
-   # - name: Verify the certificate chain is complete
-   #   ibm.ibm_zos_core.zos_tso_command:
-   #     command: RACDCERT ID(IZUSVR) LISTCHAIN(LABEL('SERVERCERT'))
+    - name: Verify the certificate chain is complete
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) LISTCHAIN(LABEL('SERVERCERT'))
 
     - name: Connect ROOT CA certificate to key ring
       ibm.ibm_zos_core.zos_tso_command:
