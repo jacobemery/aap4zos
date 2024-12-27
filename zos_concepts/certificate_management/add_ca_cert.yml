@@ -124,11 +124,11 @@
 
 
     - name: STOP z/OSMF Started task
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: '/P IZUSVR1'
 
     - name: START z/OSMF Started task
-      zos_operator:
+      ibm.ibm_zos_core.zos_operator:
         cmd: '/S IZUSVR1'
         wait_time_s: 15
 
