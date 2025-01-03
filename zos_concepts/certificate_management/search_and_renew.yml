@@ -8,8 +8,8 @@
   environment: "{{ environment_vars }}"
   vars:
     cert_label: "{{ cert_label_survey }}"
-    cert_type: "{{ cert_type_survey | default('SITE') }}"
-    sign_with: "{{ sign_with_survey | default('CERTAUTH') }}"
+    cert_type: "{{ cert_type_survey }}"
+    sign_with: "{{ sign_with_survey | default('Self') }}"
     sign_label: "{{ sign_label_survey | default('') }}"
     owner_id: "{{ owner_id_survey }}"
     keyring: "{{ keyring_survey }}"
