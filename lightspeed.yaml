@@ -3,31 +3,12 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
-    - name: Ping z/OS.
-      ibm.ibm_zos_core.zos_ping:
+    # - name: Ping z/OS.
 
-    - name: Run z/OS TSO command to LISTUSER for user IBMUSER.
-      ibm.ibm_zos_core.zos_tso_command:
-        commands:
-          - LISTUSER IBMUSER
-      register: listuser_response
+    # - name: Run z/OS TSO command to LISTUSER for user IBMUSER.
 
-    - name: Create a z/OS dataset member called IBMUSER.ANSIB.DATASET(TEST1) with default parameters.
-      ibm.ibm_zos_core.zos_data_set:
-        name: IBMUSER.ANSIB.DATASET(TEST1)
-        state: present
-        type: MEMBER
+    # - name: Create a z/OS dataset member called IBMUSER.ANSIB.DATASET(TEST1) with default parameters.
 
-    - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST2)
-      ibm.ibm_zos_core.zos_copy:
-        src: IBMUSER.ANSIB.DATASET(TEST1)
-        dest: IBMUSER.ANSIB.DATASET(TEST2)
-        remote_src: true
-      register: copy_response
+    # - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST2)
 
-    - name: Submit JCL from ~/test.jcl.j2 template.
-      ibm.ibm_zos_core.zos_job_submit:
-        src: '{{ playbook_dir }}/templates/test.jcl.j2'
-        location: LOCAL
-        wait: true
-      register: submit_response
+    # - name: Submit JCL from ~/test.jcl.j2 template.
