@@ -15,10 +15,10 @@
         name: IBMUSER.ANSIB.DATASET(TEST1)
         state: present
         type: MEMBER
-    - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST2)
+    - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST3)
       ibm.ibm_zos_core.zos_copy:
         src: IBMUSER.ANSIB.DATASET(TEST1)
-        dest: IBMUSER.ANSIB.DATASET(TEST2)
+        dest: IBMUSER.ANSIB.DATASET(TEST3)
         remote_src: true
     - name: Submit JCL from ~/test.jcl.j2 template.
       ibm.ibm_zos_core.zos_job_submit:
