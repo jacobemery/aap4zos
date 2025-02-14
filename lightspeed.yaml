@@ -15,14 +15,15 @@
         name: IBMUSER.ANSIB.DATASET(TEST1)
         state: present
         type: MEMBER
-    - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST3)
+    - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST4)
       ibm.ibm_zos_core.zos_copy:
         src: IBMUSER.ANSIB.DATASET(TEST1)
-        dest: IBMUSER.ANSIB.DATASET(TEST3)
+        dest: IBMUSER.ANSIB.DATASET(TEST4)
         remote_src: true
-    - name: Submit JCL from ~/test.jcl.j2 template.
+    - name: Submit JCL from ~/templates/test.jcl.j2 template.
       ibm.ibm_zos_core.zos_job_submit:
-        src: ~/test.jcl.j2
+        src: '{{ playbook_dir }}/templates/test.jcl.j2'
         location: LOCAL
         wait: true
-        max_rc: 4
+        wait_time_s: 120
+
