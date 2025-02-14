@@ -12,11 +12,10 @@
           - LISTUSER IBMUSER
       register: listuser_response
 
-    - name: Allocate z/OS PDS with name IBMUSER.ANSIB.DATASET with default parameters.
+    - name: Create a z/OS PDS member called IBMUSER.ANSIB.DATASET(TEST1) with default parameters.
       ibm.ibm_zos_core.zos_data_set:
-        name: IBMUSER.ANSIB.DATASET
+        name: IBMUSER.ANSIB.DATASET(TEST1)
         state: present
-      register: allocate_dataset_response
 
     - name: Copy z/OS PDS member IBM.ANSIB.DATASET(TEST1) to (TEST2)
       ibm.ibm_zos_core.zos_copy:
