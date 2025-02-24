@@ -1,0 +1,26 @@
+---
+
+- name: Stage digicert CA.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+  
+ 
+    - name: Pull root CA certificate content and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem?_gl=1*ea16w5*_gcl_au*NDc4NzU4NDQ5LjE3NDA0Mjg4MDI
+        dest: /u/ibmuser/digicert.pem
+        mode: '600'
+        validate_certs: false
+      register: get_root_ca_digicert
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/digicert.pem
+        dest: IBMUSER.COMMON.DIGICA
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
