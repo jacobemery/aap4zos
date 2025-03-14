@@ -14,7 +14,7 @@
       register: get_g2_digicert
       
     - name: Create sequential data set from g2 cert in USS.
-      ibm.com_zos_core.zos_copy: 
+      ibm.ibm_zos_core.zos_copy: 
         src: /u/ibmuser/g2.pem
         dest: IBMUSER.COMMON.G2CERT
         force: true
