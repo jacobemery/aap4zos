@@ -40,3 +40,13 @@
         dest_data_set:
           type: SEQ
           record_format: VB
+
+    - name: Copy ShopZ userCert from USS to dataset
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/userCert.p12
+        dest: IBMUSER.COMMON.SHOPZ
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
