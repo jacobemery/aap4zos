@@ -70,5 +70,8 @@
         command: PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
         command: RACDCERT ID(IBMUSER) ADDRING(SMPERING)
 
-
-        
+    - name: Define certificates to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{user_password}}') TRUST
+        command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.G2CERT') WITHLABEL('DigiCert Global Root G2') TRUST
+        command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.DIGICA') WITHLABEL('DigiCert Global Root CA') TRUST
