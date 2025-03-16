@@ -1,6 +1,6 @@
 ---
 
-- name: Stage digicert CA.
+- name: Stage digicert CA Certificates.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
