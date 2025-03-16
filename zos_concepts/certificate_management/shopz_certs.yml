@@ -46,6 +46,7 @@
         src: /u/ibmuser/userCert.p12
         dest: IBMUSER.COMMON.SHOPZ
         force: true
+        is_binary: true
         remote_src: true
         dest_data_set:
           type: SEQ
