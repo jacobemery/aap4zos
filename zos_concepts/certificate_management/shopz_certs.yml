@@ -56,7 +56,7 @@
 
     - name: create smpe directory
       ansible.builtin.file:
-        path: /var/smpe/smpnt
+        path: /var/smpe/smpnts
         state: directory
         mode: '600'    
 
