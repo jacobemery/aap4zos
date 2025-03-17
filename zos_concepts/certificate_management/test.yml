@@ -1,12 +1,12 @@
 ---
 
-- name: this is a test.
+- name: create directory
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
     - name: create new directory
-      ibm.ibm_zos_core.zos_copy:
-        dest: /var/new/smpe/smpnt/
-        force: true
+      ansible.builtin.file:
+        path: /var/smpe/smpnt
+        state: directory
         mode: '600'
