@@ -66,8 +66,6 @@
 
     - name: Setup RACF permissions and keyrings
       ibm.ibm_zos_core.zos_tso_command:
-        command: "RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{ user_password }}') TRUST"
-
         command: RDEFINE FACILITY IRR.DIGTCERT.ADD UACC(NONE)
         command: RDEFINE FACILITY IRR.DIGTCERT.ADDRING  UACC(NONE)
         command: RDEFINE FACILITY IRR.DIGTCERT.ALTER    UACC(NONE)
