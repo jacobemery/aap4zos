@@ -7,6 +7,6 @@
   tasks:
     - name: create new directory
       ibm.ibm_zos_core.zos_copy:
-        dest: /var/new/smpe/smpnt
+        dest: /var/new/smpe/smpnt/
         force: true
         mode: '600'
