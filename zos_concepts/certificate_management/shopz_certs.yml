@@ -54,6 +54,14 @@
 
    ## - name: CREATE EMPTY UNIX FILE HERE: /var/smpe/smpnt
 
+#    - name: Create /var/smpe/smpnt directory.
+#      ibm.ibm_zos_core.zos_copy:
+#        dest: "/var/smpe/smpnt"
+#        force: true
+#        mode: '600'
+  
+
+
     - name: Setup RACF permissions and keyrings
       ibm.ibm_zos_core.zos_tso_command:
         command: RDEFINE FACILITY IRR.DIGTCERT.ADD UACC(NONE)
