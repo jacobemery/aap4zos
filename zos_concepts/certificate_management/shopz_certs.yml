@@ -75,3 +75,14 @@
         command: RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{user_password}}') TRUST
         command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.G2CERT') WITHLABEL('DigiCert Global Root G2') TRUST
         command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.DIGICA') WITHLABEL('DigiCert Global Root CA') TRUST
+
+    - name: Connect certs to Key Ring and SETROPTS
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IBMUSER) CONNECT(LABEL('SMPE Client Certificate') RING(SMPERING) USAGE(CERTAUTH) )
+        command: RACDCERT ID(IBMUSER) CONNECT( CERTAUTH LABEL('DigiCert Global Root G2') RING(SMPERING) USAGE(CERTAUTH) )
+        command: RACDCERT ID(IBMUSER) CONNECT( CERTAUTH LABEL('DigiCert Global Root CA') RING(SMPERING) USAGE(CERTAUTH) )
+        command: RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root G2'))
+        command: RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root CA'))
+        command: RACDCERT ID(IBMUSER) LIST(LABEL('SMPE Client Certificate'))
+        command: SETROPTS CLASSACT(DIGTCERT DIGTRING)
+        command: SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
