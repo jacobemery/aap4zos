@@ -54,15 +54,11 @@
           type: SEQ
           record_format: VB
 
-   ## - name: CREATE EMPTY UNIX FILE HERE: /var/smpe/smpnt
-
-#    - name: Create /var/smpe/smpnt directory.
-#      ibm.ibm_zos_core.zos_copy:
-#        dest: "/var/smpe/smpnt"
-#        force: true
-#        mode: '600'
-  
-
+    - name: create smpe directory
+      ansible.builtin.file:
+        path: /var/smpe/smpnt
+        state: directory
+        mode: '600'    
 
     - name: Setup RACF permissions and keyrings
       ibm.ibm_zos_core.zos_tso_command:
