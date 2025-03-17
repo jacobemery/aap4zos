@@ -4,6 +4,8 @@
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
+  vars:
+    user_password: "{{ user_cert_password }}"
   tasks:
     - name: Pull G2 root certificate and save to file.
       ansible.builtin.get_url:
@@ -80,7 +82,7 @@
 
     - name: Define certificates to RACF
       ibm.ibm_zos_core.zos_tso_command:
-        command: RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{user_password}}') TRUST
+        command: "RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{ user_password }}') TRUST"
         command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.G2CERT') WITHLABEL('DigiCert Global Root G2') TRUST
         command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.DIGICA') WITHLABEL('DigiCert Global Root CA') TRUST
 
