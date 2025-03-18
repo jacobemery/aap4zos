@@ -3,3 +3,4 @@
 
 # defaults file for aplly_ptf
 target_zone: TGT
+dry_run: true
