@@ -1,6 +1,6 @@
 ---
 - name: Gather and send z topology and missing APARs to Concert
-  hosts: 10.250.64.5
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
