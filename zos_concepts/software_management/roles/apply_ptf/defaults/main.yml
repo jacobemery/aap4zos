@@ -3,4 +3,4 @@
 
 # defaults file for aplly_ptf
 target_zone: DB2V13T
-dry_run: true
+dry_run: false
