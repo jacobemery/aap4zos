@@ -1,6 +1,6 @@
 ---
 - name: Gather and send z topology and missing APARs to Concert
-  hosts: https://itzvsi-zos-phznxjk.techzone.ibm.com
+  hosts: 10.250.64.5
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
