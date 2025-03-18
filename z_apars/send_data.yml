@@ -4,7 +4,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    zmf_host: https://itzvsi-zos-phznxjk.techzone.ibm.com
+    zmf_host: itzvsi-zos-phznxjk.techzone.ibm.com
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: 'MY PASS PHRASE'
