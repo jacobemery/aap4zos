@@ -29,6 +29,6 @@
     - role: query_csi
       ptf:  "{{ ptf_name }}"
       global_csi: "{{ global_csi }}"
-      zone: DB2V13T
+      zone: GLOBAL
       list_operands: 'SYSMOD({{ ptf }}) .'
    
