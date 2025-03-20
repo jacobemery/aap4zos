@@ -62,7 +62,7 @@
         body:
           name: "CICS"
           system: "VS01_004"
-          globalzone: "SMPE.PROGPROD.CSI
+          globalzone: "SMPE.PROGPROD.CSI"
           targetzones: ["CICS61T"]    
         headers:
           Host: "{{ zmf_host }}"
