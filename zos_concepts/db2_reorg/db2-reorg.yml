@@ -7,7 +7,7 @@
 
     - name: Submit Db2 re-org JCL.
       ibm.ibm_zos_core.zos_job_submit:
-        location: local
+        location: LOCAL
         src: templates/db2_reorg.jcl.j2
         use_template: true
         encoding:
