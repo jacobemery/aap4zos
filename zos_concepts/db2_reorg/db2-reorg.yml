@@ -1,6 +1,6 @@
 ---
 - name: Submit Db2 re-org JCL.
-  hosts: esysmvs1.ztec.dmz
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
