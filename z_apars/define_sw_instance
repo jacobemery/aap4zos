@@ -53,7 +53,32 @@
 
     - name: Define CICS software instance
         ansible.builtin.uri:
-          url: 
+          url: "https://{{ zmf_host }}/zosmf/swmgmt/swi"
+          method: POST
+          user: "{{ zmf_user | trim }}"
+          password: "{{ zmf_password | trim }}"
+          force_basic_auth: true
+          body_format: json
+          body:
+            name: "CICS"
+            system: "VS01_004"
+            globalzone: "SMPE.PROGPROD.CSI
+            targetzones: ["CICS61T"]    
+          headers:
+            Host: "{{ zmf_host }}"
+            Origin: "https://{{ zmf_host }}"
+          validate_certs: false
+          return_content: true
+          status_code: "202"
+        register: instance_data
+        delegate_to: localhost
+        ignore_errors: false
+
+
+
+
+
+
 
 
     - name: Save SWI to a json file
