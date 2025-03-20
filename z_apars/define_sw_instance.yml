@@ -53,7 +53,7 @@
 
     - name: Define CICS software instance
       ansible.builtin.uri:
-        url: "https://{{ zmf_host }}/zosmf/swmgmt/swi"
+        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
         method: POST
         user: "{{ zmf_user | trim }}"
         password: "{{ zmf_password | trim }}"
@@ -69,7 +69,7 @@
           Origin: "https://{{ zmf_host }}"
         validate_certs: false
         return_content: true
-        status_code: "202"
+        status_code: "200"
       register: instance_data
       delegate_to: localhost
       ignore_errors: false
