@@ -26,20 +26,7 @@
     collated_swi: {}
 
   tasks:
-    - name: Locating all files in playbook_output directory
-      ansible.builtin.find:
-        path: "{{ playbook_dir }}/playbook_output"
-      register: cleanup
-      delegate_to: localhost
-      ignore_errors: true
 
-    - name: Removing all files previously found in playbook_output dir
-      ansible.builtin.file:
-        path: "{{ item.path }}"
-        state: absent
-      with_items: "{{ cleanup.files }}"
-      delegate_to: localhost
-      ignore_errors: true
 
     #####################################################################################
     # PLAY #1: Retrieve all SW Instances                                                #
@@ -62,6 +49,12 @@
 
     - ansible.builtin.set_fact:
         swi_list: '{{ instance_data.json.swilist }}'
+
+
+    - name: Define CICS software instance
+        ansible.builtin.uri:
+          url: 
+
 
     - name: Save SWI to a json file
       ansible.builtin.copy:
