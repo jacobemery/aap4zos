@@ -1,5 +1,5 @@
 ---
-- name: Define z/OSMF Software Instances
+- name: Identify missing critical updates
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
