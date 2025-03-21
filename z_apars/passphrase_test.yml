@@ -10,3 +10,16 @@
         passphrase: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_numeric=2, length=10) }}"
       no_log: true
       
+- name: Execute one or more TSO commands.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+    - name: Execute the command(s) and return output.
+      block:
+        - name: Run z/OS TSO command(s).
+          ibm.ibm_zos_core.zos_tso_command:
+            commands:
+              "{{ zos_tso_command.split('\n') | default(\"NOP\") }}"
+          register: command
