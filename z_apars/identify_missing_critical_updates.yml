@@ -42,7 +42,7 @@
 
     - name: Retrieve missing critical updates
       ansible.builtin.uri:
-        url: "{{ critupdates.json.statusurl}}"
+        url: "{{ critupdates.json.statusurl }}"
         method: GET
         user: "{{ zmf_user | trim }}"
         password: "{{ zmf_password | trim }}"
@@ -58,7 +58,7 @@
 
     - name: Print json data to terminal for visual verification.
       ansible.builtin.debug:
-        msg: "{{ critupdates_output.content.missingcriticalupdates }}"
+        msg: "{{ critupdates_output.content }}"
 
 
     
