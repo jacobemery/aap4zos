@@ -25,7 +25,7 @@
           zosmfpw: "{{ zmf_password | trim }}"
         headers:
           Host: "{{ zmf_host }}"
-          Origin: "https://{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}:10443"
         validate_certs: false
         return_content: true
         status_code: "202"
