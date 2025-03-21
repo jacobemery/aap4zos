@@ -31,7 +31,7 @@
         swi_list: '{{ instance_data.json.swilist }}'
 
 
-   # - name: Print json data to terminal for visual verification.
-   #   ansible.builtin.debug:
-   #     msg: "{{ critupdates_output.content }}"
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ instance_data.json.swilist }}"
 
