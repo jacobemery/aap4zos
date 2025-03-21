@@ -8,8 +8,48 @@
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: 'MY PASS PHRASE'
+    swi-name: 
       
   tasks:
+    - name: Query missing critical updates
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi/VS01_004/{{ swi-name }}/missingcriticalupdates"
+        method: POST
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          zones: ["GLOBAL"]
+          entries: ["HOLDDATA"]
+          subentries: ["HOLDFMID", "HOLDREASON", "HOLDCLASS"]
+          filter: "HOLDTYPE='ERROR' & (HOLDCLASS='HIPER' | HOLDCLASS='PE' | HOLDCLASS='SECINT')"
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "202"
+      register: csi_data
+      delegate_to: localhost
+      ignore_errors: true
+
+    - name: Retrieve zosmf CSI output
+      ansible.builtin.uri:
+        url: "{{ csi_data.json.statusurl}}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "200"
+      register: csi_ds
+      delegate_to: localhost
+    
     - name: Define Db2_v12 software instance
       ansible.builtin.uri:
         url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
