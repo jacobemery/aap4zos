@@ -18,7 +18,7 @@
         url: "https://{{ zmf_host }}:{{ zmf_port }}/zosmf/swmgmt/swi"
         method: GET
         user: "{{ zmf_user | trim }}"
-        password: "{{ zmf_password | trim }}"
+     #   password: "{{ zmf_password | trim }}"
         force_basic_auth: true
         headers:
           Host: "{{ zmf_host }}"
