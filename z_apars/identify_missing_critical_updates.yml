@@ -8,8 +8,8 @@
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: 'MY PASS PHRASE'
-    swi-name: 
-      
+    swi-name: "{{ swi_name_survey | default('CICS') }}"
+
   tasks:
     - name: Query missing critical updates
       ansible.builtin.uri:
@@ -20,7 +20,7 @@
         force_basic_auth: true
         body_format: json
         body:
-          zones: ["GLOBAL"]
+          zosmfuid: zmf_user
           entries: ["HOLDDATA"]
           subentries: ["HOLDFMID", "HOLDREASON", "HOLDCLASS"]
           filter: "HOLDTYPE='ERROR' & (HOLDCLASS='HIPER' | HOLDCLASS='PE' | HOLDCLASS='SECINT')"
