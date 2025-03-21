@@ -14,4 +14,4 @@
 
     - name: generate random string
       ansible.builtin.debug:
-        var: lookup('community.general.random_string', min_lower=1, min_upper=1, min_special=2, min_numeric=2, length=10)
+        var: lookup('community.general.random_string', min_lower=1, min_upper=1, min_numeric=2, length=10)
