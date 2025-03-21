@@ -20,10 +20,8 @@
         force_basic_auth: true
         body_format: json
         body:
-          zosmfuid: zmf_user
-          entries: ["HOLDDATA"]
-          subentries: ["HOLDFMID", "HOLDREASON", "HOLDCLASS"]
-          filter: "HOLDTYPE='ERROR' & (HOLDCLASS='HIPER' | HOLDCLASS='PE' | HOLDCLASS='SECINT')"
+          zosmfuid: "{{ zmf_user | trim }}"
+          zosmfpw: "{{ zmf_password | trim }}"
         headers:
           Host: "{{ zmf_host }}"
           Origin: "https://{{ zmf_host }}"
