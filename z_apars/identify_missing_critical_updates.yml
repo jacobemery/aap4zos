@@ -28,13 +28,13 @@
         validate_certs: false
         return_content: true
         status_code: "202"
-      register: csi_data
+      register: critupdates
       delegate_to: localhost
       ignore_errors: true
 
-    - name: Retrieve zosmf CSI output
+    - name: Retrieve missing critical updates
       ansible.builtin.uri:
-        url: "{{ csi_data.json.statusurl}}"
+        url: "{{ critupdates.json.statusurl}}"
         method: GET
         user: "{{ zmf_user | trim }}"
         password: "{{ zmf_password | trim }}"
