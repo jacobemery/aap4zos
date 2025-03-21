@@ -32,6 +32,11 @@
       register: critupdates
       delegate_to: localhost
       ignore_errors: true
+    
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ critupdates }}"
+
 
     - name: Retrieve missing critical updates
       ansible.builtin.uri:
