@@ -1,37 +1,12 @@
 ---
-- name: List exisiting software instances
-  hosts: zos_host
-  gather_facts: false
-  environment: "{{ environment_vars }}"
-  vars:
-    #zmf_host: itzvsi-zos-pejjzea.techzone.ibm.com
-    zmf_host: "{{ ansible_host }}"
-    zmf_port: 10443
-    zmf_user: IBMUSER
-    zmf_password: 'MY PASS PHRASE'
-
+- name: Generate random string
+  hosts: localhost
+  gather_facts: true
+  
   tasks:
-
+  
     - name: generate random string
-      ansible.builtin.debug:
-        var: lookup('community.general.random_string', min_lower=1, min_upper=1, min_numeric=2, length=10)
-
-
-    - name: Get zosmf software instances
-      ansible.builtin.uri:
-        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
-        method: GET
-        user: "{{ zmf_user | trim }}"
-        password: "{{ zmf_password | trim }}"
-        force_basic_auth: true
-        headers:
-          Host: "{{ zmf_host }}"
-          Origin: "https://{{ zmf_host }}"
-        status_code: "200"
-        validate_certs: false
-        return_content: true
-      register: instance_data
-      delegate_to: localhost
-
-    - ansible.builtin.set_fact:
-        swi_list: '{{ instance_data.json.swilist }}'
+      ansible.builtin.set_fact:
+        passphrase: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_numeric=2, length=10) }}"
+      no_log: true
+      
