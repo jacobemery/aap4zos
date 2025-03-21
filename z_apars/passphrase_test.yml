@@ -17,9 +17,13 @@
   tasks:
 
     - name: Execute the command(s) and return output.
-      block:
-        - name: Run z/OS TSO command(s).
-          ibm.ibm_zos_core.zos_tso_command:
-            commands:
-              "{{ zos_tso_command.split('\n') | default(\"NOP\") }}"
-          register: command
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - "
+
+    - name: Define certificates to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - "RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{ user_password }}') TRUST"
+          - RACDCERT CERTAUTH ADD('IBMUSER.COMMON.G2CERT') WITHLABEL('DigiCert Global Root G2') TRUST
+          - RACDCERT CERTAUTH ADD('IBMUSER.COMMON.DIGICA') WITHLABEL('DigiCert Global Root CA') TRUST
