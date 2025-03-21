@@ -8,7 +8,8 @@
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: 'MY PASS PHRASE'
-    swi-name: "{{ swi_name_survey | default('CICS') }}"
+    swi-name: 'CICS'
+    #swi-name: "{{ swi_name_survey | default('CICS') }}"
 
   tasks:
     - name: Query missing critical updates
@@ -45,30 +46,13 @@
         validate_certs: false
         return_content: true
         status_code: "200"
-      register: csi_ds
+      register: critupdates_output
       delegate_to: localhost
-    
-    - name: Define Db2_v12 software instance
-      ansible.builtin.uri:
-        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
-        method: POST
-        user: "{{ zmf_user | trim }}"
-        password: "{{ zmf_password | trim }}"
-        force_basic_auth: true
-        body_format: json
-        body:
-          name: "Db2_v12"
-          system: "VS01_004"
-          globalzone: "SMPE.PROGPROD.CSI"
-          targetzones: ["DB2V12T"]    
-        headers:
-          Host: "{{ zmf_host }}"
-          Origin: "https://{{ zmf_host }}"
-        validate_certs: false
-        return_content: true
-        status_code: "200"
-      register: instance_data
-      delegate_to: localhost
-      ignore_errors: false
 
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ critupdates_output | to_nice_json }}"
+
+
+    
 
