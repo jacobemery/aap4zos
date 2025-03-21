@@ -12,14 +12,37 @@
     swi_name: "{{ swi_name_survey | default('CICS') }}"
 
   tasks:
-    - name: Query missing critical updates
+
+    - name: Get zosmf software instances
       ansible.builtin.uri:
-        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi/VS01_004/{{ swi_name }}/missingcriticalupdates"
-        method: POST
+        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
+        method: GET
         user: "{{ zmf_user | trim }}"
         password: "{{ zmf_password | trim }}"
         force_basic_auth: true
-        body_format: json
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: instance_data
+      delegate_to: localhost
+
+    - ansible.builtin.set_fact:
+        swi_list: '{{ instance_data.json.swilist }}'
+
+
+
+  
+ #   - name: Query missing critical updates
+ #     ansible.builtin.uri:
+ #       url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi/VS01_004/{{ swi_name }}/missingcriticalupdates"
+ #       method: POST
+ #       user: "{{ zmf_user | trim }}"
+ #       password: "{{ zmf_password | trim }}"
+ #       force_basic_auth: true
+ #       body_format: json
         body:
           zosmfuid: "{{ zmf_user | trim }}"
           zosmfpw: "{{ zmf_password | trim }}"
@@ -35,12 +58,12 @@
 
 
 
-    - name: Pause for 5 seconds
+  #  - name: Pause for 5 seconds
       ansible.builtin.pause:
         seconds: 5
 
 
-    - name: Retrieve missing critical updates
+ #   - name: Retrieve missing critical updates
       ansible.builtin.uri:
         url: "{{ critupdates.json.statusurl }}"
         method: GET
