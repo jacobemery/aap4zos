@@ -8,13 +8,13 @@
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: 'MY PASS PHRASE'
-    swi-name: 'CICS'
+    swi_name: 'CICS'
     #swi-name: "{{ swi_name_survey | default('CICS') }}"
 
   tasks:
     - name: Query missing critical updates
       ansible.builtin.uri:
-        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi/VS01_004/{{ swi-name }}/missingcriticalupdates"
+        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi/VS01_004/{{ swi_name }}/missingcriticalupdates"
         method: POST
         user: "{{ zmf_user | trim }}"
         password: "{{ zmf_password | trim }}"
