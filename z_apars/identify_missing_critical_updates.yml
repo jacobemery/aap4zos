@@ -33,6 +33,13 @@
       delegate_to: localhost
       ignore_errors: true
 
+
+
+    - name: Pause for 5 seconds
+      ansible.builtin.pause:
+        seconds: 5
+
+
     - name: Retrieve missing critical updates
       ansible.builtin.uri:
         url: "{{ critupdates.json.statusurl}}"
