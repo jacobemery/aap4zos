@@ -35,8 +35,7 @@
     
     - name: Print json data to terminal for visual verification.
       ansible.builtin.debug:
-        msg: "{{ critupdates }}"
-
+        msg: "{{ critupdates.json.statusurl }}"
 
     - name: Retrieve missing critical updates
       ansible.builtin.uri:
@@ -56,7 +55,7 @@
 
     - name: Print json data to terminal for visual verification.
       ansible.builtin.debug:
-        msg: "{{ critupdates_output | to_nice_json }}"
+        msg: "{{ critupdates_output.json.missingcriticalupdates | to_nice_json }}"
 
 
     
