@@ -64,7 +64,7 @@
     - name: Filter on APARs
       ansible.builtin.debug:
         var: item
-      loop: "{{ critupdates_output.json | community.general.json_query('missingcriticalupdates[*].name') }}"
+      mgs: "{{ critupdates_output.json | community.general.json_query('missingcriticalupdates[*].name') }}"
        
 
 
