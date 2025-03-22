@@ -59,7 +59,7 @@
 
     - name: Print json data to terminal for visual verification.
       ansible.builtin.debug:
-        msg: "{{ critupdates_output.content | to_nice_json }}"
+        msg: "{{ critupdates_output.content }}"
 
 
     
