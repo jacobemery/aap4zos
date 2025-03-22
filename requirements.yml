@@ -6,3 +6,4 @@ collections:
   - name: ibm.ibm_zos_cics
   - name: community.general
   - name: community.crypto
+  - name: awx.awx
