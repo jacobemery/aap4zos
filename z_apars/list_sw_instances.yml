@@ -1,16 +1,4 @@
 ---
-- name: Modify host variable
-  hosts: zos_host
-  gather_facts: false
-  environment: "{{ environment_vars }}"
-
-  tasks:
-    - name: modify host variable
-      ansible.builtin.set_fact:
-        ansible_pass: "MY NEW PASS PHRASE'
-      
-
-
 - name: List exisiting software instances
   hosts: zos_host
   gather_facts: false
@@ -20,7 +8,7 @@
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
     zmf_user: IBMUSER
-    zmf_password: "{{ ansible_pass }}"
+    zmf_password: "MY PASS PHRASE"
 
   tasks:
 
