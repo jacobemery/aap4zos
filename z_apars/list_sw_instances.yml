@@ -1,4 +1,16 @@
 ---
+- name: Modify host variable
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+
+  tasks:
+    - name: modify host variable
+      ansible.builtin.set_fact:
+        ansible_pass: "MY NEW PASS PHRASE'
+      
+
+
 - name: List exisiting software instances
   hosts: zos_host
   gather_facts: false
