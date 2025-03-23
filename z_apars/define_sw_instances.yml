@@ -7,7 +7,7 @@
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
     zmf_user: IBMUSER
-    zmf_password: 'MY PASS PHRASE'
+    #zmf_password: 'MY PASS PHRASE'
       
   tasks:
 
