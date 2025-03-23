@@ -4,13 +4,24 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    #zmf_host: itzvsi-zos-pejjzea.techzone.ibm.com
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: 'MY PASS PHRASE'
       
   tasks:
+
+    - name: generate random string
+      ansible.builtin.set_fact:
+        zmf_password: "{{ lookup('community.general.random_string', min_lower=1, min_upper=1, min_numeric=2, length=10) }}"
+      no_log: true
+      
+    - name: Execute the command(s) and return output.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - "ALTUSER IBMUSER PHRASE('{{ zmf_password }}') NOEXPIRE RESUME"
+
+
     - name: Define Db2_v12 software instance
       ansible.builtin.uri:
         url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
