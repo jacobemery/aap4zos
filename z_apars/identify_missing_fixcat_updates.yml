@@ -8,7 +8,7 @@
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
     zmf_user: IBMUSER
-    zmf_password: 'MY PASS PHRASE'
+    zmf_password: 'w6AF73xLy*'
     #swi_name: 'CICS'
     swi_name: "{{ swi_name_survey | default('CICS') }}"
 
