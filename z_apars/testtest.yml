@@ -9,12 +9,19 @@
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: "{{ ansible_pass }}"
+    user_id: "{{ ibmuser }}"
+    password: "{{ my pass phrase }}"
 
   tasks:
     - name: modify host variable
       ansible.builtin.set_fact:
         ansible_pass: "MY NEW PASS PHRASE'
 
+    - name: Do something with the credentials
+      debug:
+        msg: "Username: {{ user_id }}, Password: {{ password }}"
+
+        
 
     - name: Access a vault secret
       ansible.builtin.debug:
