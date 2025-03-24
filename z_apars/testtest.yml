@@ -26,17 +26,13 @@
         msg: "{{ mypassword }}"
         
 
-    - name: Access a vault secret
-      ansible.builtin.debug:
-        msg: "Vault secret: {{ lookup('ansible.builtin.vault', 'TESTVAULT') }}"
-
         
     - name: Get zosmf software instances
       ansible.builtin.uri:
         url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
         method: GET
         user: "{{ zmf_user | trim }}"
-        password: "{{ zmf_password | trim }}"
+        password: "{{ mypassword | trim }}"
         force_basic_auth: true
         headers:
           Host: "{{ zmf_host }}"
