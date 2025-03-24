@@ -18,8 +18,8 @@
         ansible_pass: "MY NEW PASS PHRASE'
 
     - name: Do something with the credentials
-      debug:
-        msg: "Username: {{ user_id }}, Password: {{ password }}"
+      ansible.builtin.debug:
+        msg: "{{ user_id }}"
 
         
 
