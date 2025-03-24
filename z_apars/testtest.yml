@@ -15,7 +15,7 @@
   tasks:
     - name: modify host variable
       ansible.builtin.set_fact:
-        ansible_pass: "MY NEW PASS PHRASE'
+        ansible_pass: "MY NEW PASS PHRASE"
 
     - name: Do something with the credentials
       ansible.builtin.debug:
