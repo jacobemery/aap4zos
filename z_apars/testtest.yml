@@ -9,8 +9,8 @@
     zmf_port: 10443
     zmf_user: IBMUSER
     zmf_password: "{{ ansible_pass }}"
-    user_id: "{{ ibmuser }}"
-    password: "{{ my pass phrase }}"
+    user_id: "{{ my_username }}"
+    mypassword: "{{ my_password }}"
 
   tasks:
     - name: modify host variable
