@@ -21,6 +21,9 @@
       ansible.builtin.debug:
         msg: "{{ user_id }}"
 
+    - name: Do something with the credentials
+      ansible.builtin.debug:
+        msg: "{{ mypassword }}"
         
 
     - name: Access a vault secret
