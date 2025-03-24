@@ -15,6 +15,11 @@
       ansible.builtin.set_fact:
         ansible_pass: "MY NEW PASS PHRASE'
 
+
+    - name: Access a vault secret
+      ansible.builtin.debug:
+        msg: "Vault secret: {{ lookup('ansible.builtin.vault', 'TESTVAULT') }}"
+
         
     - name: Get zosmf software instances
       ansible.builtin.uri:
