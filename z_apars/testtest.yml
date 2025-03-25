@@ -8,22 +8,22 @@
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
     zmf_user: IBMUSER
-    zmf_password: "{{ ansible_pass }}"
-    user_id: "{{ my_username }}"
-    mypassword: "{{ my_password }}"
+    #zmf_password: "{{ ansible_pass }}"
+    #user_id: "{{ my_username }}"
+    zmf_password: "{{ zos_passphrase }}"
 
   tasks:
     - name: modify host variable
       ansible.builtin.set_fact:
         ansible_pass: "MY NEW PASS PHRASE"
 
-    - name: Do something with the credentials
-      ansible.builtin.debug:
-        msg: "{{ user_id }}"
+   # - name: Do something with the credentials
+   #   ansible.builtin.debug:
+   #     msg: "{{ user_id }}"
 
     - name: Do something with the credentials
       ansible.builtin.debug:
-        msg: "{{ mypassword }}"
+        msg: "{{ zmf_password }}"
         
 
         
@@ -32,7 +32,7 @@
         url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
         method: GET
         user: "{{ zmf_user | trim }}"
-        password: "{{ mypassword | trim }}"
+        password: "{{ zmf_password | trim }}"
         force_basic_auth: true
         headers:
           Host: "{{ zmf_host }}"
