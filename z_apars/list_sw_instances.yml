@@ -11,6 +11,10 @@
 
   tasks:
 
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ zmf_password }}"
+
     - name: Get zosmf software instances
       ansible.builtin.uri:
         url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
