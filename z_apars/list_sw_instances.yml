@@ -4,11 +4,10 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    #zmf_host: itzvsi-zos-pejjzea.techzone.ibm.com
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
-    zmf_user: IBMUSER
-    zmf_password: "w6AF73xLy*"
+    zmf_user: "{{ ansible_user }}"
+    zmf_password: "{{ zos_passphrase }}"
 
   tasks:
 
