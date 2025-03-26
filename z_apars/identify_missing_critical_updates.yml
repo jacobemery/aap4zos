@@ -6,8 +6,8 @@
   vars:
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
-    zmf_user: IBMUSER
-    zmf_password: 'w6AF73xLy*'
+    zmf_user: "{{ ansible_user }}"
+    zmf_password: "{{ zos_passphrase }}"
     swi_name: "{{ swi_name_survey | default('CICS') }}"
 
   tasks:
@@ -32,13 +32,10 @@
       delegate_to: localhost
       ignore_errors: true
 
-
-
     - name: Pause for 5 seconds
       ansible.builtin.pause:
         seconds: 5
-
-
+        
     - name: Retrieve missing critical updates
       ansible.builtin.uri:
         url: "{{ critupdates.json.statusurl }}"
@@ -59,15 +56,5 @@
       ansible.builtin.debug:
         msg: "{{ critupdates_output.content }}"
 
-    - name: Filter on APARs
-      ansible.builtin.debug:
-        var: item
-      loop: "{{ critupdates_output.json | community.general.json_query('missingcriticalupdates[*].name') }}"
-      register: apars
-
-    - name: Display list
-      ansible.builtin.debug:
-       msg: "{{ apars }}"
       
-
 
