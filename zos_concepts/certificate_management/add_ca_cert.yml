@@ -132,3 +132,7 @@
         cmd: 'S IZUSVR1'
         wait_time_s: 15
 
+    - name: Print json to terminal
+      ansible.builtin.debug:
+        msg: "playbook completed"    
+
