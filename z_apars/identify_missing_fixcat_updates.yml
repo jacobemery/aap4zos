@@ -7,9 +7,8 @@
   vars:
     zmf_host: "{{ ansible_host }}"
     zmf_port: 10443
-    zmf_user: IBMUSER
-    zmf_password: 'w6AF73xLy*'
-    #swi_name: 'CICS'
+    zmf_user: "{{ ansible_user }}"
+    zmf_password: "{{ zos_passphrase }}"
     swi_name: "{{ swi_name_survey | default('CICS') }}"
 
   tasks:
