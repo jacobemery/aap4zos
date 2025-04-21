@@ -22,7 +22,7 @@
 
     - name: Print JCL.
       ansible.builtin.debug:
-        msg: "{{ db2_reorg.jobs[0].ddnames[1].content }}"
+        msg: "{{ db2_reorg.jobs[0].ddnames[3].content }}"
 
     - name: Print return code, job ID, and image copy dataset name.
       ansible.builtin.debug:
