@@ -1,6 +1,6 @@
 ---
 - name: Submit a console dump
-  hosts: all
+  hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
