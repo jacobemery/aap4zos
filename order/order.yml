@@ -15,6 +15,7 @@
         location: LOCAL
         src: templates/order.jcl.j2
         use_template: true
+        wait_time_s: 240
         encoding:
           from: UTF-8
           to: IBM-037
