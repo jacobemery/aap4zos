@@ -42,6 +42,6 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
-                    \nREJECT S({{ ptf }})."
+                    \nREJECT PTFS."
   tags: reject sysmod
   when: reject_check_result.ret_code.code <= 4
