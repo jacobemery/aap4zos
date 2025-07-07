@@ -23,7 +23,7 @@
     - name: FTP dump using template
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/AMAPDUPL.j2"
-        location: local
+        location: LOCAL
         use_template: true
         wait_time_s: 7200
       register: job_status
