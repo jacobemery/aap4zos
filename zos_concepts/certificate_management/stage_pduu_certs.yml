@@ -4,8 +4,6 @@
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
-  vars:
-    user_password: "{{ user_cert_password }}"
   tasks:
     - name: Pull DigiCert Global CA G2 Cert
       ansible.builtin.get_url:
