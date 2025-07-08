@@ -4,10 +4,10 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    dump_title: "Ansible Dump"
+    dump_title: "{{ user_dump_title }}"
     jobname: "*MASTER*"
     sdata: "(ALLNUC,PSA,SQA,CSA,LPA,TRT,LSQA,RGN)"
-    copy_ds_name: "IBMUSER.TEST.DUMP3"
+    copy_ds_name: "{{ user_dump_dataset }}"
 
   tasks:
     - name: Get system name
