@@ -1,6 +1,6 @@
 //FIXUPDT  JOB (ACCT),REGION=0M
 //RECEIVE  EXEC PGM=GIMSMP
-//SMPCSI   DD DSN=SMPE.PROGPROD.CSI,DISP=SHR
+//SMPCSI   DD DSN=SMPE.ZOS25.CSI,DISP=SHR
 //SMPNTS   DD PATH='/var/smpe/smpnts',PATHDISP=KEEP
 //SMPOUT   DD SYSOUT=*
 //SMPRPT   DD SYSOUT=*
@@ -12,9 +12,9 @@
               ORDERSERVER(ORDRSRVR)
               CLIENT(CLNTINFO)
               CONTENT(
-                PTFS(UI94550)
+                PTFS(UJ96006)
               )
-              FORTGTZONES(CICS61T)
+              FORTGTZONES(TGT25)
             ).
 /*
 //ORDRSRVR DD *
