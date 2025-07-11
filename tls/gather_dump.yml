@@ -3,13 +3,25 @@
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
-  vars:
-    dump_title: "{{ user_dump_title }}"
-    jobname: "*MASTER*"
-    sdata: "(ALLNUC,PSA,SQA,CSA,LPA,TRT,LSQA,RGN)"
-    copy_ds_name: "{{ user_dump_dataset }}"
+  vars_prompt:
+    - name: dump_title
+      prompt: "Please enter the name of this dump"
+      private: false
 
   tasks:
+
+    - name: Set jobname
+      ansible.builtin.set_fact:
+        jobname: "*MASTER*"
+
+    - name: Set data areas included in dump
+      ansible.builtin.set_fact:
+        sdata: "(ALLNUC,PSA,SQA,CSA,LPA,TRT,LSQA,RGN)"
+
+    - name: Set dataset name
+      ansible.builtin.set_fact:
+        copy_ds_name: "IBMUSER.DUMP.P{{ 9999999 | ansible.builtin.random }}.TECH.ZONE"
+
     - name: Get system name
       ansible.builtin.command: uname -n
       register: result
