@@ -20,7 +20,7 @@
 
     - name: Set dataset name
       ansible.builtin.set_fact:
-        copy_ds_name: "IBMUSER.DUMP.P{{ 9999999 | ansible.builtin.random }}.TECH.ZONE"
+        copy_ds_name: "IBMUSER.DUMP.P{{ 9999999 | ansible.builtin.random }}"
 
     - name: Get system name
       ansible.builtin.command: uname -n
