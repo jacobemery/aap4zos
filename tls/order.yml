@@ -14,8 +14,8 @@
         encoding:
           from: UTF-8
           to: IBM-037
-      register: order
+      register: orderjob
 
     - name: Print JCL.
       ansible.builtin.debug:
-        msg: "{{ order.content }}"
+        msg: "{{ orderjob.content }}"
