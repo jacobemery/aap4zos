@@ -21,7 +21,7 @@
       - dd_input:
           dd_name: "SMPCNTL"
           content: " SET  BOUNDARY({{zone}}) .
-                    \nREJECT CHECK S({{ ptf }})."
+                    \nREJECT CHECK PTFS."
   register: reject_check_result
 
 # REJECT a SYSMOD
