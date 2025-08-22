@@ -4,12 +4,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
-
-
-#    - name: modify jobclass(a) to allow job submit
-#      ibm.ibm_zos_core.zos_operator:
-#        cmd: '\$tjobclass(a),syssym=allow'
-
+  
     - name: Order jcl.
       ibm.ibm_zos_core.zos_job_submit:
         location: LOCAL
