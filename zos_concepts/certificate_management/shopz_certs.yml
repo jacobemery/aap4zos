@@ -60,6 +60,12 @@
         state: directory
         mode: '600'    
 
+    - name: create smpwkdir directory
+      ansible.builtin.file:
+        path: /var/smpe/smpwkdir
+        state: directory
+        mode: '600'
+    
     - name: Setup RACF permissions and keyrings
       ibm.ibm_zos_core.zos_tso_command:
         commands:
