@@ -209,3 +209,12 @@
     - name: Print JCL.
       ansible.builtin.debug:
         msg: "{{ applyjob.content }}"
+
+
+    - name: Submit z/OS operator command.
+      zos_operator:
+        cmd: "F LLA,REFRESH"
+        wait_time_s: "{{ wait_time_s }}"
+        verbose: "{{ verbose }}"
+      no_log: true
+      register: result_zos_operator
