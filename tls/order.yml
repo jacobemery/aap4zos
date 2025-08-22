@@ -18,4 +18,4 @@
 
     - name: Print JCL.
       ansible.builtin.debug:
-        msg: "{{ order.jobs[0].content }}"
+        msg: "{{ order.content }}"
