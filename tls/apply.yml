@@ -5,11 +5,6 @@
   environment: "{{ environment_vars }}"
   tasks:
 
-
-#    - name: modify jobclass(a) to allow job submit
-#      ibm.ibm_zos_core.zos_operator:
-#        cmd: '\$tjobclass(a),syssym=allow'
-
     - name: Apply jcl.
       ibm.ibm_zos_core.zos_job_submit:
         location: LOCAL
@@ -19,8 +14,8 @@
         encoding:
           from: UTF-8
           to: IBM-037
-      register: order
+      register: applyjob
 
     - name: Print JCL.
       ansible.builtin.debug:
-        msg: "{{ order.jobs[0].content }}"
+        msg: "{{ applyjob.content }}"
