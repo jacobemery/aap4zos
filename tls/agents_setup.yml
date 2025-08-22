@@ -177,3 +177,19 @@
           - RACDCERT ID(IBMUSER) LISTRING(pduu)
           - SETROPTS CLASSACT(DIGTCERT DIGTRING)
           - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
+
+
+    - name: Order jcl.
+      ibm.ibm_zos_core.zos_job_submit:
+        location: LOCAL
+        src: templates/order.jcl.j2
+        use_template: true
+        wait_time_s: 1000
+        encoding:
+          from: UTF-8
+          to: IBM-037
+      register: orderjob
+
+    - name: Print JCL.
+      ansible.builtin.debug:
+        msg: "{{ orderjob.content }}"
