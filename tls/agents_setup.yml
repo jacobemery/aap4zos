@@ -214,7 +214,7 @@
     - name: Submit z/OS operator command.
       zos_operator:
         cmd: "F LLA,REFRESH"
-        wait_time_s: "{{ wait_time_s }}"
-        verbose: "{{ verbose }}"
+        wait_time_s: 1
+        verbose: false
       no_log: true
       register: result_zos_operator
