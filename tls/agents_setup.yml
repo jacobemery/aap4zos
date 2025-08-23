@@ -194,7 +194,7 @@
 
     - name: Print JCL.
       ansible.builtin.debug:
-        msg: "{{ orderjob.content }}"
+        msg: "{{ orderjob }}"
 
 
     - name: Apply jcl.
@@ -210,7 +210,7 @@
 
     - name: Print JCL.
       ansible.builtin.debug:
-        msg: "{{ applyjob.content }}"
+        msg: "{{ applyjob }}"
 
 
     - name: Submit z/OS operator command.
