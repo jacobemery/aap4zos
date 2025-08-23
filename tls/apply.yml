@@ -2,6 +2,8 @@
 - name: Apply AMAPDUPL PTF.
   hosts: zos_host
   gather_facts: false
+  collections:
+    - ibm.ibm_zos_core
   environment: "{{ environment_vars }}"
   tasks:
 
