@@ -200,11 +200,6 @@
           to: IBM-037
       register: orderjob
 
-    - name: Print JCL.
-      ansible.builtin.debug:
-        msg: "{{ orderjob }}"
-
-
     - name: Apply jcl.
       ibm.ibm_zos_core.zos_job_submit:
         location: LOCAL
@@ -215,11 +210,6 @@
           from: UTF-8
           to: IBM-037
       register: applyjob
-
-    - name: Print JCL.
-      ansible.builtin.debug:
-        msg: "{{ applyjob }}"
-
 
     - name: Submit z/OS operator command.
       zos_operator:
