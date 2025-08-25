@@ -5,7 +5,7 @@
   tasks:
   - copy:
       dest: /u/ibmuser/userCert.p12
-      content: '{{ shopz_server_cert_base64 | b64decode }}'
+      content: '{{ shopz_cert | b64decode }}'
   - shell:
       cmd: cat /u/ibmuser/userCert.p12
     register: shopzout
