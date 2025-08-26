@@ -4,10 +4,10 @@
   gather_facts: no
   tasks:
   - copy:
-      dest: /u/ibmuser/userCert.p12
+      dest: ~/userCert.p12
       content: '{{ shopz_cert | b64decode }}'
   - shell:
-      cmd: cat /u/ibmuser/userCert.p12
+      cmd: cat ~/userCert.p12
     register: shopzout
       
 - name: setup for shopz & pduu
@@ -53,13 +53,12 @@
           type: SEQ
           record_format: VB
 
-    - name: Copy ShopZ userCert from USS to dataset
+    - name: Copy local shopz cert file to z/OS dataset
       ibm.ibm_zos_core.zos_copy:
-        src: /u/ibmuser/userCert.p12
+        src: ~/userCert.p12
         dest: IBMUSER.COMMON.SHOPZ
         force: true
         is_binary: true
-        remote_src: true
         dest_data_set:
           type: SEQ
           record_format: VB
