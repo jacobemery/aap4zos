@@ -1,4 +1,4 @@
-- name: setup for shopz & pduu
+- name: delete existing smp/e file in /var/smpe/smpnts
   hosts: zos_host
   collections:
     - ibm.ibm_zos_core
