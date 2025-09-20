@@ -11,7 +11,7 @@
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "SMPE.PROGPROD.GLOBAL"
+          data_set_name: "SMPE.PROGPROD.CSI"
           disposition: old
 
       - dd_output:
@@ -20,19 +20,19 @@
             type: text
       - dd_input:
           dd_name: "SMPCNTL"
-          content: " SET  BOUNDARY({{zone}}) .
+          content: " SET  BOUNDARY(GLOBAL) .
                     \nREJECT CHECK PTFS."
   register: reject_check_result
 
 # REJECT a SYSMOD
-- name: "REJECT SYSMOD {{ ptf }}"
+- name: "REJECT ALL RECEIVED-ONLY SYSMODS"
   ibm.ibm_zos_core.zos_mvs_raw:
     pgm: GIMSMP
     auth: "yes"
     dds:
       - dd_data_set:
           dd_name: "SMPCSI"
-          data_set_name: "{{ global_csi }}"
+          data_set_name: "SMPE.PROGPROD.CSI"
           disposition: old
 
       - dd_output:
@@ -41,7 +41,7 @@
             type: text
       - dd_input:
           dd_name: "SMPCNTL"
-          content: " SET  BOUNDARY({{zone}}) .
+          content: " SET  BOUNDARY(GLOBAL) .
                     \nREJECT PTFS
                     \nAPARS
                     \nFUNCTIONS
