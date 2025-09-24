@@ -1,0 +1,195 @@
+---
+- name: Submit a console dump
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars_prompt:
+    - name: dump_title
+      prompt: "Please enter the name of this dump"
+      private: false
+
+  tasks:
+
+    - name: Set jobname
+      ansible.builtin.set_fact:
+        jobname: "*MASTER*"
+
+    - name: Set data areas included in dump
+      ansible.builtin.set_fact:
+        sdata: "(ALLNUC,PSA,SQA,CSA,LPA,TRT,LSQA,RGN)"
+
+    - name: Set dataset name
+      ansible.builtin.set_fact:
+        copy_ds_name: "IBMUSER.DUMP.P{{ 9999999 | ansible.builtin.random }}"
+
+    - name: Get system name
+      ansible.builtin.command: uname -n
+      register: result
+      changed_when: true
+
+    - name: Set system_name for use later
+      ansible.builtin.set_fact:
+        system_name: "{{ result.stdout }}"
+
+    - name: Check dump dataset status
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "D D,S"
+      register: dump_status
+
+    - name: Register dump info
+      ansible.builtin.set_fact:
+        automatic_alloc: "{{ (dump_status.content |
+          regex_search('AUTOMATIC ALLOCATION IS: (\\w+)', '\\1') | first) }}"
+        avail_data_sets: "{{ (dump_status.content |
+          regex_search('DATA SETS AVAILABLE=(\\d{3})', '\\1') | first) }}"
+      when: dump_status is defined
+
+    - name: Check MAXSPACE
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "D D,O"
+      register: dump_options
+
+    - name: Register MAXSPACE
+      ansible.builtin.set_fact:
+        maxspace: "{{ dump_options.content |
+          regex_findall('MAXSPACE=(\\d{8})', '\\1') | first }}"
+      when: dump_options is defined
+
+    - name: Stop playbook if dynamic is inactive AND no datatsets available
+      ansible.builtin.fail:
+        msg: "Cannot continue, automatic allocation is INACTIVE and no dump datasets available"
+      when: automatic_alloc == "INACTIVE" and avail_data_sets | int == 0
+
+    - name: Issue DUMP command
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "DUMP COMM=('{{ dump_title }}')"
+      register: dump_result
+      when: automatic_alloc == "ACTIVE" or avail_data_sets | int >= 1
+
+    - name: Check for reply message
+      ibm.ibm_zos_core.zos_operator_action_query:
+        system: "{{ system_name }}"
+      register: actionable_messages
+      when: dump_result is defined and not dump_result.failed
+
+    - name: Filter query for IEE094D
+      ansible.builtin.set_fact:
+        action_found: "{{ actionable_messages | ibm.ibm_zos_core.filter_wtor_messages('IEE094D SPECIFY OPERAND') }}"
+      when: actionable_messages is defined and not actionable_messages.failed
+
+    - name: Get reply number
+      ansible.builtin.set_fact:
+        reply_num: "{{ action_found[0].number }}"
+      when: action_found is defined and (action_found | length == 1)
+
+    - name: Reply to command with options
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "{{ reply_num }},JOBNAME={{ jobname }},SDATA={{ sdata }},END"
+      register: end_dump_response
+      when: reply_num is defined
+
+    - name: Check if dump was captured by looking for IEA794I
+      ansible.builtin.shell: |
+        pcon -r |
+        grep -A 1 'IEA794I' |
+        tail -n 2
+      register: dump_captured
+      until: "'DUMPID' in dump_captured.stdout"
+      retries: 60 # Maximum attempts
+      delay: 30   # Wait 30 seconds between retries
+      changed_when: true
+      when: end_dump_response is defined and not end_dump_response.failed
+
+    - name: Get DUMPID from 794I
+      ansible.builtin.set_fact:
+        captured_id: "{{ (dump_captured.stdout | regex_search('DUMPID=(\\d{3})', '\\1') | first) }}"
+      when: dump_captured is defined and not dump_captured.failed
+
+    # Change this grep to only care about two lines possibly
+    - name: Check if the dump was written by looking for IEA611I or IEA911E
+      ansible.builtin.shell: |
+        pcon -r |
+        grep -A 2 -E 'IEA611I|IEA911E|IEA799I' |
+        tail -n 3
+      register: dump_written
+      until: "'DUMPID=' + captured_id in dump_written.stdout"
+      retries: 60  # Maximum attempts
+      delay: 30     # Wait 30 seconds between retries
+      changed_when: true
+      when: dump_captured is defined and not dump_captured.failed
+
+    - name: No dump datasets available
+      ansible.builtin.fail:
+        msg: "Cannot continue, no dump datasets available. Unable to continue. Please respond to IEA793A message."
+      when: dump_written.stdout.find("IEA799I") != -1
+
+    - name: Find SDRSN when it is a partial dump
+      ansible.builtin.shell: |
+        pcon -r |
+        grep 'SDRSN =' |
+        tail -n 1
+      register: sdrsn_all
+      when: dump_written.stdout.find("PARTIAL") != -1
+
+    # Change this logic to do a grep for SDRSN when partial? Then do regex to get value and rest should be similar
+    - name: Get SDRSN when it is a partial dump
+      ansible.builtin.set_fact:
+        sdrsn: "{{ sdrsn_all.stdout | regex_search('SDRSN\\s*=\\s*(.*)', '\\1') | first }}"
+      when: dump_written.stdout.find("PARTIAL") != -1 and sdrsn_all is defined
+
+    - name: SDRSN words to List
+      ansible.builtin.set_fact:
+        sdrsn_list: "{{ sdrsn.split(' ') }}"
+      when: dump_written.stdout.find("PARTIAL") != -1
+
+    - name: Convert each list item to bits
+      ansible.builtin.set_fact:
+        sdrsn_bits: "{{ sdrsn_bits | default([]) + ['{:0>32b}'.format(item | int(base=16))] }}"
+      with_items: "{{ sdrsn_list }}"
+      when: dump_written.stdout.find("PARTIAL") != -1
+
+    - name: Output SDRSDFUL issue if present
+      ansible.builtin.debug:
+        msg: Partial dump because dump dataset was full. Consider allocating a larger dump dataset
+      when: dump_written.stdout.find("PARTIAL") != -1 and sdrsn_bits[2][4] == "1"  # SDRSDFUL is the 5th bit of the second word
+
+    - name: Output MAXSPACE issue if present
+      ansible.builtin.debug:
+        msg: |
+          Partial dump due to MAXSPACE setting of {{ maxspace }}M
+          You may change this setting by issuing CD SET,SDUMP,MAXSPACE=nnnnnnnnM
+      when: dump_written.stdout.find("PARTIAL") != -1 and sdrsn_bits[2][15] == "1" # The MAXSPACE bit is the 16th bit of the second word
+
+    # Add output for SDRSN, that it was partial, and IEA611I/911E
+    - name: Output SDRSN if partial and not one of our existing checks
+      ansible.builtin.debug:
+        msg: |
+          Dump is partial for unknown reason.
+          SDRSN: {{ sdrsn }}
+      when: dump_written.stdout.find("PARTIAL") != -1 and sdrsn_bits[2][4] == "0" and sdrsn_bits[2][15] == "0"
+
+    - name: Get dump name
+      ansible.builtin.set_fact:
+        dump_name: "{{ dump_written.stdout_lines[0].split()[10] }}"
+      when: dump_written is defined and not dump_written.failed
+
+    # Output complete dump taken
+    - name: Output complete dump finished
+      ansible.builtin.debug:
+        msg: |
+          Complete dump taken and available on {{ dump_name }}
+      when: dump_written.stdout.find("COMPLETE") != -1
+
+    - name: Copy dump dataset to a temp dataset
+      ibm.ibm_zos_core.zos_copy:
+        src: "{{ dump_name }}"
+        dest: "{{ copy_ds_name }}"
+        remote_src: true
+        force: true
+      register: copy_result
+      when: dump_name is defined
+
+# Add output for successful/failed copy
+    - name: Successful copy
+      ansible.builtin.debug:
+        var: copy_result
