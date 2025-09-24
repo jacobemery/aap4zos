@@ -8,10 +8,6 @@
       prompt: Please enter the title of the dump
       private: false
 
-    - name: jobname
-      prompt: Please enter the jobname(s) to be include in the dump
-      private: false
-
     - name: sdata
       prompt: Please enter the SDATA parameters
       private: false
@@ -21,6 +17,12 @@
       private: false
 
   tasks:
+    
+    - name: Set jobname
+      ansible.builtin.set_fact:
+        jobname: "*MASTER*"
+    
+    
     - name: Get system name
       ansible.builtin.command: uname -n
       register: result
