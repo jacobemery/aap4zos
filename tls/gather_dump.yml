@@ -5,23 +5,24 @@
   environment: "{{ environment_vars }}"
   vars_prompt:
     - name: dump_title
-      prompt: "Please enter the name of this dump"
+      prompt: Please enter the title of the dump
+      private: false
+
+    - name: sdata
+      prompt: Please enter the SDATA parameters
+      private: false
+
+    - name: copy_ds_name
+      prompt: Please enter the name of the dataset to copy the dump into
       private: false
 
   tasks:
-
+    
     - name: Set jobname
       ansible.builtin.set_fact:
         jobname: "*MASTER*"
-
-    - name: Set data areas included in dump
-      ansible.builtin.set_fact:
-        sdata: "(ALLNUC,PSA,SQA,CSA,LPA,TRT,LSQA,RGN)"
-
-    - name: Set dataset name
-      ansible.builtin.set_fact:
-        copy_ds_name: "IBMUSER.DUMP.P{{ 9999999 | ansible.builtin.random }}"
-
+    
+    
     - name: Get system name
       ansible.builtin.command: uname -n
       register: result
@@ -80,11 +81,11 @@
     - name: Get reply number
       ansible.builtin.set_fact:
         reply_num: "{{ action_found[0].number }}"
-      when: action_found is defined and (action_found | length == 1)
+      when: action_found is defined
 
     - name: Reply to command with options
       ibm.ibm_zos_core.zos_operator:
-        cmd: "{{ reply_num }},JOBNAME={{ jobname }},SDATA={{ sdata }},END"
+        cmd: "{{ reply_num }},TSONAME={{ jobname }},SDATA={{ sdata }},END"
       register: end_dump_response
       when: reply_num is defined
 
@@ -105,7 +106,6 @@
         captured_id: "{{ (dump_captured.stdout | regex_search('DUMPID=(\\d{3})', '\\1') | first) }}"
       when: dump_captured is defined and not dump_captured.failed
 
-    # Change this grep to only care about two lines possibly
     - name: Check if the dump was written by looking for IEA611I or IEA911E
       ansible.builtin.shell: |
         pcon -r |
@@ -129,9 +129,9 @@
         grep 'SDRSN =' |
         tail -n 1
       register: sdrsn_all
+      changed_when: true
       when: dump_written.stdout.find("PARTIAL") != -1
 
-    # Change this logic to do a grep for SDRSN when partial? Then do regex to get value and rest should be similar
     - name: Get SDRSN when it is a partial dump
       ansible.builtin.set_fact:
         sdrsn: "{{ sdrsn_all.stdout | regex_search('SDRSN\\s*=\\s*(.*)', '\\1') | first }}"
@@ -173,13 +173,6 @@
         dump_name: "{{ dump_written.stdout_lines[0].split()[10] }}"
       when: dump_written is defined and not dump_written.failed
 
-    # Output complete dump taken
-    - name: Output complete dump finished
-      ansible.builtin.debug:
-        msg: |
-          Complete dump taken and available on {{ dump_name }}
-      when: dump_written.stdout.find("COMPLETE") != -1
-
     - name: Copy dump dataset to a temp dataset
       ibm.ibm_zos_core.zos_copy:
         src: "{{ dump_name }}"
@@ -189,7 +182,14 @@
       register: copy_result
       when: dump_name is defined
 
-# Add output for successful/failed copy
-    - name: Successful copy
+    - name: Complete dump and successful copy
       ansible.builtin.debug:
-        var: copy_result
+        msg: |
+          Complete dump successfully copied to {{ copy_ds_name }}
+      when: not copy_result.failed and dump_written.stdout.find("COMPLETE") != -1
+
+    - name: Partial dump and successful copy
+      ansible.builtin.debug:
+        msg: |
+          Partial dump successfully copied to {{ copy_ds_name }}
+      when: not copy_result.failed and dump_written.stdout.find("PARTIAL") != -1
