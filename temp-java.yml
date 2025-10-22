@@ -1,1 +1,10 @@
-# this is a test
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Pull Java pax file
+      ansible.builtin.get_url:
+        url: https://ibm.box.com/shared/static/jdj6ji726dgz3uozj5u0xn8pffiky5v0.z
+        dest: ~/ibm-semeru-certified-jdk_s390x_zos_17.0.15.0.pax.Z
