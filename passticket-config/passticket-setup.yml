@@ -1,1 +1,68 @@
+---
+- name: Setup passticket support
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+  
+    - name: Add 'UGROUP' RACF group
+      ibm.ibm_zos_core.zos_tso_command:
+        command: AG UGROUP OMVS(GID(0) SHARED)
 
+    - name: SETROPTS PTKTDATA
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS CLASSACT(PTKTDATA) RACLIST(PTKTDATA) GENERIC(PTKTDATA)
+
+    - name: SETROPTS IDIDMAP
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS CLASSACT(IDIDMAP) RACLIST(IDIDMAP) GENERIC(IDIDMAP)
+
+    - name: Define ROOT CA Certificate to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.ROOTCA') WITHLABEL('ROOTCA') TRUST
+
+    - name: Define Intermediate Certificate to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.INTCERT') WITHLABEL('INTERCERT') TRUST
+
+    - name: Define Server/PKCS12 dataset to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('{{ zos_cert_p12_password }}')
+
+    - name: Issue a SETROPTS REFRESH to initialize changes
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+
+    - name: Verify the certificate chain is complete
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) LISTCHAIN(LABEL('SERVERCERT'))
+
+    - name: Connect ROOT CA certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(CERTAUTH LABEL('ROOTCA') RING(ZOSMF_RING))
+
+    - name: Connect Intermediate certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(CERTAUTH LABEL('INTERCERT') RING(ZOSMF_RING))
+
+    - name: Connect Server/PKCS12 certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(LABEL('SERVERCERT') RING(ZOSMF_RING) DEFAULT)
+
+    - name: Issue a SETROPTS REFRESH to initialize changes
+      ibm.ibm_zos_core.zos_tso_command:
+        command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+
+
+    - name: STOP z/OSMF Started task
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'P IZUSVR1'
+
+    - name: START z/OSMF Started task
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'S IZUSVR1'
+        wait_time_s: 15
+
+    - name: Print json to terminal
+      ansible.builtin.debug:
+        msg: "playbook completed"    
