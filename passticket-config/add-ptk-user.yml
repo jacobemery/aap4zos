@@ -17,7 +17,12 @@
           #- "CO ({{ new_userid }}) GROUP(OMVSGRP)"
         max_rc: 4
 
+    #- name: MODIFY IKJTSO00 member of SYS1.PARMLIB to include a line for RACMAP command in AUTHCMD
+    #- name: Operator command to run: SET IKJTSO=00
+
     - name: Map identity to email address
       ibm.ibm_zos_core.zos_tso_command:
         command: "RACMAP ID({{ new_userid }}) MAP USERDIDFILTER(NAME('{{ new_email }}')) REGISTRY(NAME('ldaps://bluepages.ibm.com')) WITHLABEL('{{ new_userid }} ON BLUEPAGES')"
         max_rc: 4
+
+    #- name: STERPTS COMMAND TO TAKE AFFECT
