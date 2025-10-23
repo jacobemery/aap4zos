@@ -13,8 +13,8 @@
           - "ALU {{ new_userid }} PASSWORD({{ new_password }}) OMVS(UID(0) SHARED)"
           - "CO ({{ new_userid }}) GROUP(IZUADMIN)"
           #- "CO ({{ new_userid }}) GROUP(WLMGRP)"
-          #- "CO ({{ new_userid }}) GROUP(CFZADMGP)"
-          - "CO ({{ new_userid }}) GROUP(OMVSGRP)"
+          - "CO ({{ new_userid }}) GROUP(CFZADMGP)"
+          #- "CO ({{ new_userid }}) GROUP(OMVSGRP)"
         max_rc: 4
 
     - name: Map identity to email address
