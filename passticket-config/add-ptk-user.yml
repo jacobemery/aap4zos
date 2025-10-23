@@ -8,16 +8,16 @@
     - name: Add new userID and connect to groups
       ibm.ibm_zos_core.zos_tso_command:
         commands: 
-          - "AU '{{ new_userid }}' DFLTGRP(UGROUP) TSO(ACCTNUM(*) PROC(IZUFPROC) SIZE(2096128))"
-          - "PW USER('{{ new_userid }}') NOINTERVAL"
-          - "ALU '{{ new_userid }}' PASSWORD('{{ new_password }}') OMVS(UID(0) SHARED)"
-          - "CO ('{{ new_userid }}') GROUP(IZUADMIN)"
-          - "CO ('{{ new_userid }}') GROUP(WLMGRP)"
-          - "CO ('{{ new_userid }}') GROUP(CFZADMGP)"
-          - "CO ('{{ new_userid }}') GROUP(OMVSGRP)"
+          - "AU {{ new_userid }} DFLTGRP(UGROUP) TSO(ACCTNUM(*) PROC(IZUFPROC) SIZE(2096128))"
+          - "PW USER({{ new_userid }}) NOINTERVAL"
+          - "ALU {{ new_userid }} PASSWORD({{ new_password }}) OMVS(UID(0) SHARED)"
+          - "CO ({{ new_userid }}) GROUP(IZUADMIN)"
+          - "CO ({{ new_userid }}) GROUP(WLMGRP)"
+          - "CO ({{ new_userid }}) GROUP(CFZADMGP)"
+          - "CO ({{ new_userid }}) GROUP(OMVSGRP)"
         max_rc: 4
 
     - name: Map identity to email address
       ibm.ibm_zos_core.zos_tso_command:
-        command: "RACMAP ID('{{ new_userid }}') MAP USERDIDFILTER(NAME('{{ new_email }}')) REGISTRY(NAME('ldaps://bluepages.ibm.com')) WITHLABEL('{{ new_userid }} ON BLUEPAGES')"
+        command: "RACMAP ID({{ new_userid }}) MAP USERDIDFILTER(NAME('{{ new_email }}')) REGISTRY(NAME('ldaps://bluepages.ibm.com')) WITHLABEL('{{ new_userid }} ON BLUEPAGES')"
         max_rc: 4
