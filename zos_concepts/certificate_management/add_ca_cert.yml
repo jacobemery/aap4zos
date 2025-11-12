@@ -77,10 +77,12 @@
     - name: Delete existing Server cert in RACF keyring (ZOSMF_RING).
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT REMOVE(ID(IZUSVR) LABEL('VS01zOSMFCert') RING(ZOSMF_RING)) ID(IZUSVR)
+        max_rc: 4
 
     - name: Delete existing CA cert in RACF keyring (ZOSMF_RING).
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT REMOVE(CERTAUTH LABEL('VSICA') RING(ZOSMF_RING)) ID(IZUSVR)
+        max_rc: 4
 
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
