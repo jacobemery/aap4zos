@@ -4,8 +4,6 @@
   environment: "{{ environment_vars }}"
   gather_facts: false
   tasks:
-    - name: Ping z/OS
-      ibm.ibm_zos_core.zos_ping:
 
     - name: Gather z/OS specific gather_facts.
       ibm.ibm_zos_core.zos_gather_facts:
@@ -32,46 +30,10 @@
 
     - name: Submit JCL.
       ibm.ibm_zos_core.zos_job_submit:
-        src: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
+        src: "{{ playbook_dir }}/zos_concepts/jobs/submit_query_retrieve/files/{{ job_name | upper }}.jcl"
         location: LOCAL
         wait_time_s: 60
         encoding:
           from: ISO8859-1
           to: IBM-037
       register: job_submit
-
-    # - name: Set facts used in this playbook based on results.
-    #   ansible.builtin.set_fact:
-    #     submit_job_name: "{{ job_submit.jobs[0].job_name }}"
-    #     submit_job_id: "{{ job_submit.jobs[0].job_id }}"
-    #     submit_jobs_ddnames_length: "{{ job_submit.jobs[0].ddnames | length }}"
-    #     submit_job_ddnames_list: "{{ job_submit.jobs[0].ddnames }}"
-    #     submit_job_list: "{{ job_submit.jobs[0] }}"
-    #     submit_job_ret_code: "{{ job_submit.jobs[0].ret_code.code }}"
-    #     submit_job_ret_code_msg: "{{ job_submit.jobs[0].ret_code.msg }}"
-    #     submit_job_subsystem: "{{ job_submit.jobs[0].subsystem }}"
-
-    # - name: Print results for job {{ submit_job_name }}
-    #   ansible.builtin.debug:
-    #     msg:
-    #       - Job name={{ submit_job_name }}
-    #       - Subsystem={{ submit_job_subsystem }}
-    #       - Job ID={{ submit_job_id }}
-    #       - DD Count={{ submit_jobs_ddnames_length }}
-    #       - "{{ submit_job_ddnames_list }}"
-    #       - "{{ submit_job_list }}"
-    #       - Return Code={{ submit_job_ret_code }}
-    #       - Return Code Message={{ submit_job_ret_code_msg }}
-
-    # - name: Get job output for job ID {{ submit_job_id }}
-    #   ibm.ibm_zos_core.zos_job_output:
-    #     job_id: "{{ submit_job_id }}"
-    #   register: job_output_result
-
-    # - name: "Result for get job output for job ID {{ submit_job_id }}"
-    #   ansible.builtin.debug:
-    #     msg: "{{ job_output_result }}"
-
-    # - name: Debug return code variable.
-    #   ansible.builtin.debug:
-    #     var: job_submit.jobs[0].ret_code.code
