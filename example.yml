@@ -14,6 +14,7 @@
     - name: Print gathered facts.
       ansible.builtin.debug:
         msg: "{{ zos_facts }}"
+      verbosity: 1
 
     - name: Execute USS command.
       ansible.builtin.command:
