@@ -1,0 +1,219 @@
+---
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - copy:
+      dest: ~/userCert.p12
+      content: '{{ shopz_cert | b64decode }}'
+  - shell:
+      cmd: cat ~/userCert.p12
+    register: shopzout
+      
+- name: setup for shopz & pduu
+  hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+    - name: Pull G2 root certificate and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem?_gl=1*n786pk*_gcl_au*NDc4NzU4NDQ5LjE3NDA0Mjg4MDI.
+        dest: /u/ibmuser/g2.pem
+        mode: '600'
+        validate_certs: false
+      register: get_g2_digicert
+      
+    - name: Create sequential data set from g2 cert in USS.
+      ibm.ibm_zos_core.zos_copy: 
+        src: /u/ibmuser/g2.pem
+        dest: IBMUSER.COMMON.G2CERT
+        force: true
+        remote_src: true
+        dest_data_set: 
+          type: SEQ
+          record_format: VB
+ 
+    - name: Pull root CA certificate content and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem?_gl=1*ea16w5*_gcl_au*NDc4NzU4NDQ5LjE3NDA0Mjg4MDI
+        dest: /u/ibmuser/digicert.pem
+        mode: '600'
+        validate_certs: false
+      register: get_root_ca_digicert
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/digicert.pem
+        dest: IBMUSER.COMMON.DIGICA
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: Copy local shopz cert file to z/OS dataset
+      ibm.ibm_zos_core.zos_copy:
+        src: ~/userCert.p12
+        dest: IBMUSER.COMMON.SHOPZ
+        force: true
+        is_binary: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: create smpe directory
+      ansible.builtin.file:
+        path: /var/smpe/smpnts
+        state: directory
+        mode: '600'    
+
+    - name: create smpwkdir directory
+      ansible.builtin.file:
+        path: /var/smpe/smpwkdir
+        state: directory
+        mode: '600'
+    
+    - name: Setup RACF permissions and keyrings
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RDEFINE FACILITY IRR.DIGTCERT.ADD UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.ADDRING  UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.ALTER    UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.CONNECT  UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.LIST     UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.LISTRING UACC(NONE)
+          - PERMIT IRR.DIGTCERT.ADD CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.ADDRING  CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.ALTER    CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.CONNECT  CLASS(FACILITY) ID(IBMUSER) ACCESS(UPDATE)
+          - PERMIT IRR.DIGTCERT.LIST     CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - RACDCERT ID(IBMUSER) ADDRING(SMPERING)
+        max_rc: 4
+
+    - name: Define certificates to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - "RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{ user_password }}') TRUST"
+          - RACDCERT CERTAUTH ADD('IBMUSER.COMMON.G2CERT') WITHLABEL('DigiCert Global Root G2') TRUST
+          - RACDCERT CERTAUTH ADD('IBMUSER.COMMON.DIGICA') WITHLABEL('DigiCert Global Root CA') TRUST
+
+    - name: Connect certs to Key Ring and SETROPTS
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID(IBMUSER) CONNECT(LABEL('SMPE Client Certificate') RING(SMPERING) USAGE(CERTAUTH) )
+          - RACDCERT ID(IBMUSER) CONNECT( CERTAUTH LABEL('DigiCert Global Root G2') RING(SMPERING) USAGE(CERTAUTH) )
+          - RACDCERT ID(IBMUSER) CONNECT( CERTAUTH LABEL('DigiCert Global Root CA') RING(SMPERING) USAGE(CERTAUTH) )
+          - RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root G2'))
+          - RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root CA'))
+          - RACDCERT ID(IBMUSER) LIST(LABEL('SMPE Client Certificate'))
+          - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+          - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
+
+    - name: Pull DigiCert Global CA G2 Cert
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalCAG2.crt.pem?_gl=1*1ng682l*_gcl_au*MzYzODYyMDk0LjE3NTE5MTgyMjY.
+        dest: /u/ibmuser/pduug2.pem
+        mode: '600'
+        validate_certs: false
+      register: get_g2_digicert_pduu
+      
+    - name: Create sequential data set from g2 cert in USS.
+      ibm.ibm_zos_core.zos_copy: 
+        src: /u/ibmuser/pduug2.pem
+        dest: IBMUSER.PDUU.G2CERT
+        force: true
+        remote_src: true
+        dest_data_set: 
+          type: SEQ
+          record_format: VB
+ 
+    - name: Pull root CA certificate content and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem?_gl=1*g93czk*_gcl_au*MzYzODYyMDk0LjE3NTE5MTgyMjY.
+        dest: /u/ibmuser/pduuroot.pem
+        mode: '600'
+        validate_certs: false
+      register: get_root_ca_digicert_pduu
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/pduuroot.pem
+        dest: IBMUSER.PDUU.ROOT
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: Pull EV Root CA
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertHighAssuranceEVRootCA.crt.pem?_gl=1*1i8mmrj*_gcl_au*MzYzODYyMDk0LjE3NTE5MTgyMjY.
+        dest: /u/ibmuser/pduuev.pem
+        mode: '600'
+        validate_certs: false
+      register: get_ev_digicert_pduu
+
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/pduuev.pem
+        dest: IBMUSER.PDUU.EV
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+          
+
+    - name: Setup RACF permissions and keyrings
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID(IBMUSER) ADDRING(pduu)
+          - RACDCERT ADD('IBMUSER.PDUU.ROOT') CERTAUTH TRUST WITHLABEL('DigiCert Global Root CA')
+          - RACDCERT ADD('IBMUSER.PDUU.G2CERT') CERTAUTH TRUST WITHLABEL('DigiCert Global Root G2')
+          - RACDCERT ADD('IBMUSER.PDUU.EV') CERTAUTH TRUST WITHLABEL('DigiCert High Ass EV Root CA')
+        max_rc: 4
+
+    - name: Connect certs to Key Ring and SETROPTS
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID(IBMUSER) CONNECT(RING(pduu) LABEL('DigiCert Global Root G2') CERTAUTH)
+          - RACDCERT ID(IBMUSER) CONNECT(RING(pduu) LABEL('DigiCert High Ass EV Root CA') CERTAUTH)
+          - RACDCERT ID(IBMUSER) CONNECT(RING(pduu) LABEL('DigiCert Global Root CA') CERTAUTH)
+          - RACDCERT ID(IBMUSER) LISTRING(pduu)
+          - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+          - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
+
+
+    - name: Order jcl.
+      ibm.ibm_zos_core.zos_job_submit:
+        location: LOCAL
+        src: templates/order.jcl.j2
+        use_template: true
+        wait_time_s: 1000
+        encoding:
+          from: UTF-8
+          to: IBM-037
+      register: orderjob
+
+    - name: Apply jcl.
+      ibm.ibm_zos_core.zos_job_submit:
+        location: LOCAL
+        src: templates/apply.jcl.j2
+        use_template: true
+        wait_time_s: 1000
+        encoding:
+          from: UTF-8
+          to: IBM-037
+      register: applyjob
+
+    - name: Submit z/OS operator command.
+      zos_operator:
+        cmd: "F LLA,REFRESH"
+        wait_time_s: 1
+        verbose: false
+      no_log: true
+      register: result_zos_operator

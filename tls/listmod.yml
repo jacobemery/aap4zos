@@ -1,0 +1,26 @@
+---
+- name: LISTMOD.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+
+#    - name: modify jobclass(a) to allow job submit
+#      ibm.ibm_zos_core.zos_operator:
+#        cmd: '\$tjobclass(a),syssym=allow'
+
+    - name: Submit listmod jcl.
+      ibm.ibm_zos_core.zos_job_submit:
+        location: LOCAL
+        src: templates/listmod.jcl.j2
+        use_template: true
+        wait_time_s: 500
+        encoding:
+          from: UTF-8
+          to: IBM-037
+      register: order
+
+    - name: Print JCL.
+      ansible.builtin.debug:
+        msg: "{{ order.jobs[0].content }}"
