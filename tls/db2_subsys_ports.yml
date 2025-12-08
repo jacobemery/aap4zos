@@ -12,12 +12,11 @@
         cmd: "-DBD1 STOP DB2"
         wait_time_s: 30
         verbose: true
-      no_log: true
       
     - name: Submit DSNTIJUL job for DBD1
       zos_job_submit:
         src: DB2.V13R1M0.NEW.SDSNSAMP(DSNTIJUL)
-        location: data_set
+        location: DATA_SET
         wait_time_s: 15
 
     - name: START DBD1 subsystem.
@@ -25,4 +24,3 @@
         cmd: "-DBD1 START DB2"
         wait_time_s: 30
         verbose: true
-      no_log: true
