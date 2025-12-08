@@ -188,6 +188,16 @@
           - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH
 
 
+    - name: Connect Signature certificate for Z Upgrade Agent
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT CERTAUTH ALTER(LABEL('STG Code Signing CA - G2')) TRUST
+          - SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
+          - RACDCERT ID(IBMUSER) CONNECT(CERTAUTH LABEL('STG Code Signing CA - G2') RING(SMPERING) USAGE(CERTAUTH) )
+          - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+          - SETROPTS RACLIST(DIGTCERT DIGTRING) REFRESH
+
+
     - name: Order jcl.
       ibm.ibm_zos_core.zos_job_submit:
         location: LOCAL
