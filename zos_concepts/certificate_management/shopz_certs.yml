@@ -1,0 +1,104 @@
+---
+
+- name: Stage digicert CA Certificates.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    user_password: "{{ user_cert_password }}"
+  tasks:
+    - name: Pull G2 root certificate and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem?_gl=1*n786pk*_gcl_au*NDc4NzU4NDQ5LjE3NDA0Mjg4MDI.
+        dest: /u/ibmuser/g2.pem
+        mode: '600'
+        validate_certs: false
+      register: get_g2_digicert
+      
+    - name: Create sequential data set from g2 cert in USS.
+      ibm.ibm_zos_core.zos_copy: 
+        src: /u/ibmuser/g2.pem
+        dest: IBMUSER.COMMON.G2CERT
+        force: true
+        remote_src: true
+        dest_data_set: 
+          type: SEQ
+          record_format: VB
+ 
+    - name: Pull root CA certificate content and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem?_gl=1*ea16w5*_gcl_au*NDc4NzU4NDQ5LjE3NDA0Mjg4MDI
+        dest: /u/ibmuser/digicert.pem
+        mode: '600'
+        validate_certs: false
+      register: get_root_ca_digicert
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/digicert.pem
+        dest: IBMUSER.COMMON.DIGICA
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: Copy ShopZ userCert from USS to dataset
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/userCert.p12
+        dest: IBMUSER.COMMON.SHOPZ
+        force: true
+        is_binary: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: create smpe directory
+      ansible.builtin.file:
+        path: /var/smpe/smpnts
+        state: directory
+        mode: '600'    
+
+    - name: create smpwkdir directory
+      ansible.builtin.file:
+        path: /var/smpe/smpwkdir
+        state: directory
+        mode: '600'
+    
+    - name: Setup RACF permissions and keyrings
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RDEFINE FACILITY IRR.DIGTCERT.ADD UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.ADDRING  UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.ALTER    UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.CONNECT  UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.LIST     UACC(NONE)
+          - RDEFINE FACILITY IRR.DIGTCERT.LISTRING UACC(NONE)
+          - PERMIT IRR.DIGTCERT.ADD CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.ADDRING  CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.ALTER    CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.CONNECT  CLASS(FACILITY) ID(IBMUSER) ACCESS(UPDATE)
+          - PERMIT IRR.DIGTCERT.LIST     CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - PERMIT IRR.DIGTCERT.LISTRING CLASS(FACILITY) ID(IBMUSER) ACCESS(READ)
+          - RACDCERT ID(IBMUSER) ADDRING(SMPERING)
+        max_rc: 4
+
+    - name: Define certificates to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - "RACDCERT ID(IBMUSER) ADD('IBMUSER.COMMON.SHOPZ') WITHLABEL('SMPE Client Certificate') PASSWORD('{{ user_password }}') TRUST"
+          - RACDCERT CERTAUTH ADD('IBMUSER.COMMON.G2CERT') WITHLABEL('DigiCert Global Root G2') TRUST
+          - RACDCERT CERTAUTH ADD('IBMUSER.COMMON.DIGICA') WITHLABEL('DigiCert Global Root CA') TRUST
+
+    - name: Connect certs to Key Ring and SETROPTS
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID(IBMUSER) CONNECT(LABEL('SMPE Client Certificate') RING(SMPERING) USAGE(CERTAUTH) )
+          - RACDCERT ID(IBMUSER) CONNECT( CERTAUTH LABEL('DigiCert Global Root G2') RING(SMPERING) USAGE(CERTAUTH) )
+          - RACDCERT ID(IBMUSER) CONNECT( CERTAUTH LABEL('DigiCert Global Root CA') RING(SMPERING) USAGE(CERTAUTH) )
+          - RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root G2'))
+          - RACDCERT CERTAUTH LIST(LABEL('DigiCert Global Root CA'))
+          - RACDCERT ID(IBMUSER) LIST(LABEL('SMPE Client Certificate'))
+          - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+          - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH

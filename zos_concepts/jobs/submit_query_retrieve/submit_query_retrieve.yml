@@ -138,7 +138,7 @@
     # +-------------------------------------------------------------------------
 
     - name: Submit the JCL {{ data_set_name }}(MEM1)
-      zos_job_submit:
+      ibm.ibm_zos_core.zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
         location: DATA_SET
       register: job_submit
