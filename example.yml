@@ -1,0 +1,49 @@
+- name: Example playbook for z/OS
+  hosts: zos_host
+  environment: "{{ environment_vars }}"
+  gather_facts: false
+  tasks:
+
+    - name: Gather facts for z/OS.
+      ibm.ibm_zos_core.zos_gather_facts:
+        gather_subset:
+          - ipl
+      register: zos_facts
+
+    - name: Print gathered facts.
+      ansible.builtin.debug:
+        msg: "{{ zos_facts }}"
+        verbosity: 1
+
+    - name: Execute a USS command.
+      ansible.builtin.command:
+        cmd: hostname
+      changed_when: false
+
+    - name: Execute TSO command.
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - LU IBMUSER
+      changed_when: false
+
+    - name: Execute an operator command.
+      ibm.ibm_zos_core.zos_operator:
+        cmd: D A,L
+      changed_when: false
+
+    - name: Submit JCL.
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ playbook_dir }}/zos_concepts/jobs/submit_query_retrieve/files/{{ job_name | upper }}.jcl"
+        location: LOCAL
+        wait_time_s: 60
+        encoding:
+          from: ISO8859-1
+          to: IBM-037
+      register: job_submit
+
+    - name: Ensure PDS is allocated.
+      tags: pds
+      ibm.ibm_zos_core.zos_data_set:
+        name: IBMUSER.ANSIB.DS
+        state: present
+        type: PDS
