@@ -35,7 +35,7 @@
         library: "{{ library }}"
         sms: true
         persistent:
-          data_set_name: SYS1.PARMLIB(PROG00)
+          data_set_name: SYS1.PARMLIB(PROG3A)
         state: present
 
     - name: Get APF list.
