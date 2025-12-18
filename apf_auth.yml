@@ -23,26 +23,27 @@
         space_type: cyl
         state: present
 
-    - name: Set dynamic libraries to the APF list.
+    - name: Ensure dynamic APF format.
       ibm.ibm_zos_core.zos_apf:
-        library: "{{ library }}"
-        sms: true
+        # library: "{{ library }}"
+        # sms: true
         operation: set_dynamic
-        state: present
+        # state: present
 
     - name: Get APF list to ensure idempotency.
       ibm.ibm_zos_core.zos_apf:
         operation: list
       register: apf_list
 
-    - name: Ensure APF list is persistent across IPLs.
+    - name: Ensure library is in APF list across IPLs.
       ibm.ibm_zos_core.zos_apf:
         library: "{{ library }}"
         sms: true
         persistent:
-          data_set_name: SYS1.PARMLIB(PROG3A)
-        state: present
+          data_set_name: SYS1.PARMLIB({{ item }})
+        # state: present
       when: library not in apf_list.stdout
+      loop: "{{ prog_mem_list }}"
 
     - name: Check APF list.
       ibm.ibm_zos_core.zos_apf:
