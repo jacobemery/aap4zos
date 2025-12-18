@@ -11,6 +11,18 @@
   #       volume: <vol_name>
   tasks:
 
+    - name: Allocate PDSE (let ACS assign SMS classes)
+      ibm.ibm_zos_core.zos_data_set:
+        name: "{{ library }}"
+        type: pdse
+        record_format: fb
+        record_length: 80
+        block_size: 0
+        space_primary: 20
+        space_secondary: 10
+        space_type: cyl
+        state: present
+
     - name: Add one or more libraries to the APF list.
       ibm.ibm_zos_core.zos_apf:
         library: "{{ library }}"
