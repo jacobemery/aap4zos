@@ -13,7 +13,8 @@
 
     - name: Add one or more libraries to the APF list.
       ibm.ibm_zos_core.zos_apf:
-        batch: "{{ batch_lib_list }}"
+        library: "{{ library }}"
+        sms: true
         operation: set_dynamic
         persistent:
           data_set_name: "SYS1.PARMLIB({{ item }})"
