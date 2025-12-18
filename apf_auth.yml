@@ -2,13 +2,6 @@
   hosts: zos_host
   environment: "{{ environment_vars }}"
   gather_facts: false
-  # Example list for batch_lib_list:
-  # vars:
-  #   batch_lib_list:
-  #     - library: <lib_name>
-  #       sms: true
-  #     - library: <lib_name>
-  #       volume: <vol_name>
   tasks:
 
     - name: Allocate PDSE (let ACS assign SMS classes)
