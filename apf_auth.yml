@@ -35,9 +35,8 @@
         library: "{{ library }}"
         sms: true
         persistent:
-          data_set_name: "SYS1.PARMLIB({{ item }})"
+          data_set_name: SYS1.PARMLIB(PROG00)
         state: present
-      loop: "{{ prog_mems_list }}"
 
     - name: Get APF list.
       ibm.ibm_zos_core.zos_apf:
