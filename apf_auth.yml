@@ -30,6 +30,11 @@
         operation: set_dynamic
         state: present
 
+    - name: Get APF list to ensure idempotency.
+      ibm.ibm_zos_core.zos_apf:
+        operation: list
+      register: apf_list
+
     - name: Ensure APF list is persistent across IPLs.
       ibm.ibm_zos_core.zos_apf:
         library: "{{ library }}"
@@ -37,12 +42,13 @@
         persistent:
           data_set_name: SYS1.PARMLIB(PROG3A)
         state: present
+      when: library not in apf_list.stdout
 
-    - name: Get APF list.
+    - name: Check APF list.
       ibm.ibm_zos_core.zos_apf:
         operation: list
       register: apf_list
-      failed_when: batch_lib_list.library not in apf_list.stdout
+      failed_when: library not in apf_list.stdout
 
     - name: Print APF list to terminal for visual verification.
       ansible.builtin.debug:
