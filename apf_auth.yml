@@ -37,7 +37,7 @@
         library: "{{ library }}"
         sms: true
         persistent:
-          data_set_name: SYS1.PARMLIB({{ item }})
+          data_set_name: "SYS1.PARMLIB({{ item }})"
       when: library not in apf_list.stdout
       loop: "{{ prog_mem_list }}"
 
