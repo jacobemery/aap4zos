@@ -23,11 +23,17 @@
         space_type: cyl
         state: present
 
-    - name: Add one or more libraries to the APF list.
+    - name: Set dynamic libraries to the APF list.
       ibm.ibm_zos_core.zos_apf:
         library: "{{ library }}"
         sms: true
         operation: set_dynamic
+        state: present
+
+    - name: Ensure APF list is persistent across IPLs.
+      ibm.ibm_zos_core.zos_apf:
+        library: "{{ library }}"
+        sms: true
         persistent:
           data_set_name: "SYS1.PARMLIB({{ item }})"
         state: present
