@@ -8,7 +8,7 @@
       ansible.builtin.command:
         cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
       changed_when: false
-      register: sys1_parmlib_cat_init
+      register: cat_init
       loop: "{{ prog_mem_list }}"
 
     - name: Print output of previous task for visual verification.
