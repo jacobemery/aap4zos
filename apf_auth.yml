@@ -13,7 +13,10 @@
 
     - name: Print output of previous task for visual verification.
       ansible.builtin.debug:
-        var: result.stdout_lines
+        msg:
+          - "item={{ result.item }}"
+          - "stdout_lines_type={{ result.stdout_lines | type_debug }}"
+          - "stdout_type={{ result.stdout | type_debug }}"
       loop: "{{ cat_init.results }}"
       loop_control:
         loop_var: result
@@ -67,7 +70,10 @@
 
     - name: Print output of previous task for visual verification.
       ansible.builtin.debug:
-        var: result.stdout_lines
+        msg:
+          - "item={{ result.item }}"
+          - "stdout_lines_type={{ result.stdout_lines | type_debug }}"
+          - "stdout_type={{ result.stdout | type_debug }}"
       loop: "{{ cat_end.results }}"
       loop_control:
         loop_var: result
