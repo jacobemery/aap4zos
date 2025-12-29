@@ -11,15 +11,10 @@
       register: cat_init
       loop: "{{ prog_mem_list }}"
 
-    - name: Print output of previous task for visual verification.
+    - name: Print stdout_lines for each member
       ansible.builtin.debug:
-        msg:
-          - "item={{ result.item }}"
-          - "stdout_lines_type={{ result.stdout_lines | type_debug }}"
-          - "stdout_type={{ result.stdout | type_debug }}"
-      loop: "{{ cat_init.results }}"
-      loop_control:
-        loop_var: result
+        msg: "{{ item.0.item }}: {{ item.1 }}"
+      loop: "{{ cat_init.results | subelements('stdout_lines', skip_missing=True) }}"
 
     - name: Allocate PDSE (let ACS assign SMS classes)
       ibm.ibm_zos_core.zos_data_set:
@@ -68,12 +63,7 @@
       register: cat_end
       loop: "{{ prog_mem_list }}"
 
-    - name: Print output of previous task for visual verification.
+    - name: Print stdout_lines for each member
       ansible.builtin.debug:
-        msg:
-          - "item={{ result.item }}"
-          - "stdout_lines_type={{ result.stdout_lines | type_debug }}"
-          - "stdout_type={{ result.stdout | type_debug }}"
-      loop: "{{ cat_end.results }}"
-      loop_control:
-        loop_var: result
+        msg: "{{ item.0.item }}: {{ item.1 }}"
+      loop: "{{ cat_end.results | subelements('stdout_lines', skip_missing=True) }}"
