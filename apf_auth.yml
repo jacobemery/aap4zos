@@ -4,6 +4,12 @@
   gather_facts: false
   tasks:
 
+    - name: "Before running tasks, display contents of SYS1.PARMLIB's member {{ prog_mem_list }}"
+      ansible.builtin.command:
+        cmd: "cat 'SYS1.PARMLIB({{ item }})'"
+      changed_when: false
+      loop: "{{ prog_mem_list }}"
+
     - name: Allocate PDSE (let ACS assign SMS classes)
       ibm.ibm_zos_core.zos_data_set:
         name: "{{ library }}"
@@ -43,3 +49,9 @@
     - name: Print APF list to terminal for visual verification.
       ansible.builtin.debug:
         var: apf_list.stdout
+
+    - name: "After running tasks, display contents of SYS1.PARMLIB's member {{ prog_mem_list }}"
+      ansible.builtin.command:
+        cmd: "cat 'SYS1.PARMLIB({{ item }})'"
+      changed_when: false
+      loop: "{{ prog_mem_list }}"
