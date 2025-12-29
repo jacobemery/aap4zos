@@ -13,9 +13,7 @@
 
     - name: Print output of previous task for visual verification.
       ansible.builtin.debug:
-        msg: |
-          {{ result.item }} =>
-          {{ (result.stdout_lines | default([])) | join('\n') }}
+        var: result.stdout_lines
       loop: "{{ cat_init.results }}"
       loop_control:
         loop_var: result
@@ -69,9 +67,7 @@
 
     - name: Print output of previous task for visual verification.
       ansible.builtin.debug:
-        msg: |
-          {{ result.item }} =>
-          {{ (result.stdout_lines | default([])) | join('\n') }}
+        var: result.stdout_lines
       loop: "{{ cat_end.results }}"
       loop_control:
         loop_var: result
