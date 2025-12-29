@@ -6,7 +6,7 @@
 
     - name: "Before running tasks, display contents of SYS1.PARMLIB's member {{ prog_mem_list }}"
       ansible.builtin.command:
-        cmd: "cat 'SYS1.PARMLIB({{ item }})'"
+        cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
       changed_when: false
       loop: "{{ prog_mem_list }}"
 
@@ -52,6 +52,6 @@
 
     - name: "After running tasks, display contents of SYS1.PARMLIB's member {{ prog_mem_list }}"
       ansible.builtin.command:
-        cmd: "cat 'SYS1.PARMLIB({{ item }})'"
+        cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
       changed_when: false
       loop: "{{ prog_mem_list }}"
