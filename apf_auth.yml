@@ -58,6 +58,7 @@
     - name: Print APF list to terminal for visual verification.
       ansible.builtin.debug:
         var: apf_list.stdout
+        verbosity: 1
 
     - name: After running tasks, execute display command.
       ansible.builtin.command:
