@@ -17,6 +17,7 @@
       loop: "{{ cat_init.results }}"
       loop_control:
         loop_var: result
+        label: result.item
 
     - name: Allocate PDSE (let ACS assign SMS classes)
       ibm.ibm_zos_core.zos_data_set:
@@ -71,3 +72,4 @@
       loop: "{{ cat_end.results }}"
       loop_control:
         loop_var: result
+        label: result.item
