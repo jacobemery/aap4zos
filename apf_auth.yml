@@ -13,7 +13,7 @@
 
     - name: Print stdout_lines for each member
       ansible.builtin.debug:
-        var: result.stdout_lines
+        msg: "{{ result.stdout_lines }}"
       loop: "{{ cat_init.results }}"
       loop_control:
         loop_var: result
@@ -68,7 +68,7 @@
 
     - name: Print stdout_lines for each member
       ansible.builtin.debug:
-        var: result.stdout_lines
+        msg: "{{ result.stdout_lines }}"
       loop: "{{ cat_end.results }}"
       loop_control:
         loop_var: result
