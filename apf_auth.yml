@@ -49,7 +49,7 @@
       when: library not in apf_list.stdout
       loop: "{{ prog_mem_list }}"
 
-    - name: Check APF list.
+    - name: Check APF list for dataset to ensure it has been added.
       ibm.ibm_zos_core.zos_apf:
         operation: list
       register: apf_list

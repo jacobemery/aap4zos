@@ -50,7 +50,7 @@
       when: library in apf_list.stdout
       loop: "{{ prog_mem_list }}"
 
-    - name: Check APF list.
+    - name: Check APF list for dataset to ensure it has been removed.
       ibm.ibm_zos_core.zos_apf:
         operation: list
       register: apf_list
