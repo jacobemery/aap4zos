@@ -4,14 +4,14 @@
   gather_facts: false
   tasks:
 
-    - name: "Before running tasks, execute display contents command of SYS1.PARMLIB's member {{ item }}"
+    - name: Before running tasks, execute display command.
       ansible.builtin.command:
         cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
       changed_when: false
       register: cat_init
       loop: "{{ prog_mem_list }}"
 
-    - name: Print stdout_lines for each member
+    - name: Print output from previous task for visual verification before making changes.
       ansible.builtin.debug:
         msg: "{{ result.stdout_lines }}"
       loop: "{{ cat_init.results }}"
@@ -59,14 +59,14 @@
       ansible.builtin.debug:
         var: apf_list.stdout
 
-    - name: "After running tasks, execute display contents command of SYS1.PARMLIB's member {{ item }}"
+    - name: After running tasks, execute display command.
       ansible.builtin.command:
         cmd: "cat \"//'SYS1.PARMLIB({{ item }})'\""
       changed_when: false
       register: cat_end
       loop: "{{ prog_mem_list }}"
 
-    - name: Print stdout_lines for each member
+    - name: Print output from previous task for visual verification after making changes.
       ansible.builtin.debug:
         msg: "{{ result.stdout_lines }}"
       loop: "{{ cat_end.results }}"
