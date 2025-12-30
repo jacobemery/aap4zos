@@ -56,7 +56,7 @@
       register: apf_list
       failed_when: library in apf_list.stdout
 
-    - name: Print APF list to terminal for visual verification.
+    - name: Print APF list to terminal for visual verification if verbosity is >= 1.
       ansible.builtin.debug:
         var: apf_list.stdout
         verbosity: 1
