@@ -56,10 +56,9 @@
       register: apf_list
       failed_when: library in apf_list.stdout
 
-    - name: Print APF list to terminal for visual verification if verbosity is >= 1.
+    - name: Print APF list to terminal for visual verification.
       ansible.builtin.debug:
         var: apf_list.stdout
-        verbosity: 1
 
     - name: After running tasks, execute display command.
       ansible.builtin.command:
