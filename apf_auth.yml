@@ -46,7 +46,7 @@
         operation: list
       register: apf_list
 
-    - name: Ensure library is in APF list across IPLs.
+    - name: Ensure library is in APF list across IPLs, avoiding duplicates in PROG00.
       ibm.ibm_zos_core.zos_apf:
         library: "{{ library }}"
         sms: true
