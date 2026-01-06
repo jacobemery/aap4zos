@@ -35,9 +35,11 @@
       ibm.ibm_zos_core.zos_apf:
         operation: set_dynamic
 
-    - name: Check APF list format.
+    - name: Check APF list format, fail when not 'DYAMIC'.
       ibm.ibm_zos_core.zos_apf:
         operation: check_format
+      register: format_check
+      failed_when: "'DYNAMIC' not in format_check.stdout_lines"
 
     - name: Get APF list to ensure idempotency.
       ibm.ibm_zos_core.zos_apf:
@@ -51,7 +53,9 @@
         force_dynamic: true
         persistent:
           data_set_name: "SYS1.PARMLIB({{ item }})"
-      when: library not in apf_list.stdout
+      when: 
+        - library not in apf_list.stdout 
+        - item != 'PROG00'
       loop: "{{ prog_mem_list }}"
 
     - name: Check APF list for dataset to ensure it has been added.
