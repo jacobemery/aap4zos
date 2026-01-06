@@ -35,6 +35,10 @@
       ibm.ibm_zos_core.zos_apf:
         operation: set_dynamic
 
+    - name: Check APF list format.
+      ibm.ibm_zos_core.zos_apf:
+        operation: check_format
+
     - name: Get APF list to ensure idempotency.
       ibm.ibm_zos_core.zos_apf:
         operation: list
@@ -44,6 +48,7 @@
       ibm.ibm_zos_core.zos_apf:
         library: "{{ library }}"
         sms: true
+        force_dynamic: true
         persistent:
           data_set_name: "SYS1.PARMLIB({{ item }})"
       when: library not in apf_list.stdout
