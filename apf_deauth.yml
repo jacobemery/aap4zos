@@ -47,7 +47,9 @@
         state: absent
         persistent:
           data_set_name: "SYS1.PARMLIB({{ item }})"
-      when: library in apf_list.stdout
+      when: 
+        - library not in apf_list.stdout 
+        - item != 'PROG00'
       loop: "{{ prog_mem_list }}"
 
     - name: Check APF list for dataset to ensure it has been removed.
