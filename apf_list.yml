@@ -1,4 +1,4 @@
-- name: Deauthorize library in APF.
+- name: List APF authorized libraries.
   hosts: zos_host
   environment: "{{ environment_vars }}"
   gather_facts: false
