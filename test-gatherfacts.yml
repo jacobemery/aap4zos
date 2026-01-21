@@ -1,0 +1,27 @@
+- name: Gather z/OS-specific facts.
+  hosts: new_zOS_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+    - name: Gather all facts about z/OS host.
+      ibm.ibm_zos_core.zos_gather_facts:
+
+    - name: Print gathered facts about the master catalog.
+      ansible.builtin.debug:
+        msg:
+          - "master catalog dsn: {{ ansible_facts.master_catalog_dsn }}"
+          - "master catalog volser: {{ ansible_facts.master_catalog_volser }}"
+
+    - name: Print only CPC and IODF info from gathered z/OS facts.
+      ansible.builtin.debug:
+        msg:
+          - "manufacturer: {{ cpc_nd_manufacturer }}"
+          - "model: {{ cpc_nd_model }}"
+          - "plant: {{ cpc_nd_plant }}"
+          - "iodf name: {{ iodf_name }}"
+          - "iodf config: {{ iodf_config }}"
+
+    - name: Print out all gathered facts about the z/OS host.
+      ansible.builtin.debug:
+        var: ansible_facts
