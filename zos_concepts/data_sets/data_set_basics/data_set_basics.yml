@@ -61,10 +61,10 @@
     - name: Create a sequential data set
       zos_data_set:
         name: "{{ data_set_name }}"
-        type: SEQ
+        type: seq
         state: present
         replace: true
-        format: FB
+        format: fb
         record_length: 100
         size: 5M
       register: result
