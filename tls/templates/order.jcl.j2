@@ -1,0 +1,34 @@
+//FIXUPDT  JOB (ACCT),REGION=0M
+//RECEIVE  EXEC PGM=GIMSMP
+//SMPCSI   DD DSN=SMPE.ZOS25.CSI,DISP=SHR
+//SMPNTS   DD PATH='/var/smpe/smpnts',PATHDISP=KEEP
+//SMPOUT   DD SYSOUT=*
+//SMPRPT   DD SYSOUT=*
+//SYSPRINT DD SYSOUT=*
+//SMPCNTL  DD *
+  SET       BOUNDARY(GLOBAL).
+  RECEIVE   SYSMODS HOLDDATA
+            ORDER(
+              ORDERSERVER(ORDRSRVR)
+              CLIENT(CLNTINFO)
+              CONTENT(
+                PTFS(UJ96006)
+              )
+              FORTGTZONES(TGT25)
+            )
+            DELETEPKG.
+/*
+//ORDRSRVR DD *
+  <ORDERSERVER
+     url="https://eccgw01.boulder.ibm.com/services/projects/ecc/ws/"
+   keyring="IBMUSER/SMPERING"
+   certificate="SMPE Client Certificate">
+  </ORDERSERVER>
+/*
+//CLNTINFO DD *
+  <CLIENT
+     downloadmethod="https"
+   javahome="/usr/lpp/java/java8/J8.0_64"
+   classpath="/usr/lpp/smp/classes">
+  </CLIENT>
+/*

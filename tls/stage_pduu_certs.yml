@@ -1,0 +1,81 @@
+---
+
+- name: Stage digicert certs for PDUU.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+    - name: Pull DigiCert Global CA G2 Cert
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalCAG2.crt.pem?_gl=1*1ng682l*_gcl_au*MzYzODYyMDk0LjE3NTE5MTgyMjY.
+        dest: /u/ibmuser/pduug2.pem
+        mode: '600'
+        validate_certs: false
+      register: get_g2_digicert_pduu
+      
+    - name: Create sequential data set from g2 cert in USS.
+      ibm.ibm_zos_core.zos_copy: 
+        src: /u/ibmuser/pduug2.pem
+        dest: IBMUSER.PDUU.G2CERT
+        force: true
+        remote_src: true
+        dest_data_set: 
+          type: SEQ
+          record_format: VB
+ 
+    - name: Pull root CA certificate content and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootCA.crt.pem?_gl=1*g93czk*_gcl_au*MzYzODYyMDk0LjE3NTE5MTgyMjY.
+        dest: /u/ibmuser/pduuroot.pem
+        mode: '600'
+        validate_certs: false
+      register: get_root_ca_digicert_pduu
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/pduuroot.pem
+        dest: IBMUSER.PDUU.ROOT
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+
+    - name: Pull EV Root CA
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertHighAssuranceEVRootCA.crt.pem?_gl=1*1i8mmrj*_gcl_au*MzYzODYyMDk0LjE3NTE5MTgyMjY.
+        dest: /u/ibmuser/pduuev.pem
+        mode: '600'
+        validate_certs: false
+      register: get_ev_digicert_pduu
+
+
+    - name: Create sequential data set from root CA in USS.
+      ibm.ibm_zos_core.zos_copy:
+        src: /u/ibmuser/pduuev.pem
+        dest: IBMUSER.PDUU.EV
+        force: true
+        remote_src: true
+        dest_data_set:
+          type: SEQ
+          record_format: VB
+          
+
+    - name: Setup RACF permissions and keyrings
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID(IBMUSER) ADDRING(pduu)
+          - RACDCERT ADD('IBMUSER.PDUU.ROOT') CERTAUTH TRUST WITHLABEL('DigiCert Global Root CA')
+          - RACDCERT ADD('IBMUSER.PDUU.G2CERT') CERTAUTH TRUST WITHLABEL('DigiCert Global Root G2')
+          - RACDCERT ADD('IBMUSER.PDUU.EV') CERTAUTH TRUST WITHLABEL('DigiCert High Ass EV Root CA')
+        max_rc: 4
+
+    - name: Connect certs to Key Ring and SETROPTS
+      ibm.ibm_zos_core.zos_tso_command:
+        commands:
+          - RACDCERT ID(IBMUSER) CONNECT(RING(pduu) LABEL('DigiCert Global Root G2') CERTAUTH)
+          - RACDCERT ID(IBMUSER) CONNECT(RING(pduu) LABEL('DigiCert High Ass EV Root CA') CERTAUTH)
+          - RACDCERT ID(IBMUSER) CONNECT(RING(pduu) LABEL('DigiCert Global Root CA') CERTAUTH)
+          - RACDCERT ID(IBMUSER) LISTRING(pduu)
+          - SETROPTS CLASSACT(DIGTCERT DIGTRING)
+          - SETROPTS RACLIST(FACILITY DIGTCERT DIGTRING) REFRESH

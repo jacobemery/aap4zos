@@ -1,0 +1,41 @@
+---
+- name: Run PDUU Job to submit dataset to a case
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars_prompt:
+    - name: transfer_id
+      prompt: "Please enter your transfer id"
+      private: false
+
+    - name: transfer_pw
+      prompt: "Please enter your transfer password"
+
+    - name: ds_to_send
+      prompt: "Please enter the dataset to send"
+      private: false
+
+    - name: case_num
+      prompt: "Please enter the case number to submit the dataset to"
+      private: false
+
+  tasks:
+    - name: FTP dump using template
+      ibm.ibm_zos_core.zos_job_submit:
+        src: "{{ playbook_dir }}/files/AMAPDUPL.j2"
+        location: LOCAL
+        use_template: true
+        wait_time_s: 7200
+      register: job_status
+
+    - name: Successful send
+      ansible.builtin.debug:
+        msg: |
+          Dump successfully uploaded to case {{ case_num }}
+      when: job_status["jobs"][0]["ret_code"]["msg_code"] == "0000"
+
+    - name: Unsuccessful send
+      ansible.builtin.debug:
+        msg: |
+          Job failed, view joblog for status
+      when: job_status["jobs"][0]["ret_code"]["msg_code"] != "0000"

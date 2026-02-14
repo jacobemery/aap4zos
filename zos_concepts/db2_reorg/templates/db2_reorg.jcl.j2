@@ -1,0 +1,18 @@
+//SAMPRG   JOB (D999,MISC),NOTIFY=&SYSUID,REGION=0M,
+//         CLASS=A
+//JOBLIB  DD  DSN=DB2.V12R1M0.SDSNLOAD,DISP=SHR
+//REORG   EXEC DSNUPROC,PARM='{{ sub | upper }},DSNTEX',COND=(4,LT)
+//DSNUPROC.SYSCOPY DD DSN={{ ansible_user | upper }}.{{ sub | upper }}.{{ db | upper }}.{{ ts | upper }}.IC.T&LHHMMSS,
+//             DISP=(NEW,CATLG),
+//             SPACE=(TRK,(60,6),RLSE),
+//             DSNTYPE=LARGE,
+//             UNIT=SYSDA
+//SORTOUT  DD  UNIT=SYSDA,SPACE=(4000,(20,20),,,ROUND)
+//DSNTRACE DD  SYSOUT=*
+//SYSUT1   DD  UNIT=SYSDA,SPACE=(4000,(50,50),,,ROUND)
+//SYSREC   DD  UNIT=SYSDA,SPACE=(4000,(200,200),,,ROUND)
+//SYSIN    DD  *
+  REORG TABLESPACE {{ db | upper }}.{{ ts | upper }}
+        SORTDEVT SYSDA  SORTNUM 4
+        COPYDDN(SYSCOPY)
+//* 

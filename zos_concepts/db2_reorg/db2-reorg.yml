@@ -1,0 +1,32 @@
+---
+- name: Submit Db2 re-org JCL.
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+
+    - name: modify jobclass(a) to allow job submit
+      ibm.ibm_zos_core.zos_operator:
+        cmd: '\$tjobclass(a),syssym=allow'
+
+    - name: Submit Db2 re-org JCL.
+      ibm.ibm_zos_core.zos_job_submit:
+        location: LOCAL
+        src: templates/db2_reorg.jcl.j2
+        use_template: true
+        encoding:
+          from: UTF-8
+          to: IBM-037
+      register: db2_reorg
+
+    - name: Print JCL.
+      ansible.builtin.debug:
+        msg: "{{ db2_reorg.jobs[0].ddnames[2].content }}"
+
+    - name: Print return code, job ID, and image copy dataset name.
+      ansible.builtin.debug:
+        msg:
+          - "Return Code: {{ db2_reorg.jobs[0].ret_code.code }}"
+          - "Job ID: {{ db2_reorg.jobs[0].job_id }}"
+          - "Image Copy DSN:{{ (db2_reorg.jobs[0].ddnames[2].content | select('search', 'RETAINED,  DDNAME=SYSCOPY')) | list | first | regex_replace('^IGD104I\\s+', '') | regex_replace('\\s+RETAINED.*', '') }}"
