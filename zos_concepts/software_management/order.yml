@@ -20,8 +20,12 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
 
+  vars:
+    ptf: "{{ ptf_name }}"
+    global_csi: "{{ global_csi | default('SMPE.PROGPROD.CSI') }}"
+    
   roles:
     - role: order_ptf
-      ptf: 'UI74491'
-      global_csi: 'IMSTESTL.ZOAU110.CSI'
-      smpe_root: '/var/zoau110'
+      ptf: "{{ ptf_name }}"
+      global_csi: "{{ global_csi }}"
+      smpe_root: '/var/smpe'

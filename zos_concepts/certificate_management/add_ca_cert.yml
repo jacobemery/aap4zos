@@ -1,11 +1,34 @@
 ---
 
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+  - copy:
+      dest: ~/pkcs12.p12
+      content: '{{ zos_cert_p12_tdes_base64 | b64decode }}'
+  - shell: 
+      cmd: cat ~/pkcs12.p12
+    register: out
+
+
 - name: Add staged CA cert to RACF.
   hosts: zos_host
   gather_facts: false
   environment: "{{ environment_vars }}"
   tasks:
+  
+    - name: Copy local p12 file to z/OS dataset
+      ibm.ibm_zos_core.zos_copy:
+        src: ~/pkcs12.p12
+        dest: IBMUSER.COMMON.P12PKG
+        force: true
+        is_binary: true 
+        dest_data_set:
+          type: SEQ
+          record_format: VB
 
+  
     - name: Create sequential data sets with z/OS certificates and intermediate CA content.
       ibm.ibm_zos_core.zos_copy:
         content: "{{ item.content }}"
@@ -28,16 +51,6 @@
         - { content: "{{ zos_cert }}", dest_name: /u/ibmuser/zos_cert.pem }
         - { content: "{{ zos_cert_key }}", dest_name: /u/ibmuser/zos_cert_private_key.pem }
 
-    # - name: Create sequential data set from staged pkcs12 package on controller.
-    #   ibm.ibm_zos_core.zos_copy:
-    #     src: ~/keyStore.p12
-    #     dest: IBMUSER.COMMON.P12PKG
-    #     force: true
-    #     dest_data_set:
-    #       type: SEQ
-    #       record_format: VB
-    #       record_length: 84
-
     - name: Pull root CA certificate content and save to file.
       ansible.builtin.get_url:
         url: https://letsencrypt.org/certs/isrgrootx1.pem
@@ -56,17 +69,6 @@
           type: SEQ
           record_format: VB
 
-    # - name: Create target sequential data set with certificate content.
-    #   ibm.ibm_zos_core.zos_data_set:
-    #     name: "{{ item }}"
-    #     force: true
-    #     type: SEQ
-    #     record_format: VB
-    #   loop:
-    #     - IBMUSER.COMMON.INTCERT.ENC
-    #     - IBMUSER.COMMON.ZCERT.ENC
-    #     - IBMUSER.COMMON.P12PKG
-
     - name: Add line to SYS1.PARMLIB(IZUPRM00) member to CSRF_SWITCH(OFF).
       ibm.ibm_zos_core.zos_lineinfile:
         src: SYS1.PARMLIB(IZUPRM00)
@@ -75,10 +77,12 @@
     - name: Delete existing Server cert in RACF keyring (ZOSMF_RING).
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT REMOVE(ID(IZUSVR) LABEL('VS01zOSMFCert') RING(ZOSMF_RING)) ID(IZUSVR)
+        max_rc: 4
 
-    - name: Delete existing CA cert in RACF keyring (ZOSMF_RING).
-      ibm.ibm_zos_core.zos_tso_command:
-        command: RACDCERT REMOVE(CERTAUTH LABEL('VSICA') RING(ZOSMF_RING)) ID(IZUSVR)
+    #- name: Delete existing CA cert in RACF keyring (ZOSMF_RING).
+    #  ibm.ibm_zos_core.zos_tso_command:
+    #    command: RACDCERT REMOVE(CERTAUTH LABEL('VSICA') RING(ZOSMF_RING)) ID(IZUSVR)
+    #    max_rc: 4
 
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
@@ -92,17 +96,17 @@
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT CERTAUTH ADD('IBMUSER.COMMON.INTCERT') WITHLABEL('INTERCERT') TRUST
 
-   # - name: Define Server/PKCS12 file to RACF
-   #   ibm.ibm_zos_core.zos_tso_command:
-   #     command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('WELCOME12')
+    - name: Define Server/PKCS12 dataset to RACF
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) ADD('IBMUSER.COMMON.P12PKG') WITHLABEL('SERVERCERT') PASSWORD('{{ zos_cert_p12_password }}')
 
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
 
-   # - name: Verify the certificate chain is complete
-   #   ibm.ibm_zos_core.zos_tso_command:
-   #     command: RACDCERT ID(IZUSVR) LISTCHAIN(LABEL('SERVERCERT'))
+    - name: Verify the certificate chain is complete
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) LISTCHAIN(LABEL('SERVERCERT'))
 
     - name: Connect ROOT CA certificate to key ring
       ibm.ibm_zos_core.zos_tso_command:
@@ -112,16 +116,25 @@
       ibm.ibm_zos_core.zos_tso_command:
         command: RACDCERT ID(IZUSVR) CONNECT(CERTAUTH LABEL('INTERCERT') RING(ZOSMF_RING))
 
-    # - name: Connect Server/PKCS12 certificate to key ring
-    #   ibm.ibm_zos_core.zos_tso_command:
-    #     command: RACDCERT ID(IZUSVR) CONNECT(LABEL('SERVERCERT') RING(ZOSMF_RING) DEFAULT)
+    - name: Connect Server/PKCS12 certificate to key ring
+      ibm.ibm_zos_core.zos_tso_command:
+        command: RACDCERT ID(IZUSVR) CONNECT(LABEL('SERVERCERT') RING(ZOSMF_RING) DEFAULT)
 
     - name: Issue a SETROPTS REFRESH to initialize changes
       ibm.ibm_zos_core.zos_tso_command:
         command: SETROPTS RACLIST(DIGTCERT, DIGTRING) REFRESH
 
-#### NEXT TASK: NEED TO ADD A TASK TO ADD A LINE TO THE SYS1.PARMLIB(IZUPRM00) MEMBER/DATASET --> ADD: "CSRF_SWITCH(OFF)"" AND SAVE IT
 
-#### DON'T ADD YET --> NEXT TASK: NEED TO ADD A TASK TO RUN THE FOLLOWING OPERATOR COMMANDS TO STOP AND RESTART IZUSVR1
-  # /P IZUSVR1
-  # /S IZUSVR1
+    - name: STOP z/OSMF Started task
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'P IZUSVR1'
+
+    - name: START z/OSMF Started task
+      ibm.ibm_zos_core.zos_operator:
+        cmd: 'S IZUSVR1'
+        wait_time_s: 15
+
+    - name: Print json to terminal
+      ansible.builtin.debug:
+        msg: "playbook completed"    
+

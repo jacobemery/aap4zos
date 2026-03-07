@@ -1,0 +1,60 @@
+---
+- name: Identify missing critical updates
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    zmf_host: "{{ ansible_host }}"
+    zmf_port: 10443
+    zmf_user: "{{ ansible_user }}"
+    zmf_password: "{{ zos_passphrase }}"
+    swi_name: "{{ swi_name_survey | default('CICS') }}"
+
+  tasks:
+    - name: Query missing critical updates
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi/VS01_004/{{ swi_name }}/missingcriticalupdates"
+        method: POST
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        body_format: json
+        body:
+          zosmfuid: "{{ zmf_user | trim }}"
+          zosmfpw: "{{ zmf_password | trim }}"
+        headers:
+          Host: "{{ zmf_host }}:10443"
+          Origin: "https://{{ zmf_host }}:10443"
+        validate_certs: false
+        return_content: true
+        status_code: "202"
+      register: critupdates
+      delegate_to: localhost
+      ignore_errors: true
+
+    - name: Pause for 5 seconds
+      ansible.builtin.pause:
+        seconds: 5
+        
+    - name: Retrieve missing critical updates
+      ansible.builtin.uri:
+        url: "{{ critupdates.json.statusurl }}"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        validate_certs: false
+        return_content: true
+        status_code: "200"
+      register: critupdates_output
+      delegate_to: localhost
+
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ critupdates_output.content }}"
+
+      
+
