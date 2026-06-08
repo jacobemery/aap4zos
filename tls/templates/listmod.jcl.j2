@@ -1,0 +1,9 @@
+//FIXUPDT  JOB (ACCT),REGION=0M
+//LISTIT   EXEC PGM=GIMSMP,PARM='DATE=U',REGION=0M   
+//SMPCSI   DD DISP=SHR,DSN=SMPE.ZOS25.CSI
+//SMPOUT   DD SYSOUT=*                               
+//SMPRPT   DD SYSOUT=*                               
+//SMPCNTL  DD *                                      
+   SET BOUNDARY(GLOBAL).                             
+   LIST MOD(AMAPDUPL)                               
+   ALLZONES.                                         

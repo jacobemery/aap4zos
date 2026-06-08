@@ -19,7 +19,7 @@
             type: text
       - dd_unix:
           dd_name: "SMPNTS"
-          path: "{{smpe_root}}/smpnts/"
+          path: "{{ smpe_root }}/smpnts/"
 
       - dd_input:
           dd_name: "SMPCNTL"
@@ -70,6 +70,12 @@
   when: receive_result is skipped or receive_result.ret_code.code <=4
   register: apply_check_result
 
+
+- name: display apply_check result 
+  debug:
+    msg: "{{ apply_check_result }}"
+
+    
 # APPLY
 - name: "Perform APPLY for {{ ptf }}"
   ibm.ibm_zos_core.zos_mvs_raw:
@@ -94,5 +100,11 @@
             \n)
             \nBYPASS(HOLDSYS,HOLDERROR)
             \nCOMPRESS(ALL) ."
+  register: apply_result
+  when: 
+    - apply_check_result.ret_code.code <= 4
+    - dry_run == false
 
-  when: apply_check_result.ret_code.code <= 4
+- name: display apply result 
+  debug:
+    msg: "{{ apply_result }}"

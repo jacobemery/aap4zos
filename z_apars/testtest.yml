@@ -1,0 +1,50 @@
+---
+- name: List exisiting software instances
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  vars:
+    #zmf_host: itzvsi-zos-pejjzea.techzone.ibm.com
+    zmf_host: "{{ ansible_host }}"
+    zmf_port: 10443
+    zmf_user: IBMUSER
+    #zmf_password: "{{ ansible_pass }}"
+    #user_id: "{{ my_username }}"
+    zmf_password: "{{ zos_passphrase }}"
+
+  tasks:
+
+
+   # - name: Do something with the credentials
+   #   ansible.builtin.debug:
+   #     msg: "{{ user_id }}"
+
+    - name: Do something with the credentials
+      ansible.builtin.debug:
+        msg: "{{ zmf_password }}"
+        
+
+        
+    - name: Get zosmf software instances
+      ansible.builtin.uri:
+        url: "https://{{ zmf_host }}:10443/zosmf/swmgmt/swi"
+        method: GET
+        user: "{{ zmf_user | trim }}"
+        password: "{{ zmf_password | trim }}"
+        force_basic_auth: true
+        headers:
+          Host: "{{ zmf_host }}"
+          Origin: "https://{{ zmf_host }}"
+        status_code: "200"
+        validate_certs: false
+        return_content: true
+      register: instance_data
+      delegate_to: localhost
+
+    - ansible.builtin.set_fact:
+        swi_list: '{{ instance_data.json.swilist }}'
+
+
+    - name: Print json data to terminal for visual verification.
+      ansible.builtin.debug:
+        msg: "{{ instance_data.json.swilist }}"

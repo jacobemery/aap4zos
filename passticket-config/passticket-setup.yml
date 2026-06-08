@@ -1,0 +1,23 @@
+---
+- name: Setup passticket support
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+  
+    - name: Add 'UGROUP' RACF group
+      ibm.ibm_zos_core.zos_tso_command:
+        command: AG UGROUP OMVS(GID(0) SHARED)
+
+    - name: Setup Passticket support
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: 
+          - SETROPTS CLASSACT(PTKTDATA) RACLIST(PTKTDATA) GENERIC(PTKTDATA)
+          - SETROPTS CLASSACT(IDIDMAP) RACLIST(IDIDMAP) GENERIC(IDIDMAP)
+          - SETROPTS CLASSACT(IDIDMAP) RACLIST(IDIDMAP) GENERIC(IDIDMAP)
+          - RDEFINE PTKTDATA IRRPTAUTH.IZUDFLT.* UACC(NONE)
+          - RDEFINE PTKTDATA IZUDFLT SSIGNON(KEYMASKED(4D494B4547495A55) TIMEOUT(2)) APPLDATA('NO REPLAY PROTECTION')
+          - PERMIT IRRPTAUTH.IZUDFLT.* CL(PTKTDATA) ID(UGROUP) ACCESS(UPDATE)    
+          - SETROPTS RACLIST(PTKTDATA) REFRESH                                   
+          - SETROPTS RACLIST(IDIDMAP) REFRESH                                    
+        max_rc: 4
