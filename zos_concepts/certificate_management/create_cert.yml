@@ -7,7 +7,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    owner_id: "{{ owner_id_survey | default('ZOSADMN') }}"
     cert_label: "{{ cert_label_survey | default('TESTSITE') }}"
     cert_type: "{{ cert_type_survey }}"
     sign_with: "{{ sign_with_survey | default('Self') }}"
