@@ -1,0 +1,9 @@
+- name: Ping z/OS host to ensure network connectivity.
+  hosts: new_zOS_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+    - name: Ping z/OS server using zos_ping module via SSH.
+      tags: ping, zos_ping
+      ibm.ibm_zos_core.zos_ping:

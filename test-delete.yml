@@ -1,0 +1,14 @@
+- name: delete existing smp/e file in /var/smpe/smpnts
+  hosts: zos_host
+  collections:
+    - ibm.ibm_zos_core
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+    - name: Pull G2 root certificate and save to file.
+      ansible.builtin.get_url:
+        url: https://cacerts.digicert.com/DigiCertGlobalRootG2.crt.pem?_gl=1*n786pk*_gcl_au*NDc4NzU4NDQ5LjE3NDA0Mjg4MDI.
+        dest: /u/ibmuser/g2.pem
+        mode: '600'
+        validate_certs: false
+      register: get_g2_digicert

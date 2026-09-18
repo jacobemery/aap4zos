@@ -13,16 +13,29 @@
           dd_name: "SMPCSI"
           data_set_name: "{{ global_csi }}"
 
-      - dd_output:
-          dd_name: "SMPOUT"
-          return_content:
-            type: text
+     # - dd_output:
+     #     dd_name: "SMPOUT"
+     #     return_content:
+     #       type: text
+      
       - dd_output:
           dd_name: "SMPLIST"
           return_content:
             type: text
+
+      - dd_output:
+          dd_name: "SMPRPT"
+          return_content:
+            type: text
+            
       - dd_input:
           dd_name: "SMPCNTL"
           content:
             - 'SET  BOUNDARY({{ zone }}) .'
             - 'LIST {{ list_operands }}'
+
+  register: smp_list_result
+
+- name: display smp_list_result
+  debug:
+    msg: "{{ smp_list_result }}"

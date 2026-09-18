@@ -1,0 +1,17 @@
+---
+- name: Start token exchange service
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+  
+    - name: Start token exchange service
+      ibm.ibm_zos_core.zos_tso_command:
+        commands: 
+          # - NEED A COMMAND HERE TO ALLOW AUTOGID
+          - ADDGROUP AUTTGRP OMVS(AUTOGID) DATA('WXA4Z GROUP')
+          - ADDUSER AUTTUSER NOPASSWORD DFLTGRP(AUTTGRP) OMVS(HOME(/tmp) PROGRAM(/bin/sh) AUTOUID) NAME('WXA4Z USER') DATA('WXA4Z Token Exchange Server')    
+          - DEFINE STARTED AUTTKNST.* STDATA(USER(AUTTUSER) GROUP(AUTTGRP) TRUSTED(NO)) DATA('WXA4Z Token Exchange Server') 
+          - SETROPTS RACLIST(STARTED) REFRESH
+          #- NEED OPERATOR COMMAND TO 'S AUTTKNST'
+        max_rc: 4

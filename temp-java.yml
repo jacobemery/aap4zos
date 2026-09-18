@@ -1,0 +1,27 @@
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: no
+  tasks:
+    - name: Pull Java pax file
+      ansible.builtin.get_url:
+        url: https://ibm.box.com/shared/static/jdj6ji726dgz3uozj5u0xn8pffiky5v0.z
+        dest: ~/ibm-semeru-certified-jdk_s390x_zos_17.0.15.0.pax.Z
+
+
+- name: Stage PAX to a dataset
+  hosts: zos_host
+  gather_facts: false
+  environment: "{{ environment_vars }}"
+  tasks:
+
+    - name: Copy local p12 file to z/OS dataset
+      ibm.ibm_zos_core.zos_copy:
+        src: ~/ibm-semeru-certified-jdk_s390x_zos_17.0.15.0.pax.Z
+        dest: IBMUSER.JAVA.PAX
+        force: true
+        is_binary: true 
+        dest_data_set:
+          type: SEQ
+          record_format: VB

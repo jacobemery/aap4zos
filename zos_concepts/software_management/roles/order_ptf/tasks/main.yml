@@ -47,18 +47,28 @@
           dd_name: "SMPCSI"
           data_set_name: "{{ global_csi }}"
           disposition: old
+ 
+      - dd_output:
+          dd_name: "SMPLIST"
+          return_content:
+            type: text
 
       - dd_output:
           dd_name: "SMPOUT"
           return_content:
             type: text
-      - dd_output:
-          dd_name: "SMPLIST"
-          return_content:
-            type: text
+    
       - dd_input:
           dd_name: "SMPCNTL"
           content:
             - 'SET  BOUNDARY(GLOBAL) .'
             - 'LIST SYSMOD({{ ptf }}) HOLDDATA .'
+  register: list_result
   when: order_result.ret_code.code <= 4
+
+- name: display list result
+  debug:
+    msg: "{{ list_result }}"
+  when: order_result.ret_code.code <= 4
+
+

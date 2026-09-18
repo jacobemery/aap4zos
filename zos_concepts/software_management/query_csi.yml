@@ -20,16 +20,15 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
 
+  vars:
+    ptf_name: "{{ ptf_name }}"
+    global_csi: "{{ global_csi | default('SMPE.PROGPROD.CSI') }}"
+
+    
   roles:
     - role: query_csi
-      ptf: 'UI70435'
-      global_csi: 'IMSTESTL.ZOAU100.CSI'
+      ptf:  "{{ ptf_name }}"
+      global_csi: "{{ global_csi }}"
       zone: GLOBAL
-      list_operands: 'SYSMOD({{ ptf }}) HOLDDATA .'
-      # ptf: 'UI70435'
-      # global_csi: 'IMSTESTL.ZOAU100.CSI'
-      # zone: TGT
-      # list_operands: 'SYSMOD({{ ptf }}) .'
-      # ptf: 'UI74491'
-      # zone: TGT
-      # list_operands: 'SYSMOD({{ ptf }}) .'
+      list_operands: 'SYSMOD({{ ptf }}) .'
+   
