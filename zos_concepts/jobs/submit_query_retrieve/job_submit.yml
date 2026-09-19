@@ -12,7 +12,7 @@
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ playbook_dir }}/files/{{ job_name }}.jcl"
         location: local
-        wait_time_s: 60
+        wait_time: 60
         encoding:
           from: ISO8859-1
           to: IBM-037

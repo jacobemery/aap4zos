@@ -6,14 +6,14 @@
   environment: "{{ environment_vars }}"
   vars:
     zos_operator_command: "{{ zos_operator_command_survey | default('D M=CPU') }}"
-    wait_time_s: "{{ wait_time_s_survey | default('1') }}"
+    wait_time: "{{ wait_time_survey | default('1') }}"
     verbose: "{{ verbose_survey | default('false') }}"
   tasks:
     - block:
       - name: Submit z/OS operator command.
         zos_operator:
           cmd: "{{ zos_operator_command  }}"
-          wait_time_s: "{{ wait_time_s }}"
+          wait_time: "{{ wait_time }}"
           verbose: "{{ verbose }}"
         no_log: true
         register: result_zos_operator
