@@ -2,40 +2,25 @@
 # © Copyright IBM Corporation 2020, 2021
 ###############################################################################
 # This sample playbook demonstrates basic data set operations using modules
-# included in the Red Hat Ansible Certified  Content for IBM Z core collection.
+# included in the Red Hat Ansible Certified Content for IBM Z core collection.
 #
 # Usage:
 #  ansible-playbook -i <inventory> <playbook>
 #
 # Example:
 #  ansible-playbook -i inventories data_set_basics.yml
-#  ansible-playbook -i inventories data_set_basics.yml -v
-#
-#  Additional facts for this playbook can be configured to override the defaults
-#  by reviewing the "Fact setting" section of this playbook, for example,
-#  `data_set_name` and `system_name`.
-#
-# Requirements:
-#   IBM z/OS core collection 1.2.0 or later
 #
 # Configure:
-#   tgt_tmp_dir - this is the USS directory on the target which will be written
-#                 to for this example.
+#   tgt_tmp_dir - USS directory on the target used for temporary files.
 #
 # Optional:
-#   data_set_name - this is the data set name that will be created during
-#                   execution of this sample.
-#   pds_name - this is the pds name that will be used during execution of this
-#              sample.
-#   system_name - this is the system name that will be used during this example,
-#                 determined by executing `uname -n` on the target.
+#   data_set_name - sequential data set created during execution.
+#   pds_name      - PDS created during execution.
 ###############################################################################
 
 ---
 
 - hosts: zos_host
-  collections:
-    - ibm.ibm_zos_core
   gather_facts: false
   vars:
     tgt_tmp_dir: "/tmp"
@@ -45,103 +30,91 @@
 
   tasks:
 
-    ############################################################################
-    # Modules zos_copy, zos_data_set, zos_fetch
-    ############################################################################
-    # +-------------------------------------------------------------------------
-    # | 1. Create a sequential data set
-    # | 2. Create a USS file and populate it with some data
-    # | 3. Copy the USS file to the sequential data set
-    # | 4. Create a PDS and a member within the PDS
-    # | 5. Copy the sequential data set to the PDS member
-    # | 6. Create a new PDS, replacing the existing one
-    # | 7. Delete all data sets that were created during playbook execution
-    # +-------------------------------------------------------------------------
-
-    - name: Create a sequential data set
-      zos_data_set:
+    - name: Create a sequential data set.
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ data_set_name }}"
         type: seq
         state: present
         replace: true
-        format: fb
+        record_format: fb
         record_length: 100
-        size: 5M
+        space_primary: 5
+        space_type: m
       register: result
 
-    - name: Response for data set creation
-      debug:
+    - name: Response for data set creation.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Remove old {{ tgt_tmp_dir }}/HELLO if it exists, for idempotency.
-      file:
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
       register: result
 
     - name: Response for USS file deletion.
-      debug:
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy HELLO.jcl from project to USS file.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ playbook_dir }}/files/HELLO.jcl"
         dest: "{{ tgt_tmp_dir }}/HELLO"
       register: result
 
-    - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO
-        on target {{ inventory_hostname }}
-      debug:
+    - name: Response for populating USS file {{ tgt_tmp_dir }}/HELLO.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Copy the USS file to the sequential data set.
-      zos_copy:
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ tgt_tmp_dir }}/HELLO"
         dest: "{{ data_set_name }}"
         remote_src: true
       register: result
 
-    - name: Response for copying USS file to data set
-      debug:
+    - name: Response for copying USS file to data set.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Create a PDS
-      zos_data_set:
+    - name: Create a PDS.
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}"
         type: pds
-        size: 5M
-        format: fba
+        space_primary: 5
+        space_type: m
+        record_format: fba
         record_length: 100
       register: result
 
-    - name: Response for creating the PDS
-      debug:
+    - name: Response for creating the PDS.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
     - name: Remove the target PDS member if it exists, for idempotency.
-      zos_data_set:
+      ibm.ibm_zos_core.zos_data_set:
         name: "{{ pds_name }}(HELLO)"
         type: member
         state: absent
       register: result
 
-    - name: Response for creating the PDS member
-      debug:
+    - name: Response for removing the PDS member.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Copy the sequential data set to PDS member
-      zos_copy:
+    - name: Copy the sequential data set to PDS member.
+      ibm.ibm_zos_core.zos_copy:
         src: "{{ data_set_name }}"
         dest: "{{ pds_name }}(HELLO)"
         remote_src: true
       register: result
 
-    - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO)
-      debug:
+    - name: Response for copying {{ data_set_name }} to {{ pds_name }}(HELLO).
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Delete the data sets
-      zos_data_set:
+    - name: Delete the data sets.
+      ibm.ibm_zos_core.zos_data_set:
         batch:
           - name: "{{ data_set_name }}"
             state: absent
@@ -149,26 +122,24 @@
             state: absent
       register: result
 
-    - name: Response for deleting the data sets
-      debug:
+    - name: Response for deleting the data sets.
+      ansible.builtin.debug:
         msg: "{{ result }}"
 
-    - name: Clean up {{ tgt_tmp_dir }}
-      file:
+    - name: Clean up {{ tgt_tmp_dir }}/HELLO.
+      ansible.builtin.file:
         path: "{{ tgt_tmp_dir }}/HELLO"
         state: absent
 
     - name: List tasks this playbook completed.
-      debug:
+      ansible.builtin.debug:
         msg:
           - "#########################################################################"
-          - "z/OS modules used: zos_copy, zos_data_set, zos_fetch"
+          - "z/OS modules used: zos_copy, zos_data_set"
           - "-------------------------------------------------------------------------"
           - "1. Create a sequential data set"
-          - "2. Create a USS file and populate it with some data"
-          - "3. Copy the USS file to the sequential data set"
-          - "4. Create a PDS and a member within the PDS"
-          - "5. Copy the sequential data set to the PDS member"
-          - "6. Create a new PDS, replacing the existing one"
-          - "7. Delete all data sets that were created during playbook execution"
+          - "2. Copy a USS file to the sequential data set"
+          - "3. Create a PDS and a member within the PDS"
+          - "4. Copy the sequential data set to the PDS member"
+          - "5. Delete all data sets created during playbook execution"
           - "#########################################################################"
