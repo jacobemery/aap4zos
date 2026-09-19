@@ -19,6 +19,17 @@
     today: ''
 
   tasks:
+    - name: Start Health Checker if not already active.
+      tags: search_and_renew, search, run_hc
+      ibm.ibm_zos_core.zos_operator:
+        cmd: "S HZSPROC"
+      ignore_errors: true
+
+    - name: Wait for Health Checker to initialise.
+      tags: search_and_renew, search, run_hc
+      ansible.builtin.pause:
+        seconds: 10
+
     - name: Run health check via operator command.
       tags: search_and_renew, search, run_hc
       ibm.ibm_zos_core.zos_operator:
