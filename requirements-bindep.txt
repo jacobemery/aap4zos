@@ -1,0 +1,2 @@
+# Intentionally empty — prevents introspection from pulling in system deps
+# unavailable on s390x (e.g. libsystemd from community.general).

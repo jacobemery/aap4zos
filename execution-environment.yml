@@ -8,6 +8,11 @@ images:
 dependencies:
   galaxy: requirements.yml
   python: requirements-python.txt
+  system: requirements-bindep.txt
+
+additional_build_steps:
+  prepend_builder:
+    - RUN /usr/bin/microdnf install -y systemd-devel || true
 
 options:
   package_manager_path: /usr/bin/microdnf
