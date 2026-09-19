@@ -9,7 +9,6 @@ dependencies:
   galaxy: requirements.yml
   ansible_core:
     package_pip: ansible-core>=2.15
-  ansible_runner:
   python_interpreter:
     package_system: "python3"
     python_path: "/usr/bin/python3"
