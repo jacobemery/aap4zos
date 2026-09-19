@@ -7,7 +7,7 @@
   gather_facts: false
   environment: "{{ environment_vars }}"
   vars:
-    owner_id: "{{ owner_id_survey | default('IBMUSER') }}"
+    owner_id: "{{ owner_id_survey | default('ZOSADMN') }}"
     keyring: "{{ keyring_survey | default('SharedRing1') }}"
 
   tasks:

@@ -36,7 +36,7 @@
   vars:
     tgt_tmp_dir: "/tmp"
     job_name: "HELLO"
-    data_set_name: "IBMUSER.JOBS.DEMO"
+    data_set_name: "ZOSADMN.JOBS.DEMO"
   environment: "{{ environment_vars }}"
 
   tasks:
@@ -140,7 +140,7 @@
     - name: Submit the JCL {{ data_set_name }}(MEM1)
       zos_job_submit:
         src: "{{ data_set_name }}(MEM{{ item }})"
-        location: DATA_SET
+        location: data_set
       register: job_submit
       with_sequence: count=1
 
@@ -191,7 +191,7 @@
             in {{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}
       ibm.ibm_zos_core.zos_job_submit:
         src: "{{ tgt_tmp_dir }}/ansible/jcl/{{ job_name }}"
-        location: USS
+        location: uss
       register: job_submit_uss
 
     - name: Response for submit {{ job_name }} JCL located on target
