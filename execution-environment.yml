@@ -3,16 +3,10 @@ version: 3
 
 images:
   base_image:
-    name: registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:latest
+    name: registry.redhat.io/ansible-automation-platform-26/ee-minimal-rhel9:latest
 
 dependencies:
   galaxy: requirements.yml
-  python: requirements-python.txt
-  system: requirements-bindep.txt
-
-additional_build_steps:
-  prepend_builder:
-    - RUN /usr/bin/microdnf install -y systemd-devel || true
 
 options:
   package_manager_path: /usr/bin/microdnf

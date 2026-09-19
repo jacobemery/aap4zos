@@ -1,3 +1,0 @@
-# Intentionally empty — prevents ansible-builder introspection from pulling
-# in optional Python deps from collections that require system libraries
-# unavailable on s390x (e.g. libsystemd from community.general).
