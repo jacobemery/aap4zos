@@ -3,16 +3,16 @@ version: 3
 
 images:
   base_image:
-    name: registry.redhat.io/ansible-automation-platform-24/ee-supported-rhel8:latest
+    name: registry.redhat.io/ansible-automation-platform-26/ee-supported-rhel9:latest
 
 dependencies:
   galaxy: requirements.yml
   ansible_core:
-    package_pip: ansible-core==2.14.2
+    package_pip: ansible-core>=2.15
   ansible_runner:
-  package_pip: ansible-runner==2.3.1
+    package_pip: ansible-runner>=2.3
   python_interpreter:
-    package_system: "python39"
+    package_system: "python3"
     python_path: "/usr/bin/python3"
 
 options:
