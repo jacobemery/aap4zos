@@ -28,7 +28,7 @@
     - name: Wait for Health Checker to initialise.
       tags: search_and_renew, search, run_hc
       ansible.builtin.pause:
-        seconds: 10
+        seconds: 30
 
     - name: Run health check via operator command.
       tags: search_and_renew, search, run_hc
