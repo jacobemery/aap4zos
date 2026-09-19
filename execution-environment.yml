@@ -10,7 +10,6 @@ dependencies:
   ansible_core:
     package_pip: ansible-core>=2.15
   ansible_runner:
-    package_pip: ansible-runner>=2.3
   python_interpreter:
     package_system: "python3"
     python_path: "/usr/bin/python3"
