@@ -121,7 +121,7 @@
     - name: Remove the target PDS member if it exists, for idempotency.
       zos_data_set:
         name: "{{ pds_name }}(HELLO)"
-        type: MEMBER
+        type: member
         state: absent
       register: result
 
